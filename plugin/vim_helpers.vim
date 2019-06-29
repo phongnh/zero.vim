@@ -71,6 +71,18 @@ endif
         return shellescape(escaped_selection)
     endfunction
 
+    function! GetSearchTextForGrepper() range abort
+        let selection = @/
+
+        if selection ==# "\n" || empty(selection)
+            return ''
+        endif
+
+        " Escape some characters
+        let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
+        return '"' . escaped_selection . '"'
+    endfunction
+
     function! GetSearchTextForCtrlSF() range abort
         let selection = @/
 
