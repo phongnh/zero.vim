@@ -78,6 +78,8 @@ endif
             return ''
         endif
 
+        let selection = substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+
         " Escape some characters
         let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
         return '"' . escaped_selection . '"'
@@ -89,6 +91,8 @@ endif
         if selection ==# "\n" || empty(selection)
             return ''
         endif
+
+        let selection = substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 
         " Escape some characters
         let escaped_selection = escape(selection, '"%#*$')
