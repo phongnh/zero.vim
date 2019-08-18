@@ -180,6 +180,23 @@ command! -nargs=? -complete=file LGrepCword LGrep '\b<cword>\b' <args>
 command! -bar -nargs=1 BGrep silent! lgrep! <args> % | lwindow | redraw!
 command! -nargs=0 BGrepCword BGrep '\b<cword>\b'
 
+" Replace typographic characters
+" Copied from https://github.com/srstevenson/dotfiles
+function! <sid>replace_typographic_characters() abort
+    let l:map = {}
+    let l:map['–'] = '--'
+    let l:map['—'] = '---'
+    let l:map['‘'] = "'"
+    let l:map['’'] = "'"
+    let l:map['“'] = '"'
+    let l:map['”'] = '"'
+    let l:map['•'] = '*'
+    let l:map['…'] = '...'
+    execute ':%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
+endfunction
+
+command! -bar ReplaceTypographicCharacters call <sid>replace_typographic_characters()
+
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg --hidden --vimgrep --smart-case'
