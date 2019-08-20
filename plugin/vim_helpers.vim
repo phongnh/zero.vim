@@ -199,11 +199,19 @@ command! -bar ReplaceTypographicCharacters call <sid>replace_typographic_charact
 
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
-    let &grepprg = 'rg --hidden --vimgrep --smart-case'
+    let &grepprg = 'rg -H --no-heading --hidden --vimgrep --smart-case'
+
+    if get(g:, 'grep_ignore_vcs', 0)
+        let &grepprg .= ' --no-ignore-vcs'
+    endif
 elseif executable('ag')
     " https://github.com/ggreer/the_silver_searcher
     let s:default_vcs_ignore = '--ignore ''.git'' --ignore ''.hg'' --ignore ''.svn'' --ignore ''.bzr'''
     let &grepprg = 'ag --hidden --vimgrep --smart-case' . s:default_vcs_ignore
+
+    if get(g:, 'grep_ignore_vcs', 0)
+        let &grepprg .= ' --skip-vcs-ignores'
+    endif
 endif
 set grepformat=%f:%l:%c:%m,%f:%l:%m
 
