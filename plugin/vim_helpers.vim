@@ -7,6 +7,8 @@ if get(g:, 'loaded_vim_helpers', 0)
     finish
 endif
 
+let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
+
 " Search Helpers {{{
     function! GetSelectedText() range abort
         " Save the current register and clipboard
@@ -217,43 +219,165 @@ set grepformat=%f:%l:%c:%m,%f:%l:%m
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
+" Log command
+function! s:LogCommand(cmd, ...) abort
+    if !g:vim_helpers_debug
+        return
+    endif
+
+    let cwd = get(a:, 1, '')
+    let cmd = a:cmd
+
+    if strlen(cwd) && cwd != '.'
+        let cmd = printf('[%s] %s', cwd, cmd)
+    endif
+
+    echomsg cmd
+endfunction
+
+function! s:CloseWindowAndDeleteBuffer() abort
+    " Close the current window, deleting buffers that are no longer displayed.
+    set bufhidden=wipe
+    bwipeout!
+endfunction
+
+function! s:SystemRun(cmd, ...) abort
+    let cwd = get(a:, 1, '')
+
+    if strlen(cwd)
+        let cmd = printf('cd %s && %s', fnameescape(cwd), a:cmd)
+    else
+        let cmd = a:cmd
+    endif
+
+    try
+        call s:LogCommand(cmd, cwd)
+        return system(cmd)
+    catch /E684/
+    endtry
+
+    return ''
+endfunction
+
+function! s:TermopenRun(cmd, cwd) abort
+    let cmd = a:cmd
+    let cwd = a:cwd
+
+    let l:opts = {
+                \ 'on_stderr': 'bdelete!',
+                \ }
+
+    function! l:opts.on_exit(job_id, data, event) abort
+        call s:CloseWindowAndDeleteBuffer()
+    endfunction
+
+    if strlen(cwd)
+        let l:opts['cwd'] = cwd
+    endif
+
+    call s:LogCommand(cmd, cwd)
+    call termopen(cmd, l:opts)
+endfunction
+
+function! s:TermStartRun(cmd, cwd) abort
+    let cmd = a:cmd
+    let cwd = a:cwd
+
+    let l:opts = {
+                \ 'hidden': 1,
+                \ 'norestore': 1,
+                \ 'term_finish': 'close!',
+                \ }
+
+    function! l:opts.on_exit(job_id, data, event) abort
+        call s:CloseWindowAndDeleteBuffer()
+    endfunction
+
+    if strlen(cwd)
+        let l:opts['cwd'] = cwd
+    endif
+
+    call s:LogCommand(cmd, cwd)
+    call term_start(cmd, l:opts)
+endfunction
+
 " Git helpers
+function! s:FindGitRepo() abort
+    if exists('b:git_dir') && strlen(b:git_dir)
+        return b:git_dir
+    endif
+
+    let path = expand('%:p:h')
+    if empty(path)
+        let path = getcwd()
+    endif
+
+    let git_dir = finddir('.git', path . ';')
+    if strlen(git_dir)
+        let b:git_dir = fnamemodify(git_dir, ':p:h')
+    endif
+
+    return git_dir
+endfunction
+
 function! s:InGitRepo() abort
-    let git = finddir('.git', getcwd() . ';')
-    return strlen(git)
+    return strlen(s:FindGitRepo())
+endfunction
+
+function! s:GitWorkTree() abort
+    if exists('b:git_dir')
+        return fnamemodify(b:git_dir, ':h:p')
+    endif
+    return ''
 endfunction
 
 function! s:ListGitBranches(A, L, P) abort
-    if s:InGitRepo() && executable('git')
-        let output = system("git branch -a | cut -c 3-")
-        let output = substitute(output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
-        let output = substitute(output, 'remotes/', '', 'g')
-        return output
+    if s:InGitRepo()
+        try
+            let output = s:SystemRun('git branch -a | cut -c 3-', s:GitWorkTree())
+            let output = substitute(output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
+            let output = substitute(output, 'remotes/', '', 'g')
+            return output
+        catch
+            return ''
+        endtry
     else
         return ''
     endif
 endfunction
 
 function! s:BuildPath(path) abort
-    return empty(a:path) ? expand("%") : a:path
+    return empty(a:path) ? expand('%') : a:path
 endfunction
 
-let s:has_uniq = executable('uniq')
+function! s:ConvertPath(git_dir, path) abort
+    let repo_dir = fnamemodify(a:git_dir, ':h:p') . '/'
+    let path = fnamemodify(a:path, ':p')
+    let path = substitute(path, repo_dir, '', 'g')
+    return path
+endfunction
+
+let s:git_full_log_cmd = 'git log --name-only --format= --follow -- %s'
+
+if executable('uniq')
+    let s:git_full_log_cmd .= ' | uniq'
+endif
+
 function! s:GitFullHistoryCommand(path) abort
-    let cmd = 'git log --name-only --format= --follow %s'
-    if s:has_uniq
-        let cmd .= ' | uniq'
-    endif
-    let cmd = '$(' . cmd . ')'
-    return printf(cmd, shellescape(a:path))
+    return printf('$(' . s:git_full_log_cmd . ')', shellescape(a:path))
 endfunction
 
 function! s:ParseRef(line) abort
-    if strlen(a:line)
-        let line = substitute(a:line, '^\s\+', '', '')
-        let line = substitute(line, '\s\+$', '', '')
-        let ref = get(split(line, ' '), 0, '')
-        if strlen(ref) && (ref !~# '^0\{7,\}$') && (ref =~# '^[a-z0-9]\{7,\}$')
+    if empty(a:line)
+        return
+    endif
+    let line = substitute(a:line, '^\s\+', '', '')
+    let line = substitute(line, '\s\+$', '', '')
+    let ref = get(split(line, ' '), 0, '')
+    if strlen(ref) && (ref !~# '^0\{7,\}$') && ref =~# '^\^\?[a-z0-9]\{7,\}$'
+        if ref[0] == '^'
+            return printf('"$(git show --summary --format=format:%%h %s)"', ref)
+        else
             return ref
         endif
     endif
@@ -262,14 +386,14 @@ endfunction
 
 " Gitk
 if executable('gitk')
-    let s:gitk_cmd = 'silent! !gitk %s'
-
+    let s:gitk_cmd = 'gitk %s'
     if !s:is_windows
         let s:gitk_cmd .= ' &'
     endif
 
     function! s:RunGitk(options) abort
-        execute printf(s:gitk_cmd, a:options)
+        let cmd = printf(s:gitk_cmd, a:options)
+        call s:SystemRun(cmd, s:GitWorkTree())
         redraw!
     endfunction
 
@@ -286,10 +410,12 @@ if executable('gitk')
                 return
             endif
 
+            let path = s:ConvertPath(b:git_dir, path)
+
             if a:bang
                 call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
             else
-                call s:RunGitk(shellescape(path))
+                call s:RunGitk('-- ' . shellescape(path))
             endif
         endif
     endfunction
@@ -301,9 +427,6 @@ if executable('gitk')
 
     function! s:GitkRef(line) abort
         let ref = s:ParseRef(a:line)
-        if empty(ref)
-            return
-        endif
         call s:RunGitk(ref)
     endfunction
 
@@ -319,21 +442,25 @@ endif
 
 " Tig
 if executable('tig')
+    let s:tig_cmd = 'tig %s'
+
     if has('nvim')
-        augroup CommandHelpersTigNVim
-            autocmd!
-            autocmd TermClose term://*tig* tabclose
-        augroup END
+        " augroup CommandHelpersTigNVim
+        "     autocmd!
+        "     autocmd TermClose term://*tig* tabclose
+        " augroup END
 
         function! s:RunTig(options) abort
-            let cmd = printf('tig %s', a:options)
+            let cmd = printf(s:tig_cmd, a:options)
+            let cwd = s:GitWorkTree()
             tabnew
-            call termopen(cmd)
+            call s:TermopenRun(cmd, cwd)
             startinsert
         endfunction
     elseif !has('gui_running')
         function! s:RunTig(options) abort
-            execute printf('silent! !tig %s', a:options)
+            let cmd = printf(s:tig_cmd, a:options)
+            call s:SystemRun(cmd, s:GitWorkTree())
             redraw!
         endfunction
     else
@@ -353,37 +480,47 @@ if executable('tig')
             if empty(path)
                 return
             endif
+
+            let path = s:ConvertPath(b:git_dir, path)
+
             if a:bang
                 call s:RunTig('-- ' . s:GitFullHistoryCommand(path))
             else
-                call s:RunTig(shellescape(path))
+                call s:RunTig('-- ' . shellescape(path))
             endif
         endif
     endfunction
 
-    function! s:TigBlame(path, blame) abort
+    function! s:TigBlame(path) abort
         if s:InGitRepo()
             let path = s:BuildPath(a:path)
             if empty(path)
                 return
             endif
+
+            let path = s:ConvertPath(b:git_dir, path)
+
             call s:RunTig('blame -- ' . shellescape(path))
+        endif
+    endfunction
+
+    function! s:TigStatus() abort
+        if s:InGitRepo()
+            call s:RunTig('status')
         endif
     endfunction
 
     command! -nargs=? -complete=custom,<SID>ListGitBranches Tig call <SID>Tig(<q-args>)
     command! -nargs=? -bang -complete=file TigFile call <SID>TigFile(<q-args>, <bang>0)
-    command! -nargs=? -bang -complete=file TigBlame call <SID>TigBlame(<q-args>, <bang>0)
+    command! -nargs=? -complete=file TigBlame call <SID>TigBlame(<q-args>)
+    command! -nargs=? TigStatus call <SID>TigStatus()
 
-    nnoremap <silent> gC :Tig status<CR>
+    nnoremap <silent> gC :TigStatus<CR>
     nnoremap <silent> gL :TigFile<CR>
     nnoremap <silent> gB :TigBlame<CR>
 
     function! s:TigShow(line) abort
         let ref = s:ParseRef(a:line)
-        if empty(ref)
-            return
-        endif
         call s:RunTig('show ' . ref)
     endfunction
 
