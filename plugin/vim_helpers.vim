@@ -182,7 +182,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     " Clear the permanent highlights
     command! ClearHightlights call clearmatches()
 
-    if get(g:, 'highlight_mappings', 1)
+    if get(g:, 'highlight_mappings', 0)
         nnoremap <silent> <Leader>hl :HighlightLine<CR>
         nnoremap <silent> <Leader>hw :HighlightWord<CR>
         nnoremap <silent> <Leader>hv :HighlightColumns<CR>
