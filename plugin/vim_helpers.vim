@@ -33,6 +33,12 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         endif
     endfunction
 
+    function! s:TrimNewLines(text) abort
+        let text = substitute(a:text, '^\n\+', '', 'g')
+        let text = substitute(text, '\n\+$', '', 'g')
+        return text
+    endfunction
+
     function! GetSelectedTextForSubstitute() range abort
         let selection = GetSelectedText()
 
@@ -46,9 +52,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     endfunction
 
     function! GetSelectedTextForAg() range abort
-        let selection = GetSelectedText()
-        let selection = substitute(selection, '^\n\+', '', 'g')
-        let selection = substitute(selection, '\n\+$', '', 'g')
+        let selection = s:TrimNewLines(GetSelectedText())
 
         if empty(selection)
             return ''
@@ -60,9 +64,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     endfunction
 
     function! GetSelectedTextForGrepper() range abort
-        let selection = GetSelectedText()
-        let selection = substitute(selection, '^\n\+', '', 'g')
-        let selection = substitute(selection, '\n\+$', '', 'g')
+        let selection = s:TrimNewLines(GetSelectedText())
 
         if empty(selection)
             return ''
@@ -73,14 +75,30 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         return shellescape(escaped_selection)
     endfunction
 
-    function! GetSearchTextForGrepper() range abort
+    function! GetSelectedTextForFerret() range abort
+        let selection = s:TrimNewLines(GetSelectedText())
+
+        if empty(selection)
+            return ''
+        endif
+
+        " Escape some characters
+        let escaped_selection = escape(selection, '\^$.*+?()[]{}| ')
+        return escaped_selection
+    endfunction
+
+    function! s:GetSearchText() range abort
         let selection = @/
 
         if selection ==# "\n" || empty(selection)
             return ''
         endif
 
-        let selection = substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+        return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    endfunction
+
+    function! GetSearchTextForGrepper() range abort
+        let selection = s:GetSearchText()
 
         " Escape some characters
         let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
@@ -88,17 +106,19 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     endfunction
 
     function! GetSearchTextForCtrlSF() range abort
-        let selection = @/
-
-        if selection ==# "\n" || empty(selection)
-            return ''
-        endif
-
-        let selection = substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+        let selection = s:GetSearchText()
 
         " Escape some characters
         let escaped_selection = escape(selection, '"%#*$')
         return '"' . escaped_selection . '"'
+    endfunction
+
+    function! GetSearchTextForFerret() range abort
+        let selection = s:GetSearchText()
+
+        " Escape some characters
+        let escaped_selection = escape(selection, '\^$.*+?()[]{}| ')
+        return escaped_selection
     endfunction
 
     function! GetWordForSubstitute() abort
