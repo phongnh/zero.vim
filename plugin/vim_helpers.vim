@@ -192,15 +192,18 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
 " Grep
 command! -bar -nargs=+ -complete=file Grep silent! grep! <args> | cwindow | redraw!
-command! -nargs=? -complete=file GrepCword Grep '\b<cword>\b' <args>
+command! -nargs=? -complete=file GrepCCword Grep -w '<cword>' <args>
+command! -nargs=? -complete=file GrepCword Grep '<cword>' <args>
 
 " LGrep
 command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
-command! -nargs=? -complete=file LGrepCword LGrep '\b<cword>\b' <args>
+command! -nargs=? -complete=file LGrepCCword LGrep -w '<cword>' <args>
+command! -nargs=? -complete=file LGrepCword LGrep '<cword>' <args>
 
 " BGrep
 command! -bar -nargs=1 BGrep silent! lgrep! <args> % | lwindow | redraw!
-command! -nargs=0 BGrepCword BGrep '\b<cword>\b'
+command! -nargs=0 BGrepCCword BGrep -w '<cword>'
+command! -nargs=0 BGrepCword BGrep '<cword>'
 
 " Replace typographic characters
 " Copied from https://github.com/srstevenson/dotfiles
