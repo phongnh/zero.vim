@@ -10,6 +10,32 @@ endif
 let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
 " Search Helpers {{{
+    function! s:TrimNewLines(text) abort
+        let text = substitute(a:text, '^\n\+', '', 'g')
+        let text = substitute(text, '\n\+$', '', 'g')
+        return text
+    endfunction
+
+    function! s:ShellEscape(text) abort
+        if empty(a:text)
+            return ''
+        endif
+
+        " Escape some characters
+        let escaped_text = escape(a:text, '\^$.*+?()[]{}|')
+        return shellescape(escaped_text)
+    endfunction
+
+    function! s:GetSearchText()
+        let selection = @/
+
+        if selection ==# "\n" || empty(selection)
+            return ''
+        endif
+
+        return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    endfunction
+
     function! GetSelectedText() range abort
         " Save the current register and clipboard
         let reg_save     = getreg('"')
@@ -33,10 +59,24 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         endif
     endfunction
 
-    function! s:TrimNewLines(text) abort
-        let text = substitute(a:text, '^\n\+', '', 'g')
-        let text = substitute(text, '\n\+$', '', 'g')
-        return text
+    function! GetSelectedTextForShell() range abort
+        let selection = s:TrimNewLines(GetSelectedText())
+        return s:ShellEscape(selection)
+    endfunction
+
+    function! GetSearchTextForShell()
+        let search = s:GetSearchText()
+        return s:ShellEscape(search)
+    endfunction
+
+    function! GetWordForSubstitute() abort
+        let cword = expand('<cword>')
+
+        if empty(cword)
+            return ''
+        else
+            return cword . '/'
+        endif
     endfunction
 
     function! GetSelectedTextForSubstitute() range abort
@@ -49,86 +89,6 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         let escaped_selection = substitute(escaped_selection, '\n', '\\n', 'g')
 
         return escaped_selection
-    endfunction
-
-    function! GetSelectedTextForAg() range abort
-        let selection = s:TrimNewLines(GetSelectedText())
-
-        if empty(selection)
-            return ''
-        endif
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
-        return shellescape(escaped_selection)
-    endfunction
-
-    function! GetSelectedTextForGrepper() range abort
-        let selection = s:TrimNewLines(GetSelectedText())
-
-        if empty(selection)
-            return ''
-        endif
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
-        return shellescape(escaped_selection)
-    endfunction
-
-    function! GetSelectedTextForFerret() range abort
-        let selection = s:TrimNewLines(GetSelectedText())
-
-        if empty(selection)
-            return ''
-        endif
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '\^$.*+?()[]{}| ')
-        return escaped_selection
-    endfunction
-
-    function! s:GetSearchText() range abort
-        let selection = @/
-
-        if selection ==# "\n" || empty(selection)
-            return ''
-        endif
-
-        return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
-    endfunction
-
-    function! GetSearchTextForGrepper() range abort
-        let selection = s:GetSearchText()
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '\^$.*+?()[]{}|')
-        return '"' . escaped_selection . '"'
-    endfunction
-
-    function! GetSearchTextForCtrlSF() range abort
-        let selection = s:GetSearchText()
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '"%#*$')
-        return '"' . escaped_selection . '"'
-    endfunction
-
-    function! GetSearchTextForFerret() range abort
-        let selection = s:GetSearchText()
-
-        " Escape some characters
-        let escaped_selection = escape(selection, '\^$.*+?()[]{}| ')
-        return escaped_selection
-    endfunction
-
-    function! GetWordForSubstitute() abort
-        let cword = expand("<cword>")
-
-        if empty(cword)
-            return ''
-        else
-            return cword . '/'
-        endif
     endfunction
 " }}}
 
