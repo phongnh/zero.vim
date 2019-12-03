@@ -192,7 +192,7 @@ if executable('rg')
 elseif executable('ag')
     " https://github.com/ggreer/the_silver_searcher
     let s:default_vcs_ignore = '--ignore ''.git'' --ignore ''.hg'' --ignore ''.svn'' --ignore ''.bzr'''
-    let &grepprg = 'ag --hidden --vimgrep --smart-case' . s:default_vcs_ignore
+    let &grepprg = 'ag --hidden --vimgrep --smart-case ' . s:default_vcs_ignore
 
     if get(g:, 'grep_ignore_vcs', 0)
         let &grepprg .= ' --skip-vcs-ignores'
