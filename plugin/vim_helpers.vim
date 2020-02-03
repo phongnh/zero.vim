@@ -199,7 +199,7 @@ elseif executable('ag')
 endif
 set grepformat=%f:%l:%c:%m,%f:%l:%m
 
-let s:rg_filetype_mappings = {
+let s:rg_default_filetype_mappings = {
             \ 'bash':            'sh',
             \ 'javascript':      'js',
             \ 'javascript.jsx':  'js',
@@ -208,19 +208,9 @@ let s:rg_filetype_mappings = {
             \ 'python':          'py',
             \ }
 
-function! s:GetRgKnownFileTypes() abort
-    if exists('s:rg_known_filetypes')
-        return
-    endif
+let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
 
-    try
-        let s:rg_known_filetypes = systemlist("rg --type-list | cut -d ':' -f 1")
-    catch
-        let s:rg_known_filetypes = []
-    endtry
-endfunction
-
-let s:ag_filetype_mappings = {
+let s:ag_default_filetype_mappings = {
             \ 'bash':            'shell',
             \ 'javascript':      'js',
             \ 'javascript.jsx':  'js',
@@ -229,49 +219,9 @@ let s:ag_filetype_mappings = {
             \ 'zsh':             'shell',
             \ }
 
-function! s:GetAgKnownFileTypes() abort
-    if exists('s:ag_known_filetypes')
-        return
-    endif
+let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
 
-    try
-        let s:ag_known_filetypes = systemlist("ag --list-file-types | grep '\-\-' | cut -d '-' -f 3")
-    catch
-        let s:ag_known_filetypes = []
-    endtry
-endfunction
-
-function! s:ParseFileTypeOption() abort
-    let ext = expand('%:e')
-
-    if &grepprg =~# '^rg '
-        let ft = get(s:rg_filetype_mappings, &filetype, &filetype)
-        call s:GetRgKnownFileTypes()
-
-        if strlen(ft) && index(s:rg_known_filetypes, ft) >= 0
-            return printf("-t %s", ft)
-        elseif strlen(ext)
-            return printf("-g '*.%s'", ext)
-        endif
-    elseif &grepprg =~# '^ag '
-        let ft = get(s:ag_filetype_mappings, &filetype, &filetype)
-        call s:GetAgKnownFileTypes()
-
-        if strlen(ft) && index(s:ag_known_filetypes, ft) >= 0
-            return printf("--%s", ft)
-        elseif strlen(ext)
-            return printf("-G '.%s$'", ext)
-        endif
-    elseif &grepprg =~# '^grep '
-        if strlen(ext)
-            return printf("--include='*.%s'", ext)
-        endif
-    endif
-
-    return ''
-endfunction
-
-command! -nargs=+ -complete=dir GrepWithFileType execute printf("Grep %s <args>", <SID>ParseFileTypeOption())
+command! -nargs=+ -complete=dir GrepWithFileType execute printf("Grep %s <args>", vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]))
 command! -nargs=? -complete=dir GrepWithFileTypeCCword GrepWithFileType -w <cword> <args>
 command! -nargs=? -complete=dir GrepWithFileTypeCword GrepWithFileType <cword> <args>
 
