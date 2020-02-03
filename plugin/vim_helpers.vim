@@ -8,6 +8,16 @@ endif
 
 let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
+if exists('*trim')
+    function! s:strip(str) abort
+        return trim(a:str)
+    endfunction
+else
+    function! s:strip(str) abort
+        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
+    endfunction
+endif
+
 " Search Helpers {{{
     function! s:TrimNewLines(text) abort
         let text = substitute(a:text, '^\n\+', '', 'g')
@@ -221,9 +231,9 @@ let s:ag_default_filetype_mappings = {
 
 let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
 
-command! -nargs=+ -complete=dir GrepWithFileType execute printf("Grep %s <args>", vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]))
-command! -nargs=? -complete=dir GrepWithFileTypeCCword GrepWithFileType -w <cword> <args>
-command! -nargs=? -complete=dir GrepWithFileTypeCword GrepWithFileType <cword> <args>
+command! -nargs=+ -complete=dir FTGrep execute printf(<SID>strip("Grep %s <args>"), vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]))
+command! -nargs=? -complete=dir FTGrepCCword FTGrep -w '<cword>' <args>
+command! -nargs=? -complete=dir FTGrepCword FTGrep '<cword>' <args>
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
