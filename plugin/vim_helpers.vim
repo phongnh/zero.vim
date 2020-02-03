@@ -21,11 +21,11 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         endif
 
         " Escape some characters
-        let escaped_text = escape(a:text, '\^$.*+?()[]{}|')
+        let escaped_text = escape(a:text, '^$.*+?()[]{}|')
         return shellescape(escaped_text)
     endfunction
 
-    function! s:GetSearchText()
+    function! s:GetSearchText() abort
         let selection = @/
 
         if selection ==# "\n" || empty(selection)
@@ -63,7 +63,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         return s:ShellEscape(selection)
     endfunction
 
-    function! GetSearchTextForShell()
+    function! GetSearchTextForShell() abort
         let search = s:GetSearchText()
         return s:ShellEscape(search)
     endfunction
@@ -98,7 +98,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     endif
 
     " Copy path to clipboard
-    function! s:copy_path_to_clipboard(path)
+    function! s:copy_path_to_clipboard(path) abort
         let @" = a:path
         if has('clipboard')
             let [@*, @+] = [@", @"]
@@ -106,7 +106,7 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
         echo 'Copied: ' . @"
     endfunction
 
-    function! s:copy_path(path, line)
+    function! s:copy_path(path, line) abort
         let path = expand(a:path)
         if a:line
             let path .= ':' . line('.')
@@ -190,7 +190,7 @@ if executable('rg')
     endif
 elseif executable('ag')
     " https://github.com/ggreer/the_silver_searcher
-    let s:default_vcs_ignore = '--ignore ''.git'' --ignore ''.hg'' --ignore ''.svn'' --ignore ''.bzr'''
+    let s:default_vcs_ignore = "--ignore '.git' --ignore '.hg' --ignore '.svn' --ignore '.bzr'"
     let &grepprg = 'ag --hidden --vimgrep --smart-case ' . s:default_vcs_ignore
 
     if get(g:, 'grep_ignore_vcs', 0)
