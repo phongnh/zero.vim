@@ -2,7 +2,6 @@
 " Maintainer: Phong Nguyen
 " Version:    0.1.0
 
-let g:loaded_vim_helpers = 0
 if get(g:, 'loaded_vim_helpers', 0)
     finish
 endif
@@ -519,4 +518,4 @@ command! -bang SW w<bang> !sudo tee >/dev/null %
 " Clear terminal console
 command! -bar Cls execute 'silent! !clear' | redraw!
 
-let g:loaded_vim_helpers = '0.1.0'
+let g:loaded_vim_helpers = 1
