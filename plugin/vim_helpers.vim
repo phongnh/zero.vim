@@ -149,24 +149,9 @@ let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
     endif
 " }}}
 
-" Grep
-command! -bar -nargs=+ -complete=file Grep silent! grep! <args> | cwindow | redraw!
-command! -nargs=? -complete=file GrepCCword Grep -w '<cword>' <args>
-command! -nargs=? -complete=file GrepCword Grep '<cword>' <args>
-
-" LGrep
-command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
-command! -nargs=? -complete=file LGrepCCword LGrep -w '<cword>' <args>
-command! -nargs=? -complete=file LGrepCword LGrep '<cword>' <args>
-
-" BGrep
-command! -bar -nargs=1 BGrep silent! lgrep! <args> % | lwindow | redraw!
-command! -nargs=0 BGrepCCword BGrep -w '<cword>'
-command! -nargs=0 BGrepCword BGrep '<cword>'
-
 " Replace typographic characters
 " Copied from https://github.com/srstevenson/dotfiles
-function! <sid>replace_typographic_characters() abort
+function! <SID>replace_typographic_characters() abort
     let l:map = {}
     let l:map['–'] = '--'
     let l:map['—'] = '---'
@@ -179,7 +164,22 @@ function! <sid>replace_typographic_characters() abort
     execute ':%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
 endfunction
 
-command! -bar ReplaceTypographicCharacters call <sid>replace_typographic_characters()
+command! -bar ReplaceTypographicCharacters call <SID>replace_typographic_characters()
+
+" Grep
+command! -bar -nargs=+ -complete=file Grep silent! grep! <args> | redraw! | cwindow
+command! -nargs=? -complete=file GrepCCword Grep -w '<cword>' <args>
+command! -nargs=? -complete=file GrepCword Grep '<cword>' <args>
+
+" LGrep
+command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | redraw! | lwindow
+command! -nargs=? -complete=file LGrepCCword LGrep -w '<cword>' <args>
+command! -nargs=? -complete=file LGrepCword LGrep '<cword>' <args>
+
+" BGrep
+command! -bar -nargs=1 BGrep silent! lgrep! <args> % | redraw! | lwindow
+command! -nargs=0 BGrepCCword BGrep -w '<cword>'
+command! -nargs=0 BGrepCword BGrep '<cword>'
 
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
