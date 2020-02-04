@@ -8,99 +8,6 @@ endif
 
 let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
-if exists('*trim')
-    function! s:strip(str) abort
-        return trim(a:str)
-    endfunction
-else
-    function! s:strip(str) abort
-        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
-    endfunction
-endif
-
-" Search Helpers {{{
-    function! s:TrimNewLines(text) abort
-        let text = substitute(a:text, '^\n\+', '', 'g')
-        let text = substitute(text, '\n\+$', '', 'g')
-        return text
-    endfunction
-
-    function! s:ShellEscape(text) abort
-        if empty(a:text)
-            return ''
-        endif
-
-        " Escape some characters
-        let escaped_text = escape(a:text, '^$.*+?()[]{}|')
-        return shellescape(escaped_text)
-    endfunction
-
-    function! s:GetSearchText() abort
-        let selection = @/
-
-        if selection ==# "\n" || empty(selection)
-            return ''
-        endif
-
-        return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
-    endfunction
-
-    function! GetSelectedText() range abort
-        " Save the current register and clipboard
-        let reg_save     = getreg('"')
-        let regtype_save = getregtype('"')
-        let cb_save      = &clipboard
-        set clipboard&
-
-        " Put the current visual selection in the " register
-        normal! ""gvy
-
-        let selection = getreg('"')
-
-        " Put the saved registers and clipboards back
-        call setreg('"', reg_save, regtype_save)
-        let &clipboard = cb_save
-
-        if selection ==# "\n"
-            return ''
-        else
-            return selection
-        endif
-    endfunction
-
-    function! GetSelectedTextForShell() range abort
-        let selection = s:TrimNewLines(GetSelectedText())
-        return s:ShellEscape(selection)
-    endfunction
-
-    function! GetSearchTextForShell() abort
-        let search = s:GetSearchText()
-        return s:ShellEscape(search)
-    endfunction
-
-    function! GetWordForSubstitute() abort
-        let cword = expand('<cword>')
-
-        if empty(cword)
-            return ''
-        else
-            return cword . '/'
-        endif
-    endfunction
-
-    function! GetSelectedTextForSubstitute() range abort
-        let selection = GetSelectedText()
-
-        " Escape regex characters
-        let escaped_selection = escape(selection, '^$.*\/~[]')
-
-        " Escape the line endings
-        let escaped_selection = substitute(escaped_selection, '\n', '\\n', 'g')
-
-        return escaped_selection
-    endfunction
-" }}}
-
 " Copy Commands {{{
     if has('clipboard')
         " Copy yanked text to clipboard
@@ -182,9 +89,7 @@ function! s:GrepCword(cmd, word_boundary, qargs) abort
     else
         let cword = vim_helpers#CwordForGrep()
     endif
-    let cmd = a:cmd . ' ' . cword . ' ' . a:qargs
-    echomsg 'cmd = ' cmd
-    execute s:strip(cmd)
+    execute vim_helpers#strip(a:cmd . ' ' . cword . ' ' . a:qargs)
 endfunction
 
 " Grep
@@ -244,7 +149,7 @@ let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_
 
 function! s:FTGrep(qargs) abort
     let cmd = printf('Grep %s %s', vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]), a:qargs)
-    execute s:strip(cmd)
+    execute vim_helpers#strip(cmd)
 endfunction
 
 function! s:FTGrepCword(cmd, word_boundary, qargs) abort

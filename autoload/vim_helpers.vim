@@ -109,7 +109,7 @@ function! vim_helpers#SelectedTextForSubstitute() range abort
     return escaped_selection
 endfunction
 
-function! vim_helpers#GetRgKnownFileTypes() abort
+function! vim_helpers#RgKnownFileTypes() abort
     if executable('rg')
         try
             return systemlist("rg --type-list | cut -d ':' -f 1")
@@ -120,7 +120,7 @@ function! vim_helpers#GetRgKnownFileTypes() abort
     return []
 endfunction
 
-function! vim_helpers#GetAgKnownFileTypes() abort
+function! vim_helpers#AgKnownFileTypes() abort
     if executable('ag')
         try
             return systemlist("ag --list-file-types | grep '\-\-' | cut -d '-' -f 3")
@@ -135,14 +135,14 @@ function! s:SetRgKnownFileTypes() abort
     if exists('g:rg_known_filetypes')
         return
     endif
-    let g:rg_known_filetypes = vim_helpers#GetRgKnownFileTypes()
+    let g:rg_known_filetypes = vim_helpers#RgKnownFileTypes()
 endfunction
 
 function! s:SetAgKnownFileTypes() abort
     if exists('g:ag_known_filetypes')
         return
     endif
-    let g:ag_known_filetypes = vim_helpers#GetAgKnownFileTypes()
+    let g:ag_known_filetypes = vim_helpers#AgKnownFileTypes()
 endfunction
 
 function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
