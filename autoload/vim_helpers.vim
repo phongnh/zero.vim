@@ -126,7 +126,7 @@ function! s:AgKnownFileTypes() abort
         return g:ag_known_filetypes
     endif
     if executable('ag')
-        let g:ag_known_filetypes = systemlist("ag --list-file-types | grep '\-\-' | cut -d '-' -f 3")
+        let g:ag_known_filetypes = systemlist("ag --list-file-types | grep '\\-\\-' | cut -d '-' -f 3")
     else
         let g:ag_known_filetypes = []
     endif
