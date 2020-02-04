@@ -176,20 +176,31 @@ endfunction
 
 command! -bar ReplaceTypographicCharacters call <SID>replace_typographic_characters()
 
+function! s:GrepCword(cmd, word_boundary, qargs) abort
+    if a:word_boundary
+        let cword = vim_helpers#CCwordForGrep()
+    else
+        let cword = vim_helpers#CwordForGrep()
+    endif
+    let cmd = a:cmd . ' ' . cword . ' ' . a:qargs
+    echomsg 'cmd = ' cmd
+    execute s:strip(cmd)
+endfunction
+
 " Grep
-command! -bar -nargs=+ -complete=file Grep silent! grep! <args> | redraw! | cwindow
-command! -nargs=? -complete=file GrepCCword Grep -w '<cword>' <args>
-command! -nargs=? -complete=file GrepCword Grep '<cword>' <args>
+command! -bar -nargs=+ -complete=file Grep       silent! grep! <args> | redraw! | cwindow
+command!      -nargs=? -complete=file GrepCCword call <SID>GrepCword('Grep', 1, <q-args>)
+command!      -nargs=? -complete=file GrepCword  call <SID>GrepCword('Grep', 0, <q-args>)
 
 " LGrep
-command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | redraw! | lwindow
-command! -nargs=? -complete=file LGrepCCword LGrep -w '<cword>' <args>
-command! -nargs=? -complete=file LGrepCword LGrep '<cword>' <args>
+command! -bar -nargs=+ -complete=file LGrep       silent! lgrep! <args> | redraw! | lwindow
+command!      -nargs=? -complete=file LGrepCCword call <SID>GrepCword('LGrep', 1, <q-args>)
+command!      -nargs=? -complete=file LGrepCword  call <SID>GrepCword('LGrep', 0, <q-args>)
 
 " BGrep
-command! -bar -nargs=1 BGrep silent! lgrep! <args> % | redraw! | lwindow
-command! -nargs=0 BGrepCCword BGrep -w '<cword>'
-command! -nargs=0 BGrepCword BGrep '<cword>'
+command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
+command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
+command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
 
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
@@ -231,9 +242,19 @@ let s:ag_default_filetype_mappings = {
 
 let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
 
-command! -nargs=+ -complete=dir FTGrep execute printf(<SID>strip("Grep %s <args>"), vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]))
-command! -nargs=? -complete=dir FTGrepCCword FTGrep -w '<cword>' <args>
-command! -nargs=? -complete=dir FTGrepCword FTGrep '<cword>' <args>
+function! s:FTGrep(qargs) abort
+    let cmd = printf('Grep %s %s', vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]), a:qargs)
+    execute s:strip(cmd)
+endfunction
+
+function! s:FTGrepCword(cmd, word_boundary, qargs) abort
+    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0])
+    call s:GrepCword(cmd, a:word_boundary, a:qargs)
+endfunction
+
+command! -nargs=+ -complete=dir FTGrep       call <SID>FTGrep(<q-args>)
+command! -nargs=? -complete=dir FTGrepCCword call <SID>FTGrepCword('Grep', 1, '')
+command! -nargs=? -complete=dir FTGrepCword  call <SID>FTGrepCword('Grep', 0, '')
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
