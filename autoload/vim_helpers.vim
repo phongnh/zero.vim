@@ -109,59 +109,61 @@ function! vim_helpers#SelectedTextForSubstitute() range abort
     return escaped_selection
 endfunction
 
-function! vim_helpers#RgKnownFileTypes() abort
-    if executable('rg')
-        try
-            return systemlist("rg --type-list | cut -d ':' -f 1")
-        catch
-            return []
-        endtry
-    endif
-    return []
-endfunction
-
-function! vim_helpers#AgKnownFileTypes() abort
-    if executable('ag')
-        try
-            return systemlist("ag --list-file-types | grep '\-\-' | cut -d '-' -f 3")
-        catch
-            return []
-        endtry
-    endif
-    return []
-endfunction
-
-function! s:SetRgKnownFileTypes() abort
+function! s:RgKnownFileTypes() abort
     if exists('g:rg_known_filetypes')
-        return
+        return g:rg_known_filetypes
     endif
-    let g:rg_known_filetypes = vim_helpers#RgKnownFileTypes()
+    if executable('rg')
+        let g:rg_known_filetypes = systemlist("rg --type-list | cut -d ':' -f 1")
+    else
+        let g:rg_known_filetypes = []
+    endif
+    return g:rg_known_filetypes
 endfunction
 
-function! s:SetAgKnownFileTypes() abort
+function! s:AgKnownFileTypes() abort
     if exists('g:ag_known_filetypes')
-        return
+        return g:ag_known_filetypes
     endif
-    let g:ag_known_filetypes = vim_helpers#AgKnownFileTypes()
+    if executable('ag')
+        let g:ag_known_filetypes = systemlist("ag --list-file-types | grep '\-\-' | cut -d '-' -f 3")
+    else
+        let g:ag_known_filetypes = []
+    endif
+    return g:ag_known_filetypes
+endfunction
+
+function! vim_helpers#RgFileType(ft) abort
+    return get(g:rg_filetype_mappings, a:ft, a:ft)
+endfunction
+
+function! vim_helpers#IsRgKnownFileType(ft) abort
+    return index(s:RgKnownFileTypes()), a:ft) >= 0
+endfunction
+
+function! vim_helpers#AgFileType(ft) abort
+    return get(g:ag_filetype_mappings, a:ft, a:ft)
+endfunction
+
+function! vim_helpers#IsAgKnownFileType(ft) abort
+    return index(s:AgKnownFileTypes(), a:ft) >= 0
 endfunction
 
 function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
     let ext = expand('%:e')
 
     if a:cmd ==# 'rg'
-        let ft = get(g:rg_filetype_mappings, &filetype, &filetype)
-        call s:SetRgKnownFileTypes()
+        let ft = vim_helpers#RgFileType(&filetype)
 
-        if strlen(ft) && index(g:rg_known_filetypes, ft) >= 0
+        if strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
             return printf("-t %s", ft)
         elseif strlen(ext)
             return printf("-g '*.%s'", ext)
         endif
     elseif a:cmd ==# 'ag'
-        let ft = get(g:ag_filetype_mappings, &filetype, &filetype)
-        call s:SetAgKnownFileTypes()
+        let ft = vim_helpers#AgFileType(&filetype)
 
-        if strlen(ft) && index(g:ag_known_filetypes, ft) >= 0
+        if strlen(ft) && vim_helpers#IsAgKnownFileType(ft)
             return printf("--%s", ft)
         elseif strlen(ext)
             return printf("-G '.%s$'", ext)
