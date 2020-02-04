@@ -5,6 +5,16 @@
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
+if exists('*trim')
+    function! vim_helpers#strip(str) abort
+        return trim(a:str)
+    endfunction
+else
+    function! vim_helpers#strip(str) abort
+        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
+    endfunction
+endif
+
 " Search Helpers
 function! s:TrimNewLines(text) abort
     let text = substitute(a:text, '^\n\+', '', 'g')
