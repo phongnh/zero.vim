@@ -253,8 +253,8 @@ function! s:FTGrepCword(cmd, word_boundary, qargs) abort
 endfunction
 
 command! -nargs=+ -complete=dir FTGrep       call <SID>FTGrep(<q-args>)
-command! -nargs=? -complete=dir FTGrepCCword call <SID>FTGrepCword('Grep', 1, '')
-command! -nargs=? -complete=dir FTGrepCword  call <SID>FTGrepCword('Grep', 0, '')
+command! -nargs=? -complete=dir FTGrepCCword call <SID>FTGrepCword('Grep', 1, <q-args>)
+command! -nargs=? -complete=dir FTGrepCword  call <SID>FTGrepCword('Grep', 0, <q-args>)
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
