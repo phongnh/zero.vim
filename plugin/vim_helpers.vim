@@ -248,7 +248,7 @@ endfunction
 " Git helpers
 function! s:FindGitRepo() abort
     if exists('b:git_dir') && strlen(b:git_dir)
-        return b:git_dir
+        return fnamemodify(b:git_dir, ':h')
     endif
 
     let path = expand('%:p:h')
@@ -257,48 +257,41 @@ function! s:FindGitRepo() abort
     endif
 
     let git_dir = finddir('.git', path . ';')
-    if strlen(git_dir)
-        let b:git_dir = fnamemodify(git_dir, ':p:h')
+    if empty(git_dir)
+        throw 'Not in git repo!'
     endif
 
-    return git_dir
-endfunction
+    let b:git_dir = fnamemodify(git_dir, ':p:h')
 
-function! s:InGitRepo() abort
-    return strlen(s:FindGitRepo())
+    return fnamemodify(b:git_dir, ':h')
 endfunction
 
 function! s:GitWorkTree() abort
-    if exists('b:git_dir')
-        return fnamemodify(b:git_dir, ':h:p')
-    endif
-    return ''
+    return fnamemodify(b:git_dir, ':h:p')
 endfunction
 
 function! s:ListGitBranches(A, L, P) abort
-    if s:InGitRepo()
-        try
-            let output = s:SystemRun('git branch -a | cut -c 3-', s:GitWorkTree())
-            let output = substitute(output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
-            let output = substitute(output, 'remotes/', '', 'g')
-            return output
-        catch
-            return ''
-        endtry
-    else
+    try
+        let repo_dir = s:FindGitRepo()
+        let output = s:SystemRun('git branch -a | cut -c 3-', repo_dir)
+        let output = substitute(output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
+        let output = substitute(output, 'remotes/', '', 'g')
+        return output
+    catch
         return ''
-    endif
+    endtry
 endfunction
 
 function! s:BuildPath(path) abort
-    return empty(a:path) ? expand('%') : a:path
-endfunction
+    let l:path = empty(a:path) ? expand('%') : a:path
 
-function! s:ConvertPath(git_dir, path) abort
-    let repo_dir = fnamemodify(a:git_dir, ':h:p') . '/'
-    let path = fnamemodify(a:path, ':p')
-    let path = substitute(path, repo_dir, '', 'g')
-    return path
+    if empty(l:path)
+        throw 'Path is required!'
+    endif
+
+    let l:path = fnamemodify(l:path, ':p')
+    let l:path = substitute(l:path, s:GitWorkTree() . '/', '', 'g')
+    return l:path
 endfunction
 
 let s:git_full_log_cmd = 'git log --name-only --format= --follow -- %s'
@@ -338,25 +331,30 @@ if executable('gitk')
     endfunction
 
     function! s:Gitk(options) abort
-        if s:InGitRepo()
-            call s:RunGitk(a:options)
-        endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'GitkFile: ' . v:exception
+            return
+        endtry
+
+        call s:RunGitk(a:options)
     endfunction
 
     function! s:GitkFile(path, bang) abort
-        if s:InGitRepo()
-            let path = s:BuildPath(a:path)
-            if empty(path)
-                return
-            endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'GitkFile: ' . v:exception
+            return
+        endtry
 
-            let path = s:ConvertPath(b:git_dir, path)
+        let path = s:BuildPath(a:path)
 
-            if a:bang
-                call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
-            else
-                call s:RunGitk('-- ' . shellescape(path))
-            endif
+        if a:bang
+            call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
+        else
+            call s:RunGitk('-- ' . shellescape(path))
         endif
     endfunction
 
@@ -391,63 +389,90 @@ if executable('tig')
         " augroup END
 
         function! s:RunTig(options) abort
-            let cmd = printf(s:tig_cmd, a:options)
+            if type(a:options) == type([])
+                let opts = join(a:options, ' ')
+            else
+                let opts = a:options
+            endif
+            let cmd = printf(s:tig_cmd, opts)
             let cwd = s:GitWorkTree()
             tabnew
             call s:TermopenRun(cmd, cwd)
             startinsert
         endfunction
-    elseif !has('gui_running')
-        function! s:RunTig(options) abort
-            let cmd = printf(s:tig_cmd, a:options)
-            call s:SystemRun(cmd, s:GitWorkTree())
-            redraw!
-        endfunction
     else
         function! s:RunTig(options) abort
+            if type(a:options) == type([])
+                let opts = join(a:options, ' ')
+            else
+                let opts = a:options
+            endif
+            let cmd = printf(s:tig_cmd, opts)
+            let cwd = fnameescape(s:GitWorkTree())
+            let cmd = printf('silent !cd %s && %s', cwd, cmd)
+            call s:LogCommand(cmd, cwd)
+            execute 'silent ' . cmd
+            redraw!
         endfunction
     endif
 
     function! s:Tig(options) abort
-        if s:InGitRepo()
-            call s:RunTig(a:options)
-        endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'Tig: ' . v:exception
+            return
+        endtry
+
+        call s:RunTig(a:options)
     endfunction
 
     function! s:TigFile(path, bang) abort
-        if s:InGitRepo()
-            let path = s:BuildPath(a:path)
-            if empty(path)
-                return
-            endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'TigFile: ' . v:exception
+            return
+        endtry
 
-            let path = s:ConvertPath(b:git_dir, path)
+        let l:path = s:BuildPath(a:path)
 
-            if a:bang
-                call s:RunTig('-- ' . s:GitFullHistoryCommand(path))
-            else
-                call s:RunTig('-- ' . shellescape(path))
-            endif
+        if a:bang
+            call s:RunTig('-- ' . s:GitFullHistoryCommand(l:path))
+        else
+            call s:RunTig('-- ' . shellescape(l:path))
         endif
     endfunction
 
     function! s:TigBlame(path) abort
-        if s:InGitRepo()
-            let path = s:BuildPath(a:path)
-            if empty(path)
-                return
-            endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'TigFile: ' . v:exception
+            return
+        endtry
 
-            let path = s:ConvertPath(b:git_dir, path)
+        let opts = ['blame']
 
-            call s:RunTig('blame -- ' . shellescape(path))
+        if empty(a:path)
+            let l:path = s:BuildPath('')
+            call add(opts, '+' . line('.'))
         endif
+
+        call extend(opts, ['--', shellescape(l:path)])
+
+        call s:RunTig(opts)
     endfunction
 
     function! s:TigStatus() abort
-        if s:InGitRepo()
-            call s:RunTig('status')
-        endif
+        try
+            call s:FindGitRepo()
+        catch
+            echoerr 'TigStatus: ' . v:exception
+            return
+        endtry
+
+        call s:RunTig('status')
     endfunction
 
     command! -nargs=? -complete=custom,<SID>ListGitBranches Tig call <SID>Tig(<q-args>)
