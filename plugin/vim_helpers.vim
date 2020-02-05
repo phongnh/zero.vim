@@ -312,11 +312,7 @@ function! s:GitFullHistoryCommand(path) abort
 endfunction
 
 function! s:ParseRef(line) abort
-    if empty(a:line)
-        return
-    endif
-    let line = substitute(a:line, '^\s\+', '', '')
-    let line = substitute(line, '\s\+$', '', '')
+    let line = vim_helpers#strip(a:line)
     let ref = get(split(line, ' '), 0, '')
     if strlen(ref) && (ref !~# '^0\{7,\}$') && ref =~# '^\^\?[a-z0-9]\{7,\}$'
         if ref[0] == '^'
