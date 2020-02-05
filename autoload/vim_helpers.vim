@@ -138,7 +138,7 @@ function! vim_helpers#RgFileType(ft) abort
 endfunction
 
 function! vim_helpers#IsRgKnownFileType(ft) abort
-    return index(s:RgKnownFileTypes()), a:ft) >= 0
+    return index(s:RgKnownFileTypes(), a:ft) >= 0
 endfunction
 
 function! vim_helpers#AgFileType(ft) abort
