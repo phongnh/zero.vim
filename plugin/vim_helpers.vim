@@ -165,24 +165,13 @@ let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win1
 
 " Log command
 function! s:LogCommand(cmd, ...) abort
-    if !g:vim_helpers_debug
-        return
+    if g:vim_helpers_debug
+        let l:tag = get(a:, 1, '')
+        if strlen(l:tag)
+            let l:tag = '[' . l:tag . '] '
+        endif
+        echohl WarningMsg | echomsg 'Running: ' . l:tag . a:cmd | echohl None
     endif
-
-    let cwd = get(a:, 1, '')
-    let cmd = a:cmd
-
-    if strlen(cwd) && cwd != '.'
-        let cmd = printf('[%s] %s', cwd, cmd)
-    endif
-
-    echomsg cmd
-endfunction
-
-function! s:CloseWindowAndDeleteBuffer() abort
-    " Close the current window, deleting buffers that are no longer displayed.
-    set bufhidden=wipe
-    bwipeout!
 endfunction
 
 function! s:SystemRun(cmd, ...) abort
@@ -195,54 +184,12 @@ function! s:SystemRun(cmd, ...) abort
     endif
 
     try
-        call s:LogCommand(cmd, cwd)
+        call s:LogCommand(cmd)
         return system(cmd)
     catch /E684/
     endtry
 
     return ''
-endfunction
-
-function! s:TermopenRun(cmd, cwd) abort
-    let cmd = a:cmd
-    let cwd = a:cwd
-
-    let l:opts = {
-                \ 'on_stderr': 'bdelete!',
-                \ }
-
-    function! l:opts.on_exit(job_id, data, event) abort
-        call s:CloseWindowAndDeleteBuffer()
-    endfunction
-
-    if strlen(cwd)
-        let l:opts['cwd'] = cwd
-    endif
-
-    call s:LogCommand(cmd, cwd)
-    call termopen(cmd, l:opts)
-endfunction
-
-function! s:TermStartRun(cmd, cwd) abort
-    let cmd = a:cmd
-    let cwd = a:cwd
-
-    let l:opts = {
-                \ 'hidden': 1,
-                \ 'norestore': 1,
-                \ 'term_finish': 'close!',
-                \ }
-
-    function! l:opts.on_exit(job_id, data, event) abort
-        call s:CloseWindowAndDeleteBuffer()
-    endfunction
-
-    if strlen(cwd)
-        let l:opts['cwd'] = cwd
-    endif
-
-    call s:LogCommand(cmd, cwd)
-    call term_start(cmd, l:opts)
 endfunction
 
 " Git helpers
@@ -319,14 +266,16 @@ endfunction
 
 " Gitk
 if executable('gitk')
-    let s:gitk_cmd = 'gitk %s'
+    let s:gitk_cmd = 'gitk %s >/dev/null 2>&1'
     if !s:is_windows
         let s:gitk_cmd .= ' &'
     endif
 
     function! s:RunGitk(options) abort
-        let cmd = printf(s:gitk_cmd, a:options)
-        call s:SystemRun(cmd, s:GitWorkTree())
+        let cmd = vim_helpers#strip(printf(s:gitk_cmd, a:options))
+        let cwd = shellescape(s:GitWorkTree())
+        call s:LogCommand(cmd)
+        execute printf('silent !cd %s && %s', cwd, cmd)
         redraw!
     endfunction
 
@@ -382,39 +331,54 @@ endif
 if executable('tig')
     let s:tig_cmd = 'tig %s'
 
-    if has('nvim')
-        " augroup CommandHelpersTigNVim
-        "     autocmd!
-        "     autocmd TermClose term://*tig* tabclose
-        " augroup END
+    function! s:CloseWindowAndDeleteBuffer() abort
+        " Close the current window, deleting buffers that are no longer displayed.
+        set bufhidden=wipe
+        bwipeout!
+    endfunction
 
-        function! s:RunTig(options) abort
-            if type(a:options) == type([])
-                let opts = join(a:options, ' ')
-            else
-                let opts = a:options
-            endif
-            let cmd = printf(s:tig_cmd, opts)
-            let cwd = s:GitWorkTree()
+    function! s:RunTig(options) abort
+        if type(a:options) == type([])
+            let opts = join(a:options, ' ')
+        else
+            let opts = a:options
+        endif
+
+        let cwd = s:GitWorkTree()
+        let cmd = vim_helpers#strip('tig ' . opts)
+
+        if has('nvim')
+            call s:LogCommand(cmd, 'nvim')
             tabnew
-            call s:TermopenRun(cmd, cwd)
+            let b:term_title = 'tig'
+            call termopen(cmd, {
+                        \ 'term_name': 'tig',
+                        \ 'name': 'tig',
+                        \ 'cwd': cwd,
+                        \ 'on_stderr': 'bdelete!',
+                        \ 'on_exit': {job_id, code, event -> s:CloseWindowAndDeleteBuffer()},
+                        \ })
+            setlocal nonumber norelativenumber
             startinsert
-        endfunction
-    else
-        function! s:RunTig(options) abort
-            if type(a:options) == type([])
-                let opts = join(a:options, ' ')
-            else
-                let opts = a:options
-            endif
-            let cmd = printf(s:tig_cmd, opts)
-            let cwd = fnameescape(s:GitWorkTree())
+        elseif has('terminal')
+            call s:LogCommand(cmd, 'terminal')
+            call term_start(cmd, {
+                        \ 'term_name': cmd,
+                        \ 'cwd': cwd,
+                        \ 'curwin': 1,
+                        \ 'hidden': 1,
+                        \ 'norestore': 1,
+                        \ 'term_finish': 'close',
+                        \ 'exit_cb': {status, code -> s:CloseWindowAndDeleteBuffer()},
+                        \ })
+        else
+            let cwd = shellescape(cwd)
             let cmd = printf('silent !cd %s && %s', cwd, cmd)
-            call s:LogCommand(cmd, cwd)
-            execute 'silent ' . cmd
+            call s:LogCommand(cmd)
+            execute cmd
             redraw!
-        endfunction
-    endif
+        endif
+    endfunction
 
     function! s:Tig(options) abort
         try
