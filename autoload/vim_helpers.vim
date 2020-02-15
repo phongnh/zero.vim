@@ -177,5 +177,23 @@ function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
     return ''
 endfunction
 
+function! vim_helpers#ParseGrepDirOption(cmd, dir) abort
+    let dir = vim_helpers#strip(a:dir)
+
+    if empty(dir) || dir ==# '.' || dir =~ '^/' || dir =~ '^\~'
+        return ''
+    endif
+
+    if a:cmd ==# 'rg'
+        return printf("-g '%s/*'", dir)
+    elseif a:cmd ==# 'ag'
+        return printf("-G '%s/*'", dir)
+    elseif a:cmd ==# 'grep'
+        return printf("'%s'", dir)
+    endif
+
+    return ''
+endfunction
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo

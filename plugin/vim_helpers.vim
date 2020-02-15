@@ -8,6 +8,17 @@ endif
 
 let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
+" Log command
+function! s:LogCommand(cmd, ...) abort
+    if g:vim_helpers_debug
+        let l:tag = get(a:, 1, '')
+        if strlen(l:tag)
+            let l:tag = '[' . l:tag . '] '
+        endif
+        echohl WarningMsg | echomsg 'Running: ' . l:tag . a:cmd | echohl None
+    endif
+endfunction
+
 " Copy Commands {{{
     if has('clipboard')
         " Copy yanked text to clipboard
@@ -83,30 +94,7 @@ endfunction
 
 command! -bar ReplaceTypographicCharacters call <SID>replace_typographic_characters()
 
-function! s:GrepCword(cmd, word_boundary, qargs) abort
-    if a:word_boundary
-        let cword = vim_helpers#CCwordForGrep()
-    else
-        let cword = vim_helpers#CwordForGrep()
-    endif
-    execute vim_helpers#strip(a:cmd . ' ' . cword . ' ' . a:qargs)
-endfunction
-
-" Grep
-command! -bar -nargs=+ -complete=file Grep       silent! grep! <args> | redraw! | cwindow
-command!      -nargs=? -complete=file GrepCCword call <SID>GrepCword('Grep', 1, <q-args>)
-command!      -nargs=? -complete=file GrepCword  call <SID>GrepCword('Grep', 0, <q-args>)
-
-" LGrep
-command! -bar -nargs=+ -complete=file LGrep       silent! lgrep! <args> | redraw! | lwindow
-command!      -nargs=? -complete=file LGrepCCword call <SID>GrepCword('LGrep', 1, <q-args>)
-command!      -nargs=? -complete=file LGrepCword  call <SID>GrepCword('LGrep', 0, <q-args>)
-
-" BGrep
-command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
-command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
-command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
-
+" Grep Settings
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading --hidden --vimgrep --smart-case'
@@ -124,6 +112,47 @@ elseif executable('ag')
     endif
 endif
 set grepformat=%f:%l:%c:%m,%f:%l:%m
+
+" Grep Helpers
+function! s:GrepCmd() abort
+    return split(&grepprg, '\s\+')[0]
+endfunction
+
+function! s:GrepCword(cmd, word_boundary, qargs) abort
+    if a:word_boundary
+        let cword = vim_helpers#CCwordForGrep()
+    else
+        let cword = vim_helpers#CwordForGrep()
+    endif
+    execute vim_helpers#strip(a:cmd . ' ' . cword . ' ' . a:qargs)
+endfunction
+
+function! s:GrepCwordInDir(cmd, word_boundary, qargs) abort
+    let dir = fnamemodify(empty(a:qargs) ? expand('%') : a:qargs, ':~:.:h')
+    let option = vim_helpers#ParseGrepDirOption(s:GrepCmd(), dir)
+    call s:GrepCword(a:cmd, a:word_boundary, option)
+endfunction
+
+" Grep
+command! -bar -nargs=+ -complete=file Grep       silent! grep! <args> | redraw! | cwindow
+command!      -nargs=? -complete=file GrepCCword call <SID>GrepCword('Grep', 1, <q-args>)
+command!      -nargs=? -complete=file GrepCword  call <SID>GrepCword('Grep', 0, <q-args>)
+
+command!      -nargs=? -complete=file GrepCCwordInDir call <SID>GrepCwordInDir('Grep', 1, <q-args>)
+command!      -nargs=? -complete=file GrepCwordInDir  call <SID>GrepCwordInDir('Grep', 0, <q-args>)
+
+" LGrep
+command! -bar -nargs=+ -complete=file LGrep       silent! lgrep! <args> | redraw! | lwindow
+command!      -nargs=? -complete=file LGrepCCword call <SID>GrepCword('LGrep', 1, <q-args>)
+command!      -nargs=? -complete=file LGrepCword  call <SID>GrepCword('LGrep', 0, <q-args>)
+
+command!      -nargs=? -complete=file LGrepCCwordInDir call <SID>GrepCwordInDir('LGrep', 1, <q-args>)
+command!      -nargs=? -complete=file LGrepCwordInDir  call <SID>GrepCwordInDir('LGrep', 0, <q-args>)
+
+" BGrep
+command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
+command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
+command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
 
 let s:rg_default_filetype_mappings = {
             \ 'bash':            'sh',
@@ -148,31 +177,22 @@ let s:ag_default_filetype_mappings = {
 let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
 
 function! s:FTGrep(qargs) abort
-    let cmd = printf('Grep %s %s', vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0]), a:qargs)
+    let cmd = printf('Grep %s %s', vim_helpers#ParseGrepFileTypeOption(s:GrepCmd()), a:qargs)
     execute vim_helpers#strip(cmd)
 endfunction
 
 function! s:FTGrepCword(cmd, word_boundary, qargs) abort
-    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(split(&grepprg)[0])
+    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(s:GrepCmd())
     call s:GrepCword(cmd, a:word_boundary, a:qargs)
 endfunction
 
+" FTGrep
 command! -nargs=+ -complete=dir FTGrep       call <SID>FTGrep(<q-args>)
 command! -nargs=? -complete=dir FTGrepCCword call <SID>FTGrepCword('Grep', 1, <q-args>)
 command! -nargs=? -complete=dir FTGrepCword  call <SID>FTGrepCword('Grep', 0, <q-args>)
 
-let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
-" Log command
-function! s:LogCommand(cmd, ...) abort
-    if g:vim_helpers_debug
-        let l:tag = get(a:, 1, '')
-        if strlen(l:tag)
-            let l:tag = '[' . l:tag . '] '
-        endif
-        echohl WarningMsg | echomsg 'Running: ' . l:tag . a:cmd | echohl None
-    endif
-endfunction
+let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 
 function! s:SystemRun(cmd, ...) abort
     let cwd = get(a:, 1, '')
