@@ -1,0 +1,4 @@
+bind generic e        <sh -c 'echo "edit    +%(lineno) $TIG_VIM_CWD/%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic <Ctrl-x> <sh -c 'echo "split   +%(lineno) $TIG_VIM_CWD/%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic <Ctrl-v> <sh -c 'echo "vsplit  +%(lineno) $TIG_VIM_CWD/%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic <Ctrl-t> <sh -c 'echo "tabedit +%(lineno) $TIG_VIM_CWD/%(file)" > "$TIG_VIM_ACTION_FILE"'
