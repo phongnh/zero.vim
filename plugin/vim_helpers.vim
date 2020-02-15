@@ -392,7 +392,6 @@ if executable('tig')
                         \ 'cwd': cwd,
                         \ 'curwin': 1,
                         \ 'hidden': 1,
-                        \ 'norestore': 1,
                         \ 'term_finish': 'close',
                         \ 'exit_cb': {status, code -> s:CloseWindowAndDeleteBuffer()},
                         \ })
