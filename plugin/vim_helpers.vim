@@ -95,6 +95,28 @@ endfunction
 command! -bar ReplaceTypographicCharacters call <SID>replace_typographic_characters()
 
 " Grep Settings
+let s:rg_default_filetype_mappings = {
+            \ 'bash':            'sh',
+            \ 'javascript':      'js',
+            \ 'javascript.jsx':  'js',
+            \ 'javascriptreact': 'js',
+            \ 'jsx':             'js',
+            \ 'python':          'py',
+            \ }
+
+let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
+
+let s:ag_default_filetype_mappings = {
+            \ 'bash':            'shell',
+            \ 'javascript':      'js',
+            \ 'javascript.jsx':  'js',
+            \ 'javascriptreact': 'js',
+            \ 'jsx':             'js',
+            \ 'zsh':             'shell',
+            \ }
+
+let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
+
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading --hidden --vimgrep --smart-case'
@@ -118,19 +140,34 @@ function! s:GrepCmd() abort
     return split(&grepprg, '\s\+')[0]
 endfunction
 
+function! s:Grep(cmd, ...) abort
+    let cmd = vim_helpers#strip(a:cmd . ' ' . join(a:000, ' '))
+    call s:LogCommand(cmd)
+    execute cmd
+endfunction
+
 function! s:GrepCword(cmd, word_boundary, qargs) abort
     if a:word_boundary
         let cword = vim_helpers#CCwordForGrep()
     else
         let cword = vim_helpers#CwordForGrep()
     endif
-    execute vim_helpers#strip(a:cmd . ' ' . cword . ' ' . a:qargs)
+    call s:Grep(cmd, cword, a:qargs)
 endfunction
 
 function! s:GrepCwordInDir(cmd, word_boundary, qargs) abort
     let dir = fnamemodify(empty(a:qargs) ? expand('%') : a:qargs, ':~:.:h')
     let option = vim_helpers#ParseGrepDirOption(s:GrepCmd(), dir)
     call s:GrepCword(a:cmd, a:word_boundary, option)
+endfunction
+
+function! s:FTGrep(qargs) abort
+    call s:Grep('Grep', vim_helpers#ParseGrepFileTypeOption(s:GrepCmd()), a:qargs)
+endfunction
+
+function! s:FTGrepCword(cmd, word_boundary, qargs) abort
+    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(s:GrepCmd())
+    call s:GrepCword(cmd, a:word_boundary, a:qargs)
 endfunction
 
 " Grep
@@ -153,38 +190,6 @@ command!      -nargs=? -complete=file LGrepCwordInDir  call <SID>GrepCwordInDir(
 command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
 command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
 command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
-
-let s:rg_default_filetype_mappings = {
-            \ 'bash':            'sh',
-            \ 'javascript':      'js',
-            \ 'javascript.jsx':  'js',
-            \ 'javascriptreact': 'js',
-            \ 'jsx':             'js',
-            \ 'python':          'py',
-            \ }
-
-let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
-
-let s:ag_default_filetype_mappings = {
-            \ 'bash':            'shell',
-            \ 'javascript':      'js',
-            \ 'javascript.jsx':  'js',
-            \ 'javascriptreact': 'js',
-            \ 'jsx':             'js',
-            \ 'zsh':             'shell',
-            \ }
-
-let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
-
-function! s:FTGrep(qargs) abort
-    let cmd = printf('Grep %s %s', vim_helpers#ParseGrepFileTypeOption(s:GrepCmd()), a:qargs)
-    execute vim_helpers#strip(cmd)
-endfunction
-
-function! s:FTGrepCword(cmd, word_boundary, qargs) abort
-    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(s:GrepCmd())
-    call s:GrepCword(cmd, a:word_boundary, a:qargs)
-endfunction
 
 " FTGrep
 command! -nargs=+ -complete=dir FTGrep       call <SID>FTGrep(<q-args>)
