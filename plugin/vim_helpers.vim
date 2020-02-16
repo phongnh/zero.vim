@@ -390,12 +390,13 @@ if executable('tig')
             return
         endif
 
-        if has('nvim')
-            if exists(':Sayonara') == 2
-                silent! Sayonara!
-            else
-                hide
-            endif
+        if exists(':Sayonara') == 2
+            silent! Sayonara!
+        elseif exists(':Bdelete') == 2
+            silent! Bdelete
+        else
+            silent! buffer #
+            silent! hide
         endif
 
         call s:OpenTigVimAction(a:cmd)
