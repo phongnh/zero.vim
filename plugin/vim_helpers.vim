@@ -156,7 +156,7 @@ function! s:GrepCword(cmd, word_boundary, qargs) abort
     else
         let cword = vim_helpers#CwordForGrep()
     endif
-    call s:Grep(cmd, cword, a:qargs)
+    call s:Grep(a:cmd, cword, a:qargs)
 endfunction
 
 function! s:GrepCwordInDir(cmd, word_boundary, qargs) abort
