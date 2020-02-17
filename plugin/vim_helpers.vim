@@ -432,7 +432,7 @@ if executable('tig')
 
         if has('nvim')
             enew
-            setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+            setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
             let cmd_with_env = printf('env %s %s', s:TigEnvString(cwd), cmd)
             call s:LogCommand(cmd_with_env, 'nvim')
             call termopen(cmd_with_env, {
