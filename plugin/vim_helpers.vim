@@ -432,7 +432,13 @@ if executable('tig')
 
         try
             for action in readfile(s:tig_vim_action_file)
-                execute 'silent! ' . action
+                if action ==# 'Gcommit'
+                    if exists(':Gcommit') == 2
+                        execute 'silent! ' . action
+                    endif
+                else
+                    execute 'silent! ' . action
+                endif
             endfor
         finally
         endtry
