@@ -381,6 +381,22 @@ endif
 if executable('tig')
     let s:tig_cmd = 'tig %s'
     let s:tigrc_user_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h') . '/config/vim.tigrc'
+    let s:tig_mode = get(g:, 'tig_mode', 'tab')
+
+    function! s:UpdateVimSettings() abort
+        let s:tig_vim_settings = {
+                    \ 'showtabline': &showtabline,
+                    \ 'laststatus': &laststatus,
+                    \ }
+        set showtabline=0
+        set laststatus=0
+    endfunction
+
+    function! s:RestoreVimSettings() abort
+        for [k, v] in items(s:tig_vim_settings)
+            execute printf('set %s=%s', k, string(v))
+        endfor
+    endfunction
 
     function! s:GetTigVimActionFile() abort
         if !exists('s:tig_vim_action_file')
@@ -418,6 +434,11 @@ if executable('tig')
         else
             silent! buffer #
             silent! hide
+        endif
+
+        if s:tig_mode ==# 'tab'
+            silent! tabclose
+            call s:RestoreVimSettings()
         endif
 
         call s:OpenTigVimAction(a:cmd)
@@ -458,7 +479,12 @@ if executable('tig')
         call writefile(['echo'], s:GetTigVimActionFile())
 
         if has('nvim')
-            enew
+            if s:tig_mode ==# 'tab'
+                tabnew
+                call s:UpdateVimSettings()
+            else
+                enew
+            endif
             setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
             let cmd_with_env = printf('env %s %s', s:TigEnvString(cwd), cmd)
             call s:LogCommand(cmd_with_env, 'nvim')
@@ -471,6 +497,10 @@ if executable('tig')
                         \ })
             startinsert
         elseif has('terminal')
+            if s:tig_mode ==# 'tab'
+                tabnew
+                call s:UpdateVimSettings()
+            endif
             call s:LogCommand(cmd, 'terminal')
             let term_options = {
                         \ 'term_name': cmd,
