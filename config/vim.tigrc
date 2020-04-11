@@ -4,4 +4,5 @@ bind generic <Ctrl-v> <sh -c 'echo "vsplit  +%(lineno) $TIG_VIM_CWD/%(file)" > "
 bind generic <Ctrl-t> <sh -c 'echo "tabedit +%(lineno) $TIG_VIM_CWD/%(file)" > "$TIG_VIM_ACTION_FILE"'
 
 # vim-fugitive
-bind status C <sh -c 'echo "Gcommit" > "$TIG_VIM_ACTION_FILE"'
+bind status C <sh -c 'echo "Gcommit"         > "$TIG_VIM_ACTION_FILE"'
+bind status + <sh -c 'echo "Gcommit --amend" > "$TIG_VIM_ACTION_FILE"'
