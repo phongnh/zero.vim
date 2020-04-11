@@ -178,18 +178,18 @@ function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
 endfunction
 
 function! vim_helpers#ParseGrepDirOption(cmd, dir) abort
-    let dir = vim_helpers#strip(a:dir)
+    let l:dir = vim_helpers#strip(a:dir)
 
-    if empty(dir) || dir ==# '.' || dir =~ '^/' || dir =~ '^\~'
+    if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
         return ''
     endif
 
     if a:cmd ==# 'rg'
-        return printf("-g '%s/*'", dir)
+        return printf("-g '%s/*'", l:dir)
     elseif a:cmd ==# 'ag'
-        return printf("-G '%s/*'", dir)
+        return printf("-G '%s/*'", l:dir)
     elseif a:cmd ==# 'grep'
-        return printf("'%s'", dir)
+        return printf("'%s'", l:dir)
     endif
 
     return ''

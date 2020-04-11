@@ -165,13 +165,29 @@ function! s:GrepCwordInDir(cmd, word_boundary, qargs) abort
     call s:GrepCword(a:cmd, a:word_boundary, option)
 endfunction
 
-function! s:FTGrep(qargs) abort
+function! s:TGrep(qargs) abort
     call s:Grep('Grep', vim_helpers#ParseGrepFileTypeOption(s:GrepCmd()), a:qargs)
 endfunction
 
-function! s:FTGrepCword(cmd, word_boundary, qargs) abort
+function! s:TGrepCword(cmd, word_boundary, qargs) abort
     let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(s:GrepCmd())
     call s:GrepCword(cmd, a:word_boundary, a:qargs)
+endfunction
+
+function! s:FGrep(qargs) abort
+    let cmd = s:GrepCmd()
+    if cmd ==# 'rg' || cmd ==# 'grep'
+        call s:Grep('Grep', '--fixed-strings', a:qargs)
+    elseif cmd ==# 'ag'
+        call s:Grep('Grep', '--literal', a:qargs)
+    else
+        call s:Grep('Grep', a:qargs)
+    endif
+endfunction
+
+function! s:FGrepCword(word_boundary, qargs) abort
+    let cword = vim_helpers#CwordForGrep()
+    call s:FGrep(cword . ' ' . a:qargs)
 endfunction
 
 " Grep
@@ -195,10 +211,15 @@ command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
 command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
 command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
 
-" FTGrep
-command! -nargs=+ -complete=dir FTGrep       call <SID>FTGrep(<q-args>)
-command! -nargs=? -complete=dir FTGrepCCword call <SID>FTGrepCword('Grep', 1, <q-args>)
-command! -nargs=? -complete=dir FTGrepCword  call <SID>FTGrepCword('Grep', 0, <q-args>)
+" TGrep
+command! -nargs=+ -complete=dir TGrep       call <SID>TGrep(<q-args>)
+command! -nargs=? -complete=dir TGrepCCword call <SID>TGrepCword('Grep', 1, <q-args>)
+command! -nargs=? -complete=dir TGrepCword  call <SID>TGrepCword('Grep', 0, <q-args>)
+
+" FGrep
+command! -nargs=+ -complete=dir FGrep       call <SID>FGrep(<q-args>)
+command! -nargs=? -complete=dir FGrepCCword call <SID>FGrepCword('Grep', <q-args>)
+command! -nargs=? -complete=dir FGrepCword  call <SID>FGrepCword('Grep', <q-args>)
 
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
