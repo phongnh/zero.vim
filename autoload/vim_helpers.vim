@@ -121,32 +121,12 @@ function! s:RgKnownFileTypes() abort
     return g:rg_known_filetypes
 endfunction
 
-function! s:AgKnownFileTypes() abort
-    if exists('g:ag_known_filetypes')
-        return g:ag_known_filetypes
-    endif
-    if executable('ag')
-        let g:ag_known_filetypes = systemlist("ag --list-file-types | grep '\\-\\-' | cut -d '-' -f 3")
-    else
-        let g:ag_known_filetypes = []
-    endif
-    return g:ag_known_filetypes
-endfunction
-
 function! vim_helpers#RgFileType(ft) abort
     return get(g:rg_filetype_mappings, a:ft, a:ft)
 endfunction
 
 function! vim_helpers#IsRgKnownFileType(ft) abort
     return index(s:RgKnownFileTypes(), a:ft) >= 0
-endfunction
-
-function! vim_helpers#AgFileType(ft) abort
-    return get(g:ag_filetype_mappings, a:ft, a:ft)
-endfunction
-
-function! vim_helpers#IsAgKnownFileType(ft) abort
-    return index(s:AgKnownFileTypes(), a:ft) >= 0
 endfunction
 
 function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
@@ -159,14 +139,6 @@ function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
             return printf("-t %s", ft)
         elseif strlen(ext)
             return printf("-g '*.%s'", ext)
-        endif
-    elseif a:cmd ==# 'ag'
-        let ft = vim_helpers#AgFileType(&filetype)
-
-        if strlen(ft) && vim_helpers#IsAgKnownFileType(ft)
-            return printf("--%s", ft)
-        elseif strlen(ext)
-            return printf("-G '.%s$'", ext)
         endif
     elseif a:cmd ==# 'grep'
         if strlen(ext)
@@ -186,8 +158,6 @@ function! vim_helpers#ParseGrepDirOption(cmd, dir) abort
 
     if a:cmd ==# 'rg'
         return printf("-g '%s/*'", l:dir)
-    elseif a:cmd ==# 'ag'
-        return printf("-G '%s/*'", l:dir)
     elseif a:cmd ==# 'grep'
         return printf("'%s'", l:dir)
     endif

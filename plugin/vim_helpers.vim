@@ -110,31 +110,12 @@ let s:rg_default_filetype_mappings = {
 
 let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
 
-let s:ag_default_filetype_mappings = {
-            \ 'bash':            'shell',
-            \ 'javascript':      'js',
-            \ 'javascript.jsx':  'js',
-            \ 'javascriptreact': 'js',
-            \ 'jsx':             'js',
-            \ 'zsh':             'shell',
-            \ }
-
-let g:ag_filetype_mappings = extend(s:ag_default_filetype_mappings, get(g:, 'ag_filetype_mappings', {}))
-
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading --hidden --vimgrep --smart-case'
 
     if get(g:, 'grep_ignore_vcs', 0)
         let &grepprg .= ' --no-ignore-vcs'
-    endif
-elseif executable('ag')
-    " https://github.com/ggreer/the_silver_searcher
-    let s:default_vcs_ignore = "--ignore '.git' --ignore '.hg' --ignore '.svn' --ignore '.bzr'"
-    let &grepprg = 'ag --hidden --vimgrep --smart-case ' . s:default_vcs_ignore
-
-    if get(g:, 'grep_ignore_vcs', 0)
-        let &grepprg .= ' --skip-vcs-ignores'
     endif
 endif
 set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -178,8 +159,6 @@ function! s:FGrep(qargs) abort
     let cmd = s:GrepCmd()
     if cmd ==# 'rg' || cmd ==# 'grep'
         call s:Grep('Grep', '--fixed-strings', a:qargs)
-    elseif cmd ==# 'ag'
-        call s:Grep('Grep', '--literal', a:qargs)
     else
         call s:Grep('Grep', a:qargs)
     endif
