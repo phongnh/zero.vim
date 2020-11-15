@@ -24,7 +24,7 @@ function! s:LogCommand(cmd, ...) abort
 endfunction
 
 " Remove zero-width spaces (<200b>) {{{
-command! -bar Remove200b silent! %s/\%u200b//g | update
+command! -bar Remove200b silent! %s/\%u200b//g | update | redraw
 command! -bar RemoveZeroWidthSpaces Remove200b
 " }}}
 
