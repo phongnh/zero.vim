@@ -23,6 +23,11 @@ function! s:LogCommand(cmd, ...) abort
     endif
 endfunction
 
+" Remove zero-width spaces (<200b>) {{{
+command! -bar Remove200b silent! %s/\%u200b//g | update
+command! -bar RemoveZeroWidthSpaces Remove200b
+" }}}
+
 " Copy Commands {{{
     if has('clipboard')
         " Copy yanked text to clipboard
