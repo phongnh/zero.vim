@@ -435,6 +435,17 @@ if executable('tig')
             return
         endif
 
+        " Restore Goyo mode
+        if s:goyo_enabled
+            let s:goyo_enabled = 0
+            if exists('g:goyo_width') && exists('g:goyo_height')
+                execute 'Goyo ' join([g:goyo_width, g:goyo_height], 'x')
+            else
+                Goyo
+            endif
+            redraw
+        endif
+
         try
             for action in readfile(s:tig_vim_action_file)
                 if action =~# '^Git commit'
@@ -461,6 +472,8 @@ if executable('tig')
 
         " Use echo as fallback command
         call writefile(['echo'], s:GetTigVimActionFile())
+        " Goyo integration
+        let s:goyo_enabled = exists('#goyo')
 
         if has('nvim')
             if s:tig_mode ==# 'tab'
