@@ -248,7 +248,11 @@ function! s:FindGitRepo() abort
 endfunction
 
 function! s:GitWorkTree() abort
-    return fnamemodify(b:git_dir, ':h:p')
+    if exists('b:__gitmessenger_popup')
+        return gitmessenger#git#root_dir(b:__gitmessenger_popup.opener_bufnr)
+    else
+        return fnamemodify(b:git_dir, ':h:p')
+    endif
 endfunction
 
 function! s:ListGitBranches(A, L, P) abort
@@ -287,14 +291,32 @@ endfunction
 
 function! s:ParseRef(line) abort
     let line = vim_helpers#strip(a:line)
-    let ref = get(split(line, ' '), 0, '')
-    if strlen(ref) && (ref !~# '^0\{7,\}$') && ref =~# '^\^\?[a-z0-9]\{7,\}$'
+
+    " Git Messenger Popup
+    if exists('b:__gitmessenger_popup')
+        return s:ParseGitMessengerRef()
+    endif
+
+    " Fugitive Blame
+    let ref = get(split(line, '\s\+'), 0, '')
+    if ref !~# '^0\{7,\}$' && ref =~# '^\^\?[a-z0-9]\{7,\}$'
         if ref[0] == '^'
             return printf('"$(git show --summary --format=format:%%h %s)"', ref)
         else
             return ref
         endif
     endif
+
+    return ''
+endfunction
+
+function! s:ParseGitMessengerRef() abort
+    for line in get(b:__gitmessenger_popup, 'contents', [])
+        if line =~# '^\s\+Commit:\s\+[a-z0-9]\{40,\}$'
+            return get(split(vim_helpers#strip(line), '\s\+'), -1, '')
+        endif
+    endfor
+
     return ''
 endfunction
 
@@ -348,12 +370,15 @@ if executable('gitk')
 
     function! s:GitkRef(line) abort
         let ref = s:ParseRef(a:line)
+        if empty(ref)
+            return
+        endif
         call s:RunGitk(ref)
     endfunction
 
     augroup CommandHelpersGitk
         autocmd!
-        autocmd FileType fugitiveblame nnoremap <buffer> <silent> gK :call <SID>GitkRef(getline('.'))<CR>
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gK :call <SID>GitkRef(getline('.'))<CR>
     augroup END
 endif
 
@@ -589,12 +614,15 @@ if executable('tig')
 
     function! s:TigShow(line) abort
         let ref = s:ParseRef(a:line)
+        if empty(ref)
+            return
+        endif
         call s:RunTig('show ' . ref)
     endfunction
 
     augroup CommandHelpersTig
         autocmd!
-        autocmd FileType fugitiveblame nnoremap <buffer> <silent> gB :call <SID>TigShow(getline('.'))<CR>
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gB :call <SID>TigShow(getline('.'))<CR>
     augroup END
 endif
 
