@@ -13,6 +13,10 @@ function! s:Print(msg) abort
     echohl WarningMsg | echomsg a:msg | echohl None
 endfunction
 
+function! s:Error(msg) abort
+    echohl ErrorMsg | echomsg a:msg | echohl None
+endfunction
+
 function! s:LogCommand(cmd, ...) abort
     if g:vim_helpers_debug
         let l:tag = get(a:, 1, '')
@@ -289,6 +293,14 @@ function! s:GitFullHistoryCommand(path) abort
     return printf('$(' . s:git_full_log_cmd . ')', shellescape(a:path))
 endfunction
 
+function! s:TigShellEscape(path) abort
+    return '"' . a:path . '"'
+endfunction
+
+function! s:TigFullHistoryCommand(path) abort
+    return printf('$(' . s:git_full_log_cmd . ')', s:TigShellEscape(a:path))
+endfunction
+
 function! s:ParseRef(line) abort
     let line = vim_helpers#strip(a:line)
 
@@ -338,29 +350,26 @@ if executable('gitk')
     function! s:Gitk(options) abort
         try
             call s:FindGitRepo()
+            call s:RunGitk(a:options)
         catch
-            echoerr 'GitkFile: ' . v:exception
-            return
+            call s:Error('Gitk: ' . v:exception)
         endtry
-
-        call s:RunGitk(a:options)
     endfunction
 
     function! s:GitkFile(path, bang) abort
         try
             call s:FindGitRepo()
+
+            let path = s:BuildPath(a:path)
+
+            if a:bang
+                call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
+            else
+                call s:RunGitk('-- ' . shellescape(path))
+            endif
         catch
-            echoerr 'GitkFile: ' . v:exception
-            return
+            call s:Error('GitkFile: ' . v:exception)
         endtry
-
-        let path = s:BuildPath(a:path)
-
-        if a:bang
-            call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
-        else
-            call s:RunGitk('-- ' . shellescape(path))
-        endif
     endfunction
 
     command! -nargs=? -complete=custom,<SID>ListGitBranches Gitk call <SID>Gitk(<q-args>)
@@ -370,10 +379,9 @@ if executable('gitk')
 
     function! s:GitkRef(line) abort
         let ref = s:ParseRef(a:line)
-        if empty(ref)
-            return
+        if !empty(ref)
+            call s:RunGitk(ref)
         endif
-        call s:RunGitk(ref)
     endfunction
 
     augroup CommandHelpersGitk
@@ -430,9 +438,9 @@ if executable('tig')
                     \ )
     endfunction
 
-    function! s:OnExitTigCallback(code, cmd) abort
+    function! s:OnExitTigCallback(code, cmd, mode) abort
         if a:code != 0
-            echoerr printf('%s: failed!', a:cmd)
+            call s:Error(printf('[%s] %s: failed!', a:mode, a:cmd))
             return
         endif
 
@@ -455,7 +463,7 @@ if executable('tig')
 
     function! s:OpenTigVimAction(cmd)
         if !filereadable(s:tig_vim_action_file)
-            echoerr printf('%s: failed to open vim action file %s!', a:cmd, s:tig_vim_action_file)
+            call s:Error(printf('%s: failed to open vim action file %s!', a:cmd, s:tig_vim_action_file))
             unlet! s:tig_vim_action_file
             return
         endif
@@ -515,7 +523,7 @@ if executable('tig')
                         \ 'cwd': cwd,
                         \ 'clear_env': v:false,
                         \ 'env': s:TigEnvDict(cwd),
-                        \ 'on_exit': {job_id, code, event -> s:OnExitTigCallback(code, cmd_with_env)},
+                        \ 'on_exit': {job_id, code, event -> s:OnExitTigCallback(code, cmd_with_env, 'nvim')},
                         \ })
             startinsert
         elseif has('terminal')
@@ -529,7 +537,7 @@ if executable('tig')
                         \ 'cwd': cwd,
                         \ 'env': s:TigEnvDict(cwd),
                         \ 'curwin': v:true,
-                        \ 'exit_cb': {channel, code -> s:OnExitTigCallback(code, cmd)},
+                        \ 'exit_cb': {channel, code -> s:OnExitTigCallback(code, cmd, 'terminal')},
                         \ }
             if v:version >= 802
                 let term_options['norestore'] = v:true
@@ -547,60 +555,54 @@ if executable('tig')
     function! s:Tig(options) abort
         try
             call s:FindGitRepo()
+            call s:RunTig(a:options)
         catch
-            echoerr 'Tig: ' . v:exception
-            return
+            call s:Error('Tig: ' . v:exception)
         endtry
-
-        call s:RunTig(a:options)
     endfunction
 
     function! s:TigFile(path, bang) abort
         try
             call s:FindGitRepo()
+
+            let l:path = s:BuildPath(a:path)
+
+            if a:bang
+                call s:RunTig('-- ' . s:TigFullHistoryCommand(l:path))
+            else
+                call s:RunTig('-- ' . s:TigShellEscape(l:path))
+            endif
         catch
-            echoerr 'TigFile: ' . v:exception
-            return
+            call s:Error('TigFile: ' . v:exception)
         endtry
-
-        let l:path = s:BuildPath(a:path)
-
-        if a:bang
-            call s:RunTig('-- ' . s:GitFullHistoryCommand(l:path))
-        else
-            call s:RunTig('-- ' . shellescape(l:path))
-        endif
     endfunction
 
     function! s:TigBlame(path) abort
         try
             call s:FindGitRepo()
+
+            let opts = ['blame']
+
+            if empty(a:path)
+                let l:path = s:BuildPath('')
+                call add(opts, '+' . line('.'))
+            endif
+
+            call extend(opts, ['--', s:TigShellEscape(l:path)])
+
+            call s:RunTig(opts)
         catch
-            echoerr 'TigFile: ' . v:exception
-            return
+            call s:Error('TigBlame: ' . v:exception)
         endtry
-
-        let opts = ['blame']
-
-        if empty(a:path)
-            let l:path = s:BuildPath('')
-            call add(opts, '+' . line('.'))
-        endif
-
-        call extend(opts, ['--', shellescape(l:path)])
-
-        call s:RunTig(opts)
     endfunction
 
     function! s:TigStatus() abort
         try
             call s:FindGitRepo()
+            call s:RunTig('status')
         catch
-            echoerr 'TigStatus: ' . v:exception
-            return
+            call s:Error('TigStatus: ' . v:exception)
         endtry
-
-        call s:RunTig('status')
     endfunction
 
     command! -nargs=? -complete=custom,<SID>ListGitBranches Tig call <SID>Tig(<q-args>)
@@ -614,10 +616,9 @@ if executable('tig')
 
     function! s:TigShow(line) abort
         let ref = s:ParseRef(a:line)
-        if empty(ref)
-            return
+        if !empty(ref)
+            call s:RunTig('show ' . ref)
         endif
-        call s:RunTig('show ' . ref)
     endfunction
 
     augroup CommandHelpersTig
