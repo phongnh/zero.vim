@@ -160,6 +160,10 @@ function! vim_helpers#IsRgKnownFileType(ft) abort
     return index(s:RgKnownFileTypes(), a:ft) >= 0
 endfunction
 
+function! vim_helpers#RgFileTypeOption() abort
+    return vim_helpers#ParseGrepFileTypeOption('rg')
+endfunction
+
 function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
     let ext = expand('%:e')
 
