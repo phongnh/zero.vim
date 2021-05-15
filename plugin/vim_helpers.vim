@@ -47,25 +47,38 @@ command! -bar RemoveZeroWidthSpaces Remove200b
         echo 'Copied: ' . @"
     endfunction
 
-    function! s:copy_path(path, line) abort
-        let path = expand(a:path)
+    function! s:expand_path(path, line) abort
+        let l:path = expand(a:path)
         if a:line
-            let path .= ':' . line('.')
+            let l:path .= ':' . line('.')
         endif
-        call s:copy_path_to_clipboard(path)
+        return l:path
     endfunction
 
-    command! -bang CopyRelativePath call <SID>copy_path('%', <bang>0)
-    command! -bang CopyFullPath     call <SID>copy_path('%:p', <bang>0)
-    command! -bang CopyParentPath   call <SID>copy_path(<bang>0 ? '%:p:h' : '%:h', 0)
+    function! s:copy_path(path, line) abort
+        call s:copy_path_to_clipboard(s:expand_path(a:path, a:line))
+    endfunction
+
+    function! s:copy_path_with_cwd(path, line) abort
+        let l:cwd = fnamemodify(getcwd(), ':t')
+        call s:copy_path_to_clipboard(l:cwd . '/' . s:expand_path(a:path, a:line))
+    endfunction
+
+    command! -bang CopyRelativePath        call <SID>copy_path('%', <bang>0)
+    command! -bang CopyRelativePathWithCwd call <SID>copy_path_with_cwd('%', <bang>0)
+    command! -bang CopyFullPath            call <SID>copy_path('%:p',  <bang>0)
+    command! -bang CopyParentPath          call <SID>copy_path(<bang>0 ? '%:p:h' : '%:h', 0)
+    command! -bang CopyParentPathWithCwd   call <SID>copy_path_with_cwd('%:h', 0)
 
     if get(g:, 'copypath_mappings', 1)
         nnoremap <silent> yp :CopyRelativePath<CR>
         nnoremap <silent> yP :CopyRelativePath!<CR>
+        nnoremap <silent> yc :CopyRelativePathWithCwd<CR>
+        nnoremap <silent> yC :CopyRelativePathWithCwd!<CR>
         nnoremap <silent> yu :CopyFullPath<CR>
         nnoremap <silent> yU :CopyFullPath!<CR>
         nnoremap <silent> yd :CopyParentPath<CR>
-        nnoremap <silent> yD :CopyParentPath!<CR>
+        nnoremap <silent> yD :CopyParentPathWithCwd<CR>
     endif
 " }}}
 
