@@ -32,17 +32,7 @@ function! s:ShellEscape(text) abort
     return shellescape(escaped_text)
 endfunction
 
-function! s:GetSearchText() abort
-    let selection = @/
-
-    if selection ==# "\n" || empty(selection)
-        return ''
-    endif
-
-    return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
-endfunction
-
-function! vim_helpers#SelectedText() range abort
+function! vim_helpers#Vword() range abort
     " Save the current register and clipboard
     let reg_save     = getreg('"')
     let regtype_save = getregtype('"')
@@ -65,30 +55,67 @@ function! vim_helpers#SelectedText() range abort
     endif
 endfunction
 
-function! vim_helpers#SelectedTextForShell() range abort
-    let selection = s:TrimNewLines(vim_helpers#SelectedText())
+" TODO: Remove this function
+function! vim_helpers#SelectedText() range abort
+    return vim_helpers#Vword()
+endfunction
+
+function! vim_helpers#VwordForShell() range abort
+    let selection = s:TrimNewLines(vim_helpers#Vword())
     return s:ShellEscape(selection)
 endfunction
 
-function! vim_helpers#SearchTextForShell() abort
+" TODO: Remove this function
+function! vim_helpers#SelectedTextForShell() range abort
+    return vim_helpers#ShellVword()
+endfunction
+
+function! vim_helpers#Pword() abort
+    let selection = @/
+
+    if selection ==# "\n" || empty(selection)
+        return ''
+    endif
+
+    return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+endfunction
+
+function! vim_helpers#PwordForShell() abort
     let search = s:GetSearchText()
     return s:ShellEscape(search)
 endfunction
 
+" TODO: Remove this function
+function! vim_helpers#SearchTextForShell() abort
+    return vim_helpers#PwordForShell()
+endfunction
+
+function! vim_helpers#CCword() abort
+    return '\b' . expand('<cword>') . '\b'
+endfunction
+
+function! vim_helpers#Cword() abort
+    return expand('<cword>')
+endfunction
+
+function! vim_helpers#Word() abort
+    return expand('<cWORD>')
+endfunction
+
 function! vim_helpers#CCwordForGrep() abort
-    let cword = '\b' . expand('<cword>') . '\b'
+    let cword = vim_helpers#CCword()
     let cword = substitute(cword, '#', '\\\\#', 'g')
     return shellescape(cword)
 endfunction
 
 function! vim_helpers#CwordForGrep() abort
-    let cword = expand('<cword>')
+    let cword = vim_helpers#Cword()
     let cword = substitute(cword, '#', '\\\\#', 'g')
     return shellescape(cword)
 endfunction
 
 function! vim_helpers#CwordForSubstitute() abort
-    let cword = expand('<cword>')
+    let cword = vim_helpers#Cword()
 
     if empty(cword)
         return ''
@@ -97,8 +124,8 @@ function! vim_helpers#CwordForSubstitute() abort
     endif
 endfunction
 
-function! vim_helpers#SelectedTextForSubstitute() range abort
-    let selection = vim_helpers#SelectedText()
+function! vim_helpers#VwordForSubstitute() range abort
+    let selection = vim_helpers#Vword()
 
     " Escape regex characters
     let escaped_selection = escape(selection, '^$.*\/~[]')
@@ -107,6 +134,10 @@ function! vim_helpers#SelectedTextForSubstitute() range abort
     let escaped_selection = substitute(escaped_selection, '\n', '\\n', 'g')
 
     return escaped_selection
+endfunction
+
+function! vim_helpers#SelectedTextForSubstitute() range abort
+    return vim_helpers#VwordForSubstitute()
 endfunction
 
 function! s:RgKnownFileTypes() abort
