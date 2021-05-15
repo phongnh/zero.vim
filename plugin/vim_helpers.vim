@@ -105,7 +105,7 @@ command! -bar RemoveZeroWidthSpaces Remove200b
 
 " Replace typographic characters
 " Copied from https://github.com/srstevenson/dotfiles
-function! <SID>replace_typographic_characters() abort
+function! s:replace_typographic_characters() abort
     let l:map = {}
     let l:map['–'] = '--'
     let l:map['—'] = '---'
