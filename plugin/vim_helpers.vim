@@ -147,80 +147,72 @@ function! s:GrepCmd() abort
     return split(&grepprg, '\s\+')[0]
 endfunction
 
+function! s:GrepDir(dir) abort
+    let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
+    let l:dir = vim_helpers#strip(l:dir)
+
+    if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
+        return ''
+    endif
+
+    return l:dir
+endfunction
+
 function! s:Grep(cmd, ...) abort
-    let cmd = vim_helpers#strip(a:cmd . ' ' . join(a:000, ' '))
-    call s:LogCommand(cmd)
-    execute cmd
-endfunction
-
-function! s:GrepCword(cmd, word_boundary, qargs) abort
-    if a:word_boundary
-        let cword = vim_helpers#CCwordForGrep()
-    else
-        let cword = vim_helpers#CwordForGrep()
-    endif
-    call s:Grep(a:cmd, cword, a:qargs)
-endfunction
-
-function! s:GrepCwordInDir(cmd, word_boundary, qargs) abort
-    let dir = fnamemodify(empty(a:qargs) ? expand('%') : a:qargs, ':~:.:h')
-    let option = vim_helpers#ParseGrepDirOption(s:GrepCmd(), dir)
-    call s:GrepCword(a:cmd, a:word_boundary, option)
-endfunction
-
-function! s:TGrep(qargs) abort
-    call s:Grep('Grep', vim_helpers#ParseGrepFileTypeOption(s:GrepCmd()), a:qargs)
-endfunction
-
-function! s:TGrepCword(cmd, word_boundary, qargs) abort
-    let cmd = a:cmd . ' ' . vim_helpers#ParseGrepFileTypeOption(s:GrepCmd())
-    call s:GrepCword(cmd, a:word_boundary, a:qargs)
-endfunction
-
-function! s:FGrep(qargs) abort
-    let cmd = s:GrepCmd()
-    if cmd ==# 'rg' || cmd ==# 'grep'
-        call s:Grep('Grep', '--fixed-strings', a:qargs)
-    else
-        call s:Grep('Grep', a:qargs)
-    endif
-endfunction
-
-function! s:FGrepCword(word_boundary, qargs) abort
-    let cword = vim_helpers#CwordForGrep()
-    call s:FGrep(cword . ' ' . a:qargs)
+    let l:cmd = vim_helpers#strip(a:cmd . ' ' . join(a:000, ' '))
+    call s:LogCommand(l:cmd)
+    try
+        execute l:cmd
+    catch
+    endtry
 endfunction
 
 " Grep
-command! -bar -nargs=+ -complete=file Grep       silent! grep! <args> | redraw! | cwindow
-command!      -nargs=? -complete=file GrepCCword call <SID>GrepCword('Grep', 1, <q-args>)
-command!      -nargs=? -complete=file GrepCword  call <SID>GrepCword('Grep', 0, <q-args>)
-
-command!      -nargs=? -complete=file GrepCCwordInDir call <SID>GrepCwordInDir('Grep', 1, <q-args>)
-command!      -nargs=? -complete=file GrepCwordInDir  call <SID>GrepCwordInDir('Grep', 0, <q-args>)
+command! -bar -nargs=+ -complete=file        Grep       silent! grep! <args> | redraw! | cwindow
+command!      -nargs=? -complete=file        GrepCCword call <SID>Grep('Grep', vim_helpers#CCwordForGrep(), <f-args>)
+command!      -nargs=? -complete=file        GrepCword  call <SID>Grep('Grep', vim_helpers#CwordForGrep(),  <f-args>)
+command!      -nargs=? -complete=file        GrepWord   call <SID>Grep('Grep', vim_helpers#WordForGrep(),   <f-args>)
+command!      -nargs=? -complete=file -range GrepVword  call <SID>Grep('Grep', vim_helpers#VwordForGrep(),  <f-args>)
 
 " LGrep
-command! -bar -nargs=+ -complete=file LGrep       silent! lgrep! <args> | redraw! | lwindow
-command!      -nargs=? -complete=file LGrepCCword call <SID>GrepCword('LGrep', 1, <q-args>)
-command!      -nargs=? -complete=file LGrepCword  call <SID>GrepCword('LGrep', 0, <q-args>)
-
-command!      -nargs=? -complete=file LGrepCCwordInDir call <SID>GrepCwordInDir('LGrep', 1, <q-args>)
-command!      -nargs=? -complete=file LGrepCwordInDir  call <SID>GrepCwordInDir('LGrep', 0, <q-args>)
+command! -bar -nargs=+ -complete=file        LGrep       silent! lgrep! <args> | redraw! | lwindow
+command!      -nargs=? -complete=file        LGrepCCword call <SID>Grep('LGrep', vim_helpers#CCwordForGrep(), <f-args>)
+command!      -nargs=? -complete=file        LGrepCword  call <SID>Grep('LGrep', vim_helpers#CwordForGrep(),  <f-args>)
+command!      -nargs=? -complete=file        LGrepWord   call <SID>Grep('LGrep', vim_helpers#WordForGrep(),   <f-args>)
+command!      -nargs=? -complete=file -range LGrepVword  call <SID>Grep('LGrep', vim_helpers#VwordForGrep(),  <f-args>)
 
 " BGrep
-command! -bar -nargs=1 BGrep       silent! lgrep! <args> % | redraw! | lwindow
-command!      -nargs=0 BGrepCCword call <SID>GrepCword('BGrep', 1, '')
-command!      -nargs=0 BGrepCword  call <SID>GrepCword('BGrep', 0, '')
+command! -bar -nargs=1        BGrep       silent! lgrep! <args> % | redraw! | lwindow
+command!      -nargs=0        BGrepCCword call <SID>Grep('BGrep', vim_helpers#CCwordForGrep())
+command!      -nargs=0        BGrepCword  call <SID>Grep('BGrep', vim_helpers#CwordForGrep())
+command!      -nargs=0        BGrepWord   call <SID>Grep('BGrep', vim_helpers#WordForGrep())
+command!      -nargs=0 -range BGrepVword  call <SID>Grep('BGrep', vim_helpers#VwordForGrep())
 
-" TGrep
-command! -nargs=+ -complete=dir TGrep       call <SID>TGrep(<q-args>)
-command! -nargs=? -complete=dir TGrepCCword call <SID>TGrepCword('Grep', 1, <q-args>)
-command! -nargs=? -complete=dir TGrepCword  call <SID>TGrepCword('Grep', 0, <q-args>)
+if s:GrepCmd() =~# 'rg\|grep'
+    function! s:ParseFileTypeOption() abort
+        let l:cmd = get(a:, 1, s:GrepCmd())
 
-" FGrep
-command! -nargs=+ -complete=dir FGrep       call <SID>FGrep(<q-args>)
-command! -nargs=? -complete=dir FGrepCCword call <SID>FGrepCword('Grep', <q-args>)
-command! -nargs=? -complete=dir FGrepCword  call <SID>FGrepCword('Grep', <q-args>)
+        if l:cmd ==# 'rg'
+            return vim_helpers#RgFileTypeOption()
+        elseif l:cmd ==# 'grep'
+            return vim_helpers#GrepFileTypeOption()
+        endif
+
+        return ''
+    endfunction
+
+    " TGrep
+    command! -nargs=+ -complete=dir TGrep       call <SID>Grep('Grep', <SID>ParseFileTypeOption(), <f-args>)
+    command! -nargs=? -complete=dir TGrepCCword call <SID>Grep('Grep', <SID>ParseFileTypeOption(), vim_helpers#CCwordForGrep(), <f-args>)
+    command! -nargs=? -complete=dir TGrepCword  call <SID>Grep('Grep', <SID>ParseFileTypeOption(), vim_helpers#CwordForGrep(),  <f-args>)
+    command! -nargs=? -complete=dir TGrepWord   call <SID>Grep('Grep', <SID>ParseFileTypeOption(), vim_helpers#WordForGrep(),   <f-args>)
+
+    " FGrep
+    command! -nargs=+ -complete=file FGrep       call <SID>Grep('Grep', '--fixed-strings', <f-args>)
+    command! -nargs=? -complete=file FGrepCCword call <SID>Grep('Grep', '--fixed-strings', vim_helpers#CCwordForGrep(), <f-args>)
+    command! -nargs=? -complete=file FGrepCword  call <SID>Grep('Grep', '--fixed-strings', vim_helpers#CwordForGrep(),  <f-args>)
+    command! -nargs=? -complete=file FGrepWord   call <SID>Grep('Grep', '--fixed-strings', vim_helpers#WordForGrep(),   <f-args>)
+endif
 
 
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
@@ -385,8 +377,8 @@ if executable('gitk')
         endtry
     endfunction
 
-    command! -nargs=? -complete=custom,<SID>ListGitBranches Gitk call <SID>Gitk(<q-args>)
-    command! -nargs=? -bang -complete=file GitkFile call <SID>GitkFile(<q-args>, <bang>0)
+    command!       -nargs=? -complete=custom,<SID>ListGitBranches Gitk     call <SID>Gitk(<q-args>)
+    command! -bang -nargs=? -complete=file                        GitkFile call <SID>GitkFile(<q-args>, <bang>0)
 
     nnoremap <silent> gK :GitkFile<CR>
 
@@ -618,10 +610,10 @@ if executable('tig')
         endtry
     endfunction
 
-    command! -nargs=? -complete=custom,<SID>ListGitBranches Tig call <SID>Tig(<q-args>)
-    command! -nargs=? -bang -complete=file TigFile call <SID>TigFile(<q-args>, <bang>0)
-    command! -nargs=? -complete=file TigBlame call <SID>TigBlame(<q-args>)
-    command! -nargs=? TigStatus call <SID>TigStatus()
+    command!       -nargs=? -complete=custom,<SID>ListGitBranches Tig       call <SID>Tig(<q-args>)
+    command! -bang -nargs=? -complete=file                        TigFile   call <SID>TigFile(<q-args>, <bang>0)
+    command!       -nargs=? -complete=file                        TigBlame  call <SID>TigBlame(<q-args>)
+    command!       -nargs=?                                       TigStatus call <SID>TigStatus()
 
     nnoremap <silent> gC :TigStatus<CR>
     nnoremap <silent> gL :TigFile<CR>

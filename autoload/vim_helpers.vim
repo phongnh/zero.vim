@@ -32,6 +32,15 @@ function! s:ShellEscape(text) abort
     return shellescape(escaped_text)
 endfunction
 
+function! vim_helpers#GrepShellEscape(text) abort
+    if empty(a:text)
+        return ''
+    endif
+
+    let escaped_text = substitute(a:text, '#', '\\\\#', 'g')
+    return shellescape(escaped_text)
+endfunction
+
 function! vim_helpers#Vword() range abort
     " Save the current register and clipboard
     let reg_save     = getreg('"')
@@ -67,7 +76,7 @@ endfunction
 
 " TODO: Remove this function
 function! vim_helpers#SelectedTextForShell() range abort
-    return vim_helpers#ShellVword()
+    return vim_helpers#VwordForShell()
 endfunction
 
 function! vim_helpers#Pword() abort
@@ -81,7 +90,7 @@ function! vim_helpers#Pword() abort
 endfunction
 
 function! vim_helpers#PwordForShell() abort
-    let search = s:GetSearchText()
+    let search = vim_helpers#Pword()
     return s:ShellEscape(search)
 endfunction
 
@@ -104,14 +113,22 @@ endfunction
 
 function! vim_helpers#CCwordForGrep() abort
     let cword = vim_helpers#CCword()
-    let cword = substitute(cword, '#', '\\\\#', 'g')
-    return shellescape(cword)
+    return vim_helpers#GrepShellEscape(cword)
 endfunction
 
 function! vim_helpers#CwordForGrep() abort
     let cword = vim_helpers#Cword()
-    let cword = substitute(cword, '#', '\\\\#', 'g')
-    return shellescape(cword)
+    return vim_helpers#GrepShellEscape(cword)
+endfunction
+
+function! vim_helpers#WordForGrep() abort
+    let word = vim_helpers#Word()
+    return vim_helpers#GrepShellEscape(word)
+endfunction
+
+function! vim_helpers#VwordForGrep() abort
+    let selection = vim_helpers#Vword()
+    return vim_helpers#GrepShellEscape(selection)
 endfunction
 
 function! vim_helpers#CwordForSubstitute() abort
@@ -136,6 +153,7 @@ function! vim_helpers#VwordForSubstitute() range abort
     return escaped_selection
 endfunction
 
+" TODO: Remove this function
 function! vim_helpers#SelectedTextForSubstitute() range abort
     return vim_helpers#VwordForSubstitute()
 endfunction
@@ -161,29 +179,42 @@ function! vim_helpers#IsRgKnownFileType(ft) abort
 endfunction
 
 function! vim_helpers#RgFileTypeOption() abort
-    return vim_helpers#ParseGrepFileTypeOption('rg')
-endfunction
-
-function! vim_helpers#ParseGrepFileTypeOption(cmd) abort
     let ext = expand('%:e')
+    let ft = vim_helpers#RgFileType(&filetype)
 
-    if a:cmd ==# 'rg'
-        let ft = vim_helpers#RgFileType(&filetype)
-
-        if strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
-            return printf("-t %s", ft)
-        elseif strlen(ext)
-            return printf("-g '*.%s'", ext)
-        endif
-    elseif a:cmd ==# 'grep'
-        if strlen(ext)
-            return printf("--include='*.%s'", ext)
-        endif
+    if strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
+        return printf("-t %s", ft)
+    elseif strlen(ext)
+        return printf("-g '*.%s'", ext)
     endif
 
     return ''
 endfunction
 
+function! vim_helpers#GrepFileTypeOption() abort
+    let ext = expand('%:e')
+
+    if strlen(ext)
+        return printf("-include='*.%s'", ext)
+    endif
+
+    return ''
+endfunction
+
+" TODO: Remove this function
+function! vim_helpers#ParseGrepFileTypeOption(...) abort
+    let l:cmd = get(a:, 1, s:GrepCmd())
+
+    if l:cmd ==# 'rg'
+        return vim_helpers#RgFileTypeOption()
+    elseif l:cmd ==# 'grep'
+        return vim_helpers#GrepFileTypeOption()
+    endif
+
+    return ''
+endfunction
+
+" TODO: Remove this function
 function! vim_helpers#ParseGrepDirOption(cmd, dir) abort
     let l:dir = vim_helpers#strip(a:dir)
 
