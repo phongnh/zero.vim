@@ -78,12 +78,12 @@ endfunction
 
 function! vim_helpers#CCwordForShell() abort
     let cword = s:TrimNewLines(vim_helpers#CCword())
-    return s:ShellEscape(word)
+    return s:ShellEscape(cword)
 endfunction
 
 function! vim_helpers#CwordForShell() abort
     let cword = s:TrimNewLines(vim_helpers#Cword())
-    return s:ShellEscape(word)
+    return s:ShellEscape(cword)
 endfunction
 
 function! vim_helpers#WordForShell() abort
