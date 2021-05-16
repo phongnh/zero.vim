@@ -41,6 +41,18 @@ function! vim_helpers#GrepShellEscape(text) abort
     return shellescape(escaped_text)
 endfunction
 
+function! vim_helpers#CCword() abort
+    return '\b' . expand('<cword>') . '\b'
+endfunction
+
+function! vim_helpers#Cword() abort
+    return expand('<cword>')
+endfunction
+
+function! vim_helpers#Word() abort
+    return expand('<cWORD>')
+endfunction
+
 function! vim_helpers#Vword() range abort
     " Save the current register and clipboard
     let reg_save     = getreg('"')
@@ -62,6 +74,21 @@ function! vim_helpers#Vword() range abort
     else
         return selection
     endif
+endfunction
+
+function! vim_helpers#CCwordForShell() abort
+    let cword = s:TrimNewLines(vim_helpers#CCword())
+    return s:ShellEscape(word)
+endfunction
+
+function! vim_helpers#CwordForShell() abort
+    let cword = s:TrimNewLines(vim_helpers#Cword())
+    return s:ShellEscape(word)
+endfunction
+
+function! vim_helpers#WordForShell() abort
+    let word = s:TrimNewLines(vim_helpers#Word())
+    return s:ShellEscape(word)
 endfunction
 
 " TODO: Remove this function
@@ -99,18 +126,6 @@ function! vim_helpers#SearchTextForShell() abort
     return vim_helpers#PwordForShell()
 endfunction
 
-function! vim_helpers#CCword() abort
-    return '\b' . expand('<cword>') . '\b'
-endfunction
-
-function! vim_helpers#Cword() abort
-    return expand('<cword>')
-endfunction
-
-function! vim_helpers#Word() abort
-    return expand('<cWORD>')
-endfunction
-
 function! vim_helpers#CCwordForGrep() abort
     let cword = vim_helpers#CCword()
     return vim_helpers#GrepShellEscape(cword)
@@ -126,9 +141,14 @@ function! vim_helpers#WordForGrep() abort
     return vim_helpers#GrepShellEscape(word)
 endfunction
 
-function! vim_helpers#VwordForGrep() abort
+function! vim_helpers#VwordForGrep() range abort
     let selection = vim_helpers#Vword()
     return vim_helpers#GrepShellEscape(selection)
+endfunction
+
+function! vim_helpers#PwordForGrep() abort
+    let search = vim_helpers#Pword()
+    return vim_helpers#GrepShellEscape(search)
 endfunction
 
 function! vim_helpers#CwordForSubstitute() abort
