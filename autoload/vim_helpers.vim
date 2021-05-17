@@ -161,6 +161,19 @@ function! vim_helpers#CwordForSubstitute() abort
     endif
 endfunction
 
+function! vim_helpers#WordForSubstitute() abort
+    let word = vim_helpers#Word()
+
+    " Escape regex characters
+    let word = escape(word, '^$.*\/~[]')
+
+    if empty(word)
+        return ''
+    else
+        return word . '/'
+    endif
+endfunction
+
 function! vim_helpers#VwordForSubstitute() range abort
     let selection = vim_helpers#Vword()
 

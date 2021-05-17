@@ -19,6 +19,7 @@
 * vim_helpers#VwordForGrep()
 * vim_helpers#PwordForGrep()
 * vim_helpers#CwordForSubstitute()
+* vim_helpers#WordForSubstitute()
 * vim_helpers#VwordForSubstitute()
 
 ### This plugin defines the following commands:
