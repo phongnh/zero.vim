@@ -64,8 +64,8 @@ command! -bar RemoveZeroWidthSpaces Remove200b
         call s:copy_path_to_clipboard(l:cwd . '/' . s:expand_path(a:path, a:line))
     endfunction
 
-    command! -bang CopyRelativePath        call <SID>copy_path('%', <bang>0)
-    command! -bang CopyRelativePathWithCwd call <SID>copy_path_with_cwd('%', <bang>0)
+    command! -bang CopyRelativePath        call <SID>copy_path('%:~:.', <bang>0)
+    command! -bang CopyRelativePathWithCwd call <SID>copy_path_with_cwd('%:~:.', <bang>0)
     command! -bang CopyFullPath            call <SID>copy_path('%:p',  <bang>0)
     command! -bang CopyParentPath          call <SID>copy_path(<bang>0 ? '%:p:h' : '%:h', 0)
     command! -bang CopyParentPathWithCwd   call <SID>copy_path_with_cwd('%:h', 0)
