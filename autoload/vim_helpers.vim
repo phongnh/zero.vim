@@ -152,13 +152,7 @@ function! vim_helpers#PwordForGrep() abort
 endfunction
 
 function! vim_helpers#CwordForSubstitute() abort
-    let cword = vim_helpers#Cword()
-
-    if empty(cword)
-        return ''
-    else
-        return cword . '/'
-    endif
+    return vim_helpers#Cword()
 endfunction
 
 function! vim_helpers#WordForSubstitute() abort
@@ -167,23 +161,19 @@ function! vim_helpers#WordForSubstitute() abort
     " Escape regex characters
     let word = escape(word, '^$.*\/~[]')
 
-    if empty(word)
-        return ''
-    else
-        return word . '/'
-    endif
+    return word
 endfunction
 
 function! vim_helpers#VwordForSubstitute() range abort
     let selection = vim_helpers#Vword()
 
     " Escape regex characters
-    let escaped_selection = escape(selection, '^$.*\/~[]')
+    let selection = escape(selection, '^$.*\/~[]')
 
     " Escape the line endings
-    let escaped_selection = substitute(escaped_selection, '\n', '\\n', 'g')
+    let selection = substitute(selection, '\n', '\\n', 'g')
 
-    return escaped_selection
+    return selection
 endfunction
 
 " TODO: Remove this function
