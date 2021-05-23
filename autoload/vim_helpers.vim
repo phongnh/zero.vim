@@ -107,13 +107,13 @@ function! vim_helpers#SelectedTextForShell() range abort
 endfunction
 
 function! vim_helpers#Pword() abort
-    let selection = @/
+    let search = @/
 
-    if selection ==# "\n" || empty(selection)
+    if search ==# "\n" || empty(search)
         return ''
     endif
 
-    return substitute(selection, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    return substitute(search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
 function! vim_helpers#PwordForShell() abort
@@ -151,6 +151,10 @@ function! vim_helpers#PwordForGrep() abort
     return vim_helpers#GrepShellEscape(search)
 endfunction
 
+function! vim_helpers#CCwordForSubstitute() abort
+    return '\<' . vim_helpers#Cword() . '\>'
+endfunction
+
 function! vim_helpers#CwordForSubstitute() abort
     return vim_helpers#Cword()
 endfunction
@@ -174,6 +178,18 @@ function! vim_helpers#VwordForSubstitute() range abort
     let selection = substitute(selection, '\n', '\\n', 'g')
 
     return selection
+endfunction
+
+function! vim_helpers#PwordForSubstitute() range abort
+    let search = vim_helpers#Pword()
+
+    " Escape regex characters
+    let search = escape(search, '^$.*\/~[]')
+
+    " Escape the line endings
+    let search = substitute(search, '\n', '\\n', 'g')
+
+    return search
 endfunction
 
 " TODO: Remove this function
