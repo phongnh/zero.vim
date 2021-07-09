@@ -173,6 +173,7 @@ command!      -nargs=? -complete=file        GrepCCword call <SID>Grep('Grep', v
 command!      -nargs=? -complete=file        GrepCword  call <SID>Grep('Grep', vim_helpers#CwordForGrep(),  <f-args>)
 command!      -nargs=? -complete=file        GrepWord   call <SID>Grep('Grep', vim_helpers#WordForGrep(),   <f-args>)
 command!      -nargs=? -complete=file -range GrepVword  call <SID>Grep('Grep', vim_helpers#VwordForGrep(),  <f-args>)
+command!      -nargs=? -complete=file        GrepPword  call <SID>Grep('Grep', vim_helpers#PwordForGrep(),  <f-args>)
 
 " LGrep
 command! -bar -nargs=+ -complete=file        LGrep       silent! lgrep! <args> | redraw! | lwindow
@@ -180,6 +181,7 @@ command!      -nargs=? -complete=file        LGrepCCword call <SID>Grep('LGrep',
 command!      -nargs=? -complete=file        LGrepCword  call <SID>Grep('LGrep', vim_helpers#CwordForGrep(),  <f-args>)
 command!      -nargs=? -complete=file        LGrepWord   call <SID>Grep('LGrep', vim_helpers#WordForGrep(),   <f-args>)
 command!      -nargs=? -complete=file -range LGrepVword  call <SID>Grep('LGrep', vim_helpers#VwordForGrep(),  <f-args>)
+command!      -nargs=? -complete=file        LGrepPword  call <SID>Grep('LGrep', vim_helpers#PwordForGrep(),  <f-args>)
 
 " BGrep
 command! -bar -nargs=1        BGrep       silent! lgrep! <args> % | redraw! | lwindow
@@ -187,6 +189,7 @@ command!      -nargs=0        BGrepCCword call <SID>Grep('BGrep', vim_helpers#CC
 command!      -nargs=0        BGrepCword  call <SID>Grep('BGrep', vim_helpers#CwordForGrep())
 command!      -nargs=0        BGrepWord   call <SID>Grep('BGrep', vim_helpers#WordForGrep())
 command!      -nargs=0 -range BGrepVword  call <SID>Grep('BGrep', vim_helpers#VwordForGrep())
+command!      -nargs=0        BGrepPword  call <SID>Grep('BGrep', vim_helpers#PwordForGrep())
 
 if s:GrepCmd() =~# 'rg\|grep'
     function! s:ParseFileTypeOption() abort
