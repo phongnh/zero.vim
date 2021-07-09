@@ -37,7 +37,12 @@ function! vim_helpers#GrepShellEscape(text) abort
         return ''
     endif
 
+    " Escape alternative file
     let escaped_text = substitute(a:text, '#', '\\\\#', 'g')
+
+    " Escape some characters
+    let escaped_text = escape(escaped_text, '^$.*+?()[]{}|')
+
     return shellescape(escaped_text)
 endfunction
 
