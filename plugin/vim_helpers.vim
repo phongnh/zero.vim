@@ -193,8 +193,8 @@ command!      -nargs=0        BGrepPword  call <SID>Grep('BGrep', vim_helpers#Pw
 
 augroup CommandHelpersGrep
     autocmd!
-    autocmd QuickFixCmdPost grep*  cwindow
-    autocmd QuickFixCmdPost lgrep* lwindow
+    autocmd QuickFixCmdPost grep*  cwindow | redraw!
+    autocmd QuickFixCmdPost lgrep* lwindow | redraw!
 augroup END
 
 if s:GrepCmd() =~# 'rg\|grep'
