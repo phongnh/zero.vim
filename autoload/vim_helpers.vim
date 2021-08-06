@@ -28,7 +28,7 @@ function! s:ShellEscape(text) abort
     endif
 
     " Escape some characters
-    let escaped_text = escape(a:text, '^$.*+?()[]{}|')
+    let escaped_text = escape(a:text, '\^$.*+?()[]{}|-')
     return shellescape(escaped_text)
 endfunction
 
@@ -41,7 +41,7 @@ function! vim_helpers#GrepShellEscape(text) abort
     let escaped_text = substitute(a:text, '#', '\\\\#', 'g')
 
     " Escape some characters
-    let escaped_text = escape(escaped_text, '^$.*+?()[]{}|')
+    let escaped_text = escape(escaped_text, '^$.*+?()[]{}|-')
 
     return shellescape(escaped_text)
 endfunction
