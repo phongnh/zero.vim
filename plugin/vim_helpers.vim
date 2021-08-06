@@ -134,11 +134,10 @@ let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_
 
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
-    let &grepprg = 'rg -H --no-heading --vimgrep --smart-case --hidden'
+    let &grepprg = 'rg -H --no-heading -n -S --hidden'
     let &grepprg .= get(g:, 'grep_follow_links', 0) ? ' --follow' : ''
     let &grepprg .= get(g:, 'grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
-set grepformat=%f:%l:%c:%m,%f:%l:%m
 
 " Grep Helpers
 function! s:GrepCmd() abort
