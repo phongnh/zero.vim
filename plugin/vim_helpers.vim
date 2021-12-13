@@ -8,25 +8,6 @@ endif
 
 let g:vim_helpers_debug = get(g:, 'vim_helpers_debug', 0)
 
-" Log Helpers
-function! s:Print(msg) abort
-    echohl WarningMsg | echomsg a:msg | echohl None
-endfunction
-
-function! s:Error(msg) abort
-    echohl ErrorMsg | echomsg a:msg | echohl None
-endfunction
-
-function! s:LogCommand(cmd, ...) abort
-    if g:vim_helpers_debug
-        let l:tag = get(a:, 1, '')
-        if strlen(l:tag)
-            let l:tag = '[' . l:tag . '] '
-        endif
-        call s:Print('Running: ' . l:tag . a:cmd)
-    endif
-endfunction
-
 " Remove zero-width spaces (<200b>) {{{
 command! -bar Remove200b silent! %s/\%u200b//g | update | redraw
 command! -bar RemoveZeroWidthSpaces Remove200b
@@ -147,7 +128,7 @@ endfunction
 
 function! s:GrepDir(dir) abort
     let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
-    let l:dir = vim_helpers#strip(l:dir)
+    let l:dir = vim_helpers#Strip(l:dir)
 
     if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
         return ''
@@ -157,8 +138,8 @@ function! s:GrepDir(dir) abort
 endfunction
 
 function! s:Grep(cmd, ...) abort
-    let l:cmd = vim_helpers#strip(a:cmd . ' ' . join(a:000, ' '))
-    call s:LogCommand(l:cmd)
+    let l:cmd = vim_helpers#Strip(a:cmd . ' ' . join(a:000, ' '))
+    call vim_helpers#LogCommand(l:cmd)
     try
         execute l:cmd
     catch

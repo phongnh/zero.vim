@@ -97,14 +97,8 @@ function! s:OpenTigVimAction(cmd)
 endfunction
 
 function! s:RunTig(options) abort
-    if type(a:options) == type([])
-        let opts = join(a:options, ' ')
-    else
-        let opts = a:options
-    endif
-
     let cwd = vim_helpers#git#WorkTree()
-    let cmd = vim_helpers#Strip('tig ' . opts)
+    let cmd = vim_helpers#Strip('tig ' . a:options)
 
     " Use echo as fallback command
     call writefile(['echo'], s:GetTigVimActionFile())
@@ -194,7 +188,7 @@ function! vim_helpers#tig#TigBlame(path) abort
 
     call extend(opts, ['--', s:TigShellEscape(l:path)])
 
-    call vim_helpers#tig#Tig(opts)
+    call vim_helpers#tig#Tig(join(opts, ' '))
 endfunction
 
 function! vim_helpers#tig#TigStatus() abort
@@ -204,6 +198,6 @@ endfunction
 function! vim_helpers#tig#TigOnBlame() abort
     let ref = vim_helpers#git#ParseRef()
     if !empty(ref)
-        call s:RunTig('show ' . ref)
+        call vim_helpers#tig#Tig('show ' . ref)
     endif
 endfunction

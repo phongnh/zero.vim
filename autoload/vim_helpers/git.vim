@@ -82,7 +82,7 @@ endfunction
 
 " Fugitive Blame
 function! s:ParseFugitiveRef() abort
-    let line = vim_helpers#strip(getline('.'))
+    let line = vim_helpers#Strip(getline('.'))
 
     let ref = get(split(line, '\s\+'), 0, '')
     if ref !~# '^0\{7,\}$' && ref =~# '^\^\?[a-z0-9]\{7,\}$'

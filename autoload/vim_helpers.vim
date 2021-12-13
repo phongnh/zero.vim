@@ -5,7 +5,7 @@
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
-function! vim_helpers#Print(msg) abort
+function! s:Print(msg) abort
     echohl WarningMsg | echomsg a:msg | echohl None
 endfunction
 

@@ -45,6 +45,6 @@ endfunction
 function! vim_helpers#gitk#GitkOnBlame() abort
     let ref = vim_helpers#git#ParseRef()
     if !empty(ref)
-        call s:RunGitk(ref)
+        call vim_helpers#gitk#Gitk(ref)
     endif
 endfunction
