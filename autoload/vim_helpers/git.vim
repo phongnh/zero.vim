@@ -1,4 +1,16 @@
 " Git helpers
+function! vim_helpers#git#BuildPath(path) abort
+    let l:path = empty(a:path) ? expand('%') : a:path
+
+    if empty(l:path)
+        throw 'Path is required!'
+    endif
+
+    let l:path = fnamemodify(l:path, ':p')
+    let l:path = substitute(l:path, vim_helpers#git#WorkTree() . '/', '', 'g')
+    return l:path
+endfunction
+
 function! vim_helpers#git#FindRepo() abort
     if exists('b:git_dir') && strlen(b:git_dir)
         return fnamemodify(b:git_dir, ':h')
