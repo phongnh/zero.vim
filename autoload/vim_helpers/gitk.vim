@@ -11,7 +11,7 @@ function! s:RunGitk(options) abort
     redraw!
 endfunction
 
-function! s:GitFullHistoryCommand(path) abort
+function! s:GitOldPaths(path) abort
     return printf('$(' . s:gitk_log_cmd . ')', shellescape(a:path))
 endfunction
 
@@ -31,7 +31,7 @@ function! vim_helpers#gitk#GitkFile(path, bang) abort
         let path = vim_helpers#git#BuildPath(a:path)
 
         if a:bang
-            let path = s:GitFullHistoryCommand(path)
+            let path = s:GitOldPaths(path)
         else
             let path = shellescape(path)
         endif
