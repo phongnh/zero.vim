@@ -68,7 +68,7 @@ command! -bar ReplaceTypographicCharacters call <SID>ReplaceTypographicCharacter
     " Clear the permanent highlights
     command! ClearHightlights call clearmatches()
 
-    if get(g:, 'highlight_mappings', 0)
+    if get(g:, 'vim_helpers_highlight_mappings', 0)
         nnoremap <silent> <Leader>hl :HighlightLine<CR>
         nnoremap <silent> <Leader>hw :HighlightWord<CR>
         nnoremap <silent> <Leader>hv :HighlightColumns<CR>
