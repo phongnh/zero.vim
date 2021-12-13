@@ -37,47 +37,21 @@ command! -bar ReplaceTypographicCharacters call <SID>ReplaceTypographicCharacter
         command! CopyYankedText let [@+, @*] = [@", @"]
     endif
 
-    " Copy path to clipboard
-    function! s:copy_path_to_clipboard(path) abort
-        let @" = a:path
-        if has('clipboard')
-            let [@*, @+] = [@", @"]
-        endif
-        echo 'Copied: ' . @"
-    endfunction
+    command! -bang CopyRelativePath         call vim_helpers#path#CopyRelativePath(<bang>0)
+    command! -bang CopyRelativePathWithCwd  call vim_helpers#path#CopyRelativePathWithCwd(<bang>0)
+    command! -bang CopyFullPath             call vim_helpers#path#CopyFullPath(<bang>0)
+    command! -bang CopyParentDirPath        call vim_helpers#path#CopyParentDirPath(<bang>0)
+    command! -bang CopyParentDirPathWithCwd call vim_helpers#path#CopyParentDirPathWithCwd()
 
-    function! s:expand_path(path, line) abort
-        let l:path = expand(a:path)
-        if a:line
-            let l:path .= ':' . line('.')
-        endif
-        return l:path
-    endfunction
-
-    function! s:copy_path(path, line) abort
-        call s:copy_path_to_clipboard(s:expand_path(a:path, a:line))
-    endfunction
-
-    function! s:copy_path_with_cwd(path, line) abort
-        let l:cwd = fnamemodify(getcwd(), ':t')
-        call s:copy_path_to_clipboard(l:cwd . '/' . s:expand_path(a:path, a:line))
-    endfunction
-
-    command! -bang CopyRelativePath        call <SID>copy_path('%:~:.', <bang>0)
-    command! -bang CopyRelativePathWithCwd call <SID>copy_path_with_cwd('%:~:.', <bang>0)
-    command! -bang CopyFullPath            call <SID>copy_path('%:p',  <bang>0)
-    command! -bang CopyParentPath          call <SID>copy_path(<bang>0 ? '%:p:h' : '%:h', 0)
-    command! -bang CopyParentPathWithCwd   call <SID>copy_path_with_cwd('%:h', 0)
-
-    if get(g:, 'copypath_mappings', 1)
+    if get(g:, 'vim_helpers_path_mappings', 1)
         nnoremap <silent> yp :CopyRelativePath<CR>
         nnoremap <silent> yP :CopyRelativePath!<CR>
         nnoremap <silent> yc :CopyRelativePathWithCwd<CR>
         nnoremap <silent> yC :CopyRelativePathWithCwd!<CR>
         nnoremap <silent> yu :CopyFullPath<CR>
         nnoremap <silent> yU :CopyFullPath!<CR>
-        nnoremap <silent> yd :CopyParentPath<CR>
-        nnoremap <silent> yD :CopyParentPathWithCwd<CR>
+        nnoremap <silent> yd :CopyParentDirPath<CR>
+        nnoremap <silent> yD :CopyParentDirPathWithCwd<CR>
     endif
 " }}}
 
