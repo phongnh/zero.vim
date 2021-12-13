@@ -1,7 +1,7 @@
 " Gitk
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 let s:gitk_cmd = 'gitk %s >/dev/null 2>&1' . (!s:is_windows ? ' &' : '')
-let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' . '')
+let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' : '')
 
 function! s:RunGitk(options) abort
     let cmd = vim_helpers#Strip(printf(s:gitk_cmd, a:options))

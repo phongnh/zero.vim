@@ -1,5 +1,5 @@
 let s:tig_cmd = 'tig %s'
-let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' . '')
+let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' : '')
 let s:tigrc_user_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h') . '/config/vim.tigrc'
 let s:tig_mode = get(g:, 'tig_mode', 'tab')
 
