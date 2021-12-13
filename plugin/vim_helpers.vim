@@ -32,6 +32,24 @@ command! -bar Remove200b silent! %s/\%u200b//g | update | redraw
 command! -bar RemoveZeroWidthSpaces Remove200b
 " }}}
 
+" Replace typographic characters
+" Copied from https://github.com/srstevenson/dotfiles {{{
+function! s:ReplaceTypographicCharacters() abort
+    let l:map = {}
+    let l:map['–'] = '--'
+    let l:map['—'] = '---'
+    let l:map['‘'] = "'"
+    let l:map['’'] = "'"
+    let l:map['“'] = '"'
+    let l:map['”'] = '"'
+    let l:map['•'] = '*'
+    let l:map['…'] = '...'
+    execute ':%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
+endfunction
+
+command! -bar ReplaceTypographicCharacters call <SID>ReplaceTypographicCharacters()
+" }}}
+
 " Copy Commands {{{
     if has('clipboard')
         " Copy yanked text to clipboard
@@ -102,23 +120,6 @@ command! -bar RemoveZeroWidthSpaces Remove200b
         nnoremap <silent> <Leader>hc :ClearHightlights<CR>
     endif
 " }}}
-
-" Replace typographic characters
-" Copied from https://github.com/srstevenson/dotfiles
-function! s:replace_typographic_characters() abort
-    let l:map = {}
-    let l:map['–'] = '--'
-    let l:map['—'] = '---'
-    let l:map['‘'] = "'"
-    let l:map['’'] = "'"
-    let l:map['“'] = '"'
-    let l:map['”'] = '"'
-    let l:map['•'] = '*'
-    let l:map['…'] = '...'
-    execute ':%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
-endfunction
-
-command! -bar ReplaceTypographicCharacters call <SID>replace_typographic_characters()
 
 " Grep Settings
 let s:rg_default_filetype_mappings = {

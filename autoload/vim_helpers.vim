@@ -6,14 +6,19 @@ let s:save_cpo = &cpoptions
 set cpoptions&vim
 
 if exists('*trim')
-    function! vim_helpers#strip(str) abort
+    function! vim_helpers#Strip(str) abort
         return trim(a:str)
     endfunction
 else
-    function! vim_helpers#strip(str) abort
+    function! vim_helpers#Strip(str) abort
         return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
     endfunction
 endif
+
+" TODO: Remove this function
+function! vim_helpers#strip(str) abort
+    return vim_helpers#Strip(a:str)
+endfunction
 
 " Search Helpers
 function! s:TrimNewLines(text) abort

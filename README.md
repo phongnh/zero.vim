@@ -2,7 +2,7 @@
 
 ### This plugin defines the following functions for manipulating text for search and substitute:
 
-* vim_helpers#strip()
+* vim_helpers#Strip()
 * vim_helpers#CCword()
 * vim_helpers#Cword()
 * vim_helpers#Word()
@@ -28,6 +28,7 @@
 
 * Remove200b
 * RemoveZeroWidthSpaces
+* ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
 * CopyYankedText
 * CopyRelativePath
 * CopyRelativePathWithCwd
@@ -38,7 +39,6 @@
 * HighlightWord
 * HighlightColumns
 * ClearHightlights
-* ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
 * Grep, GrepCCword, GrepCword, GrepWord, GrepVword
 * LGrep, LGrepCCword, LGrepCword, LGrepWord, LGrepVword
 * BGrep, BGrepCCword, BGrepCword, BGrepWord, BGrepVword
