@@ -96,19 +96,9 @@ function! vim_helpers#WordForShell() abort
     return s:ShellEscape(word)
 endfunction
 
-" TODO: Remove this function
-function! vim_helpers#SelectedText() range abort
-    return vim_helpers#Vword()
-endfunction
-
 function! vim_helpers#VwordForShell() range abort
     let selection = s:TrimNewLines(vim_helpers#Vword())
     return s:ShellEscape(selection)
-endfunction
-
-" TODO: Remove this function
-function! vim_helpers#SelectedTextForShell() range abort
-    return vim_helpers#VwordForShell()
 endfunction
 
 function! vim_helpers#Pword() abort
@@ -124,11 +114,6 @@ endfunction
 function! vim_helpers#PwordForShell() abort
     let search = vim_helpers#Pword()
     return s:ShellEscape(search)
-endfunction
-
-" TODO: Remove this function
-function! vim_helpers#SearchTextForShell() abort
-    return vim_helpers#PwordForShell()
 endfunction
 
 function! vim_helpers#CCwordForGrep() abort
@@ -197,11 +182,6 @@ function! vim_helpers#PwordForSubstitute() range abort
     return search
 endfunction
 
-" TODO: Remove this function
-function! vim_helpers#SelectedTextForSubstitute() range abort
-    return vim_helpers#VwordForSubstitute()
-endfunction
-
 function! s:RgKnownFileTypes() abort
     if exists('g:rg_known_filetypes')
         return g:rg_known_filetypes
@@ -240,36 +220,6 @@ function! vim_helpers#GrepFileTypeOption() abort
 
     if strlen(ext)
         return printf("-include='*.%s'", ext)
-    endif
-
-    return ''
-endfunction
-
-" TODO: Remove this function
-function! vim_helpers#ParseGrepFileTypeOption(...) abort
-    let l:cmd = get(a:, 1, s:GrepCmd())
-
-    if l:cmd ==# 'rg'
-        return vim_helpers#RgFileTypeOption()
-    elseif l:cmd ==# 'grep'
-        return vim_helpers#GrepFileTypeOption()
-    endif
-
-    return ''
-endfunction
-
-" TODO: Remove this function
-function! vim_helpers#ParseGrepDirOption(cmd, dir) abort
-    let l:dir = vim_helpers#strip(a:dir)
-
-    if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
-        return ''
-    endif
-
-    if a:cmd ==# 'rg'
-        return printf("-g '%s/*'", l:dir)
-    elseif a:cmd ==# 'grep'
-        return printf("'%s'", l:dir)
     endif
 
     return ''
