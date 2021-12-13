@@ -5,6 +5,24 @@
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
+function! vim_helpers#Print(msg) abort
+    echohl WarningMsg | echomsg a:msg | echohl None
+endfunction
+
+function! vim_helpers#Error(msg) abort
+    echohl ErrorMsg | echomsg a:msg | echohl None
+endfunction
+
+function! vim_helpers#LogCommand(cmd, ...) abort
+    if g:vim_helpers_debug
+        let l:tag = get(a:, 1, '')
+        if strlen(l:tag)
+            let l:tag = '[' . l:tag . '] '
+        endif
+        call s:Print('Running: ' . l:tag . a:cmd)
+    endif
+endfunction
+
 if exists('*trim')
     function! vim_helpers#Strip(str) abort
         return trim(a:str)

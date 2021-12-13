@@ -295,16 +295,6 @@ function! s:BuildPath(path) abort
     return l:path
 endfunction
 
-let s:git_full_log_cmd = 'git log --name-only --format= --follow -- %s'
-
-if executable('uniq')
-    let s:git_full_log_cmd .= ' | uniq'
-endif
-
-function! s:GitFullHistoryCommand(path) abort
-    return printf('$(' . s:git_full_log_cmd . ')', shellescape(a:path))
-endfunction
-
 function! s:TigShellEscape(path) abort
     return '"' . a:path . '"'
 endfunction
@@ -346,59 +336,14 @@ endfunction
 
 " Gitk
 if executable('gitk')
-    let s:gitk_cmd = 'gitk %s >/dev/null 2>&1'
-    if !s:is_windows
-        let s:gitk_cmd .= ' &'
-    endif
-
-    function! s:RunGitk(options) abort
-        let cmd = vim_helpers#strip(printf(s:gitk_cmd, a:options))
-        let cwd = shellescape(s:GitWorkTree())
-        call s:LogCommand(cmd)
-        execute printf('silent !cd %s && %s', cwd, cmd)
-        redraw!
-    endfunction
-
-    function! s:Gitk(options) abort
-        try
-            call s:FindGitRepo()
-            call s:RunGitk(a:options)
-        catch
-            call s:Error('Gitk: ' . v:exception)
-        endtry
-    endfunction
-
-    function! s:GitkFile(path, bang) abort
-        try
-            call s:FindGitRepo()
-
-            let path = s:BuildPath(a:path)
-
-            if a:bang
-                call s:RunGitk('-- ' . s:GitFullHistoryCommand(path))
-            else
-                call s:RunGitk('-- ' . shellescape(path))
-            endif
-        catch
-            call s:Error('GitkFile: ' . v:exception)
-        endtry
-    endfunction
-
-    command!       -nargs=? -complete=custom,<SID>ListGitBranches Gitk     call <SID>Gitk(<q-args>)
-    command! -bang -nargs=? -complete=file                        GitkFile call <SID>GitkFile(<q-args>, <bang>0)
+    command! -nargs=? -complete=custom,vim_helpers#git#Branches Gitk call vim_helpers#gitk#Gitk(<q-args>)
+    command! -bang -nargs=? -complete=file GitkFile call vim_helpers#gitk#GitkFile(<q-args>, <bang>0)
 
     nnoremap <silent> gK :GitkFile<CR>
 
-    function! s:GitkRef(line) abort
-        let ref = s:ParseRef(a:line)
-        if !empty(ref)
-            call s:RunGitk(ref)
-        endif
-    endfunction
-
     augroup CommandHelpersGitk
         autocmd!
-        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gK :call <SID>GitkRef(getline('.'))<CR>
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gK :call vim_helpers#gitk#GitkOnBlame()<CR>
     augroup END
 endif
 
