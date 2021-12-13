@@ -34,48 +34,48 @@ command! -bar ReplaceTypographicCharacters call <SID>ReplaceTypographicCharacter
 " }}}
 
 " Copy Commands {{{
-    if has('clipboard')
-        " Copy yanked text to clipboard
-        command! CopyYankedText let [@+, @*] = [@", @"]
-    endif
+if has('clipboard')
+    " Copy yanked text to clipboard
+    command! CopyYankedText let [@+, @*] = [@", @"]
+endif
 
-    command! -bang CopyRelativePath         call vim_helpers#path#CopyRelativePath(<bang>0)
-    command! -bang CopyRelativePathWithCwd  call vim_helpers#path#CopyRelativePathWithCwd(<bang>0)
-    command! -bang CopyFullPath             call vim_helpers#path#CopyFullPath(<bang>0)
-    command! -bang CopyParentDirPath        call vim_helpers#path#CopyParentDirPath(<bang>0)
-    command! -bang CopyParentDirPathWithCwd call vim_helpers#path#CopyParentDirPathWithCwd()
+command! -bang CopyRelativePath         call vim_helpers#path#CopyRelativePath(<bang>0)
+command! -bang CopyRelativePathWithCwd  call vim_helpers#path#CopyRelativePathWithCwd(<bang>0)
+command! -bang CopyFullPath             call vim_helpers#path#CopyFullPath(<bang>0)
+command! -bang CopyParentDirPath        call vim_helpers#path#CopyParentDirPath(<bang>0)
+command! -bang CopyParentDirPathWithCwd call vim_helpers#path#CopyParentDirPathWithCwd()
 
-    if get(g:, 'vim_helpers_path_mappings', 1)
-        nnoremap <silent> yp :CopyRelativePath<CR>
-        nnoremap <silent> yP :CopyRelativePath!<CR>
-        nnoremap <silent> yc :CopyRelativePathWithCwd<CR>
-        nnoremap <silent> yC :CopyRelativePathWithCwd!<CR>
-        nnoremap <silent> yu :CopyFullPath<CR>
-        nnoremap <silent> yU :CopyFullPath!<CR>
-        nnoremap <silent> yd :CopyParentDirPath<CR>
-        nnoremap <silent> yD :CopyParentDirPathWithCwd<CR>
-    endif
+if get(g:, 'vim_helpers_path_mappings', 1)
+    nnoremap <silent> yp :CopyRelativePath<CR>
+    nnoremap <silent> yP :CopyRelativePath!<CR>
+    nnoremap <silent> yc :CopyRelativePathWithCwd<CR>
+    nnoremap <silent> yC :CopyRelativePathWithCwd!<CR>
+    nnoremap <silent> yu :CopyFullPath<CR>
+    nnoremap <silent> yU :CopyFullPath!<CR>
+    nnoremap <silent> yd :CopyParentDirPath<CR>
+    nnoremap <silent> yD :CopyParentDirPathWithCwd<CR>
+endif
 " }}}
 
 " Highlight commands {{{
-    " Highlight current line
-    command! HighlightLine call matchadd('Search', '\%' . line('.') . 'l')
+" Highlight current line
+command! HighlightLine call matchadd('Search', '\%' . line('.') . 'l')
 
-    " Highlight the word underneath the cursor
-    command! HighlightWord call matchadd('Search', '\<\w*\%' . line('.') . 'l\%' . col('.') . 'c\w*\>')
+" Highlight the word underneath the cursor
+command! HighlightWord call matchadd('Search', '\<\w*\%' . line('.') . 'l\%' . col('.') . 'c\w*\>')
 
-    " Highlight the words contained in the virtual column
-    command! HighlightColumns call matchadd('Search', '\<\w*\%' . virtcol('.') . 'v\w*\>')
+" Highlight the words contained in the virtual column
+command! HighlightColumns call matchadd('Search', '\<\w*\%' . virtcol('.') . 'v\w*\>')
 
-    " Clear the permanent highlights
-    command! ClearHightlights call clearmatches()
+" Clear the permanent highlights
+command! ClearHightlights call clearmatches()
 
-    if get(g:, 'vim_helpers_highlight_mappings', 0)
-        nnoremap <silent> <Leader>hl :HighlightLine<CR>
-        nnoremap <silent> <Leader>hw :HighlightWord<CR>
-        nnoremap <silent> <Leader>hv :HighlightColumns<CR>
-        nnoremap <silent> <Leader>hc :ClearHightlights<CR>
-    endif
+if get(g:, 'vim_helpers_highlight_mappings', 0)
+    nnoremap <silent> <Leader>hl :HighlightLine<CR>
+    nnoremap <silent> <Leader>hw :HighlightWord<CR>
+    nnoremap <silent> <Leader>hv :HighlightColumns<CR>
+    nnoremap <silent> <Leader>hc :ClearHightlights<CR>
+endif
 " }}}
 
 " Grep Settings
