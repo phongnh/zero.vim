@@ -229,10 +229,16 @@ function! vim_helpers#RgFileTypeOption() abort
     let ext = expand('%:e')
     let ft = vim_helpers#RgFileType(&filetype)
 
-    if strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
+    if strlen(ft) && ft == 'vim'
+        return "-g '*.vim' -g '*.nvim'"
+    elseif strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
         return printf("-t %s", ft)
     elseif strlen(ext)
-        return printf("-g '*.%s'", ext)
+        if ext == 'vim' || ext = 'nvim'
+            return "-g '*.vim' -g '*.nvim'"
+        else
+            return printf("-g '*.%s'", ext)
+        endif
     endif
 
     return ''
@@ -242,7 +248,11 @@ function! vim_helpers#GrepFileTypeOption() abort
     let ext = expand('%:e')
 
     if strlen(ext)
-        return printf("-include='*.%s'", ext)
+        if ext == 'vim'
+            return "-include='*.vim' -include='*.nvim'"
+        else
+            return printf("-include='*.%s'", ext)
+        endif
     endif
 
     return ''
