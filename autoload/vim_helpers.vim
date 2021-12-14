@@ -140,7 +140,7 @@ function! vim_helpers#PwordForShell() abort
 endfunction
 
 function! vim_helpers#CCwordForCtrlSF() abort
-    if get(g:, ctrlsf_backend, '') ==# 'rg'
+    if get(g:, 'ctrlsf_backend', '') ==# 'rg'
         return '-R ' . vim_helpers#CCword()
     else
         return vim_helpers#Cword()
