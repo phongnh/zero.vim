@@ -13,6 +13,8 @@
 * vim_helpers#WordForShell()
 * vim_helpers#VwordForShell()
 * vim_helpers#PwordForShell()
+* vim_helpers#CCwordForCtrlSF()
+* vim_helpers#PwordForCtrlSF()
 * vim_helpers#CCwordForGrep()
 * vim_helpers#CwordForGrep()
 * vim_helpers#WordForGrep()
@@ -23,6 +25,9 @@
 * vim_helpers#WordForSubstitute()
 * vim_helpers#VwordForSubstitute()
 * vim_helpers#PwordForSubstitute()
+* vim_helpers#InsertCCWord()
+* vim_helpers#InsertWord()
+* vim_helpers#InsertPWord()
 
 ### This plugin defines the following commands:
 
@@ -44,6 +49,7 @@
 * BGrep, BGrepCCword, BGrepCword, BGrepWord, BGrepVword
 * TGrep, TGrepCCword, TGrepCword, TGrepWord, TGrepVword
 * FGrep, FGrepCCword, FGrepCword, FGrepWord, FGrepVword
+* GrepCode, GrepCodeCCword, GrepCodeCword, GrepCodeWord, GrepCodeVword
 * Gitk, GitkFile
 * Tig, TigFile, TigStatus, TigBlame
 * SW

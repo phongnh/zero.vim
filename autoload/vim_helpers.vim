@@ -139,6 +139,19 @@ function! vim_helpers#PwordForShell() abort
     return s:ShellEscape(search)
 endfunction
 
+function! vim_helpers#CCwordForCtrlSF() abort
+    if get(g:, ctrlsf_backend, '') ==# 'rg'
+        return '-R ' . vim_helpers#CCword()
+    else
+        return vim_helpers#Cword()
+    endif
+endfunction
+
+function! vim_helpers#PwordForCtrlSF() abort
+    let l:pword = vim_helpers#Pword()
+    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . l:pword
+endfunction
+
 function! vim_helpers#CCwordForGrep() abort
     let cword = vim_helpers#CCword()
     return vim_helpers#GrepShellEscape(cword)
@@ -229,12 +242,12 @@ function! vim_helpers#RgFileTypeOption() abort
     let ext = expand('%:e')
     let ft = vim_helpers#RgFileType(&filetype)
 
-    if strlen(ft) && ft == 'vim'
+    if strlen(ft) && (ft ==# 'vim' || ft ==# 'nvim')
         return "-g '*.vim' -g '*.nvim'"
     elseif strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
         return printf("-t %s", ft)
     elseif strlen(ext)
-        if ext == 'vim' || ext = 'nvim'
+        if ext ==# 'vim' || ext ==# 'nvim'
             return "-g '*.vim' -g '*.nvim'"
         else
             return printf("-g '*.%s'", ext)
@@ -248,7 +261,7 @@ function! vim_helpers#GrepFileTypeOption() abort
     let ext = expand('%:e')
 
     if strlen(ext)
-        if ext == 'vim'
+        if ext ==# 'vim' || ext ==# 'nvim'
             return "-include='*.vim' -include='*.nvim'"
         else
             return printf("-include='*.%s'", ext)
@@ -284,6 +297,8 @@ function! vim_helpers#InsertWord() abort
         return vim_helpers#WordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
         return vim_helpers#Word()
+    elseif getcmdtype() == '@'
+        return vim_helpers#WordForGrep()
     else
         return vim_helpers#WordForShell()
     endif
@@ -296,7 +311,9 @@ function! vim_helpers#InsertCCword() abort
     elseif s:IsGrepCommand(l:cmd)
         return vim_helpers#CCwordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return '-R ' . vim_helpers#CCword()
+        return vim_helpers#CCwordForCtrlSF()
+    elseif getcmdtype() == '@'
+        return vim_helpers#CCwordForGrep()
     else
         return vim_helpers#CCwordForShell()
     endif
@@ -309,8 +326,9 @@ function! vim_helpers#InsertPword() abort
     elseif s:IsGrepCommand(l:cmd)
         return vim_helpers#PwordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
-        let l:pword = vim_helpers#Pword()
-        return (stridx(l:pword, '\b') > 0 ? '-R ' : '') . l:pword
+        return vim_helpers#PwordForCtrlSF()
+    elseif getcmdtype() == '@'
+        return vim_helpers#PwordForGrep()
     else
         return vim_helpers#PwordForShell()
     endif
