@@ -45,13 +45,17 @@ function! s:TrimNewLines(text) abort
     return text
 endfunction
 
+let s:shell_escape_characters      = '\^$.*+?()[]{}|-'
+let s:grep_escape_characters       = '^$.*+?()[]{}|-'
+let s:substitute_escape_characters = '^$.*\/~[]'
+
 function! s:ShellEscape(text) abort
     if empty(a:text)
         return ''
     endif
 
     " Escape some characters
-    let escaped_text = escape(a:text, '\^$.*+?()[]{}|-')
+    let escaped_text = escape(a:text, s:shell_escape_characters)
     return shellescape(escaped_text)
 endfunction
 
@@ -64,7 +68,7 @@ function! vim_helpers#GrepShellEscape(text) abort
     let escaped_text = substitute(a:text, '#', '\\\\#', 'g')
 
     " Escape some characters
-    let escaped_text = escape(escaped_text, '^$.*+?()[]{}|-')
+    let escaped_text = escape(escaped_text, s:grep_escape_characters)
 
     return shellescape(escaped_text)
 endfunction
@@ -105,8 +109,9 @@ function! vim_helpers#Vword() range abort
 endfunction
 
 function! vim_helpers#CCwordForShell() abort
-    let cword = s:TrimNewLines(vim_helpers#CCword())
-    return s:ShellEscape(cword)
+    let cword = s:TrimNewLines(vim_helpers#Cword())
+    let cword = escape(cword, s:shell_escape_characters)
+    return shellescape('\b' . cword . '\b')
 endfunction
 
 function! vim_helpers#CwordForShell() abort
@@ -189,7 +194,7 @@ function! vim_helpers#WordForSubstitute() abort
     let word = vim_helpers#Word()
 
     " Escape regex characters
-    let word = escape(word, '^$.*\/~[]')
+    let word = escape(word, s:substitute_escape_characters)
 
     return word
 endfunction
@@ -198,7 +203,7 @@ function! vim_helpers#VwordForSubstitute() range abort
     let selection = vim_helpers#Vword()
 
     " Escape regex characters
-    let selection = escape(selection, '^$.*\/~[]')
+    let selection = escape(selection, s:substitute_escape_characters)
 
     " Escape the line endings
     let selection = substitute(selection, '\n', '\\n', 'g')
@@ -298,7 +303,7 @@ function! vim_helpers#InsertWord() abort
     elseif s:IsCtrlSFCommand(l:cmd)
         return vim_helpers#Word()
     elseif getcmdtype() == '@'
-        return vim_helpers#WordForGrep()
+        return vim_helpers#WordForShell()
     else
         return vim_helpers#WordForShell()
     endif
@@ -313,7 +318,7 @@ function! vim_helpers#InsertCCword() abort
     elseif s:IsCtrlSFCommand(l:cmd)
         return vim_helpers#CCwordForCtrlSF()
     elseif getcmdtype() == '@'
-        return vim_helpers#CCwordForGrep()
+        return vim_helpers#CCwordForShell()
     else
         return vim_helpers#CCwordForShell()
     endif
@@ -328,7 +333,7 @@ function! vim_helpers#InsertPword() abort
     elseif s:IsCtrlSFCommand(l:cmd)
         return vim_helpers#PwordForCtrlSF()
     elseif getcmdtype() == '@'
-        return vim_helpers#PwordForGrep()
+        return vim_helpers#PwordForShell()
     else
         return vim_helpers#PwordForShell()
     endif
