@@ -146,15 +146,27 @@ endfunction
 
 function! vim_helpers#CCwordForCtrlSF() abort
     if get(g:, 'ctrlsf_backend', '') ==# 'rg'
-        return '-R ' . vim_helpers#CCword()
+        return '-R -- ' . vim_helpers#CCword()
     else
         return vim_helpers#Cword()
     endif
 endfunction
 
+function! vim_helpers#CwordForCtrlSF() abort
+    return '-- ' . vim_helpers#Cword()
+endfunction
+
+function! vim_helpers#WordForCtrlSF() abort
+    return '-- ' . vim_helpers#Word()
+endfunction
+
+function! vim_helpers#VwordForCtrlSF() abort
+    return '-- ' . vim_helpers#Vword()
+endfunction
+
 function! vim_helpers#PwordForCtrlSF() abort
     let l:pword = vim_helpers#Pword()
-    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . l:pword
+    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . l:pword
 endfunction
 
 function! vim_helpers#CCwordForGrep() abort
