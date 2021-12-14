@@ -258,5 +258,63 @@ function! vim_helpers#GrepFileTypeOption() abort
     return ''
 endfunction
 
+function! s:IsSubstituteCommand(cmd) abort
+    return a:cmd =~# '^%\?\(s\|substitute\|S\|Subvert\)/' ||
+                \ a:cmd =~# '^\(c\|l\)do \(s\|substitute\|S\|Subvert\)/' ||
+                \ a:cmd =~# '^\(c\|l\)fdo %\(s\|substitute\|S\|Subvert\)/'
+endfunction
+
+function! s:IsGrepCommand(cmd) abort
+    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|TGrep\|FGrep\|GrepCode\|LGrepCode\|grep\|lgrep\)\s' ||
+                \ a:cmd =~# '^\(Ggrep!\?\|Gcgrep!\?\|Glgrep!\?\)\s' ||
+                \ a:cmd =~# '^\(Git!\?\s\+grep\)\s'
+endfunction
+
+function! s:IsCtrlSFCommand(cmd) abort
+    return a:cmd =~# '^CtrlSF' ||
+                \ a:cmd =~# '^PCtrlSF' ||
+                \ a:cmd =~# '^TCtrlSF'
+endfunction
+
+function! vim_helpers#InsertWord() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return vim_helpers#WordForSubstitute()
+    elseif s:IsGrepCommand(l:cmd)
+        return vim_helpers#WordForGrep()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        return vim_helpers#Word()
+    else
+        return vim_helpers#WordForShell()
+    endif
+endfunction
+
+function! vim_helpers#InsertCCword() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return vim_helpers#CCwordForSubstitute()
+    elseif s:IsGrepCommand(l:cmd)
+        return vim_helpers#CCwordForGrep()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        return '-R ' . vim_helpers#CCword()
+    else
+        return vim_helpers#CCwordForShell()
+    endif
+endfunction
+
+function! vim_helpers#InsertPword() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return vim_helpers#PwordForSubstitute()
+    elseif s:IsGrepCommand(l:cmd)
+        return vim_helpers#PwordForGrep()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        let l:pword = vim_helpers#Pword()
+        return (stridx(l:pword, '\b') > 0 ? '-R ' : '') . l:pword
+    else
+        return vim_helpers#PwordForShell()
+    endif
+endfunction
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo

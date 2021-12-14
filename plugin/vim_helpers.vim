@@ -78,6 +78,16 @@ if get(g:, 'vim_helpers_highlight_mappings', 0)
 endif
 " }}}
 
+" Insert mappings {{{
+if get(g:, 'vim_helpers_insert_mappings', 1)
+    cnoremap <C-r><C-t> <C-r>=vim_helpers#InsertWord()<CR>
+    cnoremap <C-r><C-b> <C-r>=vim_helpers#InsertCCword()<CR>
+    cnoremap <C-r><C-_> <C-r>=vim_helpers#InsertPword()<CR>
+    cnoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
+    inoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
+endif
+" }}}
+
 " Grep Settings
 let s:rg_default_filetype_mappings = {
             \ 'bash':            'sh',
@@ -90,12 +100,19 @@ let s:rg_default_filetype_mappings = {
 
 let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
 
+let g:vim_helpers_code_ignore  = get(g:, 'vim_helpers_code_ignore', '.code.ignore')
+let g:vim_helpers_grep_ignores = get(g:, 'vim_helpers_grep_ignores', [])
+
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading -n -S --hidden'
     let &grepprg .= get(g:, 'grep_follow_links', 0) ? ' --follow' : ''
     let &grepprg .= get(g:, 'grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
+
+function! s:GrepCmd() abort
+    return split(&grepprg, '\s\+')[0]
+endfunction
 
 " Grep
 command! -bar -nargs=+ -complete=file        Grep       silent! grep! <args>
@@ -121,7 +138,7 @@ command!      -nargs=0        BGrepWord   call vim_helpers#grep#BGrep(vim_helper
 command!      -nargs=0 -range BGrepVword  call vim_helpers#grep#BGrep(vim_helpers#VwordForGrep())
 command!      -nargs=0        BGrepPword  call vim_helpers#grep#BGrep(vim_helpers#PwordForGrep())
 
-if split(&grepprg, '\s\+')[0] =~# 'rg\|grep'
+if s:GrepCmd() =~# 'rg\|grep'
     " TGrep
     command! -nargs=+ -complete=dir         TGrep       call vim_helpers#grep#TGrep(<f-args>)
     command! -nargs=? -complete=dir         TGrepCCword call vim_helpers#grep#TGrep(vim_helpers#CCwordForGrep(), <f-args>)
@@ -137,6 +154,24 @@ if split(&grepprg, '\s\+')[0] =~# 'rg\|grep'
     command! -nargs=? -complete=file        FGrepWord   call vim_helpers#grep#FGrep(vim_helpers#WordForGrep(), <f-args>)
     command! -nargs=? -complete=file -range FGrepVword  call vim_helpers#grep#FGrep(vim_helpers#VwordForGrep(), <f-args>)
     command! -nargs=? -complete=file        FGrepPword  call vim_helpers#grep#FGrep(vim_helpers#PwordForGrep(), <f-args>)
+endif
+
+if s:GrepCmd() =~# 'rg'
+    " GrepCode
+    command! -nargs=+ -complete=dir         GrepCode       call vim_helpers#grep#GrepCode(<f-args>)
+    command! -nargs=? -complete=dir         GrepCodeCCword call vim_helpers#grep#GrepCode(vim_helpers#CCwordForGrep(), <f-args>)
+    command! -nargs=? -complete=dir         GrepCodeCword  call vim_helpers#grep#GrepCode(vim_helpers#CwordForGrep(), <f-args>)
+    command! -nargs=? -complete=dir         GrepCodeWord   call vim_helpers#grep#GrepCode(vim_helpers#WordForGrep(), <f-args>)
+    command! -nargs=? -complete=file -range GrepCodeVword  call vim_helpers#grep#GrepCode(vim_helpers#VwordForGrep(), <f-args>)
+    command! -nargs=? -complete=file        GrepCodePword  call vim_helpers#grep#GrepCode(vim_helpers#PwordForGrep(), <f-args>)
+
+    " LGrepCode
+    command! -nargs=+ -complete=file        LGrepCode       call vim_helpers#grep#LGrepCode(<f-args>)
+    command! -nargs=? -complete=file        LGrepCodeCCword call vim_helpers#grep#LGrepCode(vim_helpers#CCwordForGrep(), <f-args>)
+    command! -nargs=? -complete=file        LGrepCodeCword  call vim_helpers#grep#LGrepCode(vim_helpers#CwordForGrep(), <f-args>)
+    command! -nargs=? -complete=file        LGrepCodeWord   call vim_helpers#grep#LGrepCode(vim_helpers#WordForGrep(), <f-args>)
+    command! -nargs=? -complete=file -range LGrepCodeVword  call vim_helpers#grep#LGrepCode(vim_helpers#VwordForGrep(), <f-args>)
+    command! -nargs=? -complete=file        LGrepCodePword  call vim_helpers#grep#LGrepCode(vim_helpers#PwordForGrep(), <f-args>)
 endif
 
 augroup CommandHelpersGrep

@@ -54,3 +54,36 @@ endfunction
 function! vim_helpers#grep#FGrep(...) abort
     call call(function('s:Grep'), ['Grep', '--fixed-strings'] + a:000)
 endfunction
+
+" Grep Code
+if executable('rg')
+    function! s:GrepCodeOption() abort
+        if s:GrepCmd() != 'rg'
+            return ''
+        endif
+
+        let l:option = ''
+
+        if !empty(g:vim_helpers_code_ignore)
+            let l:code_ignore = findfile(g:vim_helpers_code_ignore, ';')
+
+            if strlen(l:code_ignore)
+                let l:option = ' --ignore-file ' . fnamemodify(l:code_ignore, ':p')
+            endif
+        endif
+
+        if empty(l:option) && type(g:vim_helpers_grep_ignores) == type([])
+            let l:option = join(map(copy(g:zero_vim_grep_ignores), 'printf(" -g \"!%s\"", v:val)'))
+        endif
+
+        return l:option
+    endfunction
+
+    function! vim_helpers#grep#GrepCode(...) abort
+        call call(function('s:Grep'), ['Grep', s:GrepCodeOption()] + a:000)
+    endfunction
+
+    function! vim_helpers#grep#LGrepCode(...) abort
+        call call(function('s:Grep'), ['LGrep', s:GrepCodeOption()] + a:000)
+    endfunction
+endif
