@@ -24,15 +24,15 @@ function! s:Grep(cmd, ...) abort
 endfunction
 
 function! vim_helpers#grep#Grep(...) abort
-    call call(function('s:Grep'), ['Grep'] + a:000))
+    call call(function('s:Grep'), ['Grep'] + a:000)
 endfunction
 
 function! vim_helpers#grep#LGrep(...) abort
-    call call(function('s:Grep'), ['LGrep'] + a:000))
+    call call(function('s:Grep'), ['LGrep'] + a:000)
 endfunction
 
 function! vim_helpers#grep#BGrep(...) abort
-    call call(function('s:Grep'), ['BGrep'] + a:000))
+    call call(function('s:Grep'), ['BGrep'] + a:000)
 endfunction
 
 function! s:ParseFileTypeOption() abort
