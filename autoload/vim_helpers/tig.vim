@@ -2,6 +2,7 @@ let s:tig_cmd = 'tig %s'
 let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' : '')
 let s:tigrc_user_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h') . '/config/vim.tigrc'
 let s:tig_mode = get(g:, 'tig_mode', 'tab')
+let s:tig_use_shell = 1
 
 function! s:UpdateVimSettings() abort
     let s:tig_vim_settings = {
@@ -27,18 +28,14 @@ endfunction
 
 function! s:TigEnvDict(cwd) abort
     return {
-                \ 'TIGRC_USER': s:tigrc_user_path,
-                \ 'TIG_VIM_ACTION_FILE': s:GetTigVimActionFile(),
-                \ 'TIG_VIM_CWD': a:cwd,
+                \ 'TIGRC_USER':          shellescape(s:tigrc_user_path),
+                \ 'TIG_VIM_ACTION_FILE': shellescape(s:GetTigVimActionFile()),
+                \ 'TIG_VIM_CWD':         shellescape(a:cwd),
                 \ }
 endfunction
 
 function! s:TigEnvString(cwd) abort
-    return printf('TIG_VIM_ACTION_FILE=%s TIGRC_USER=%s TIG_VIM_CWD=%s',
-                \ s:GetTigVimActionFile(),
-                \ s:tigrc_user_path,
-                \ a:cwd
-                \ )
+    return join(map(items(s:TigEnvDict(a:cwd)), 'join(v:val, "=")'), ' ')
 endfunction
 
 function! s:OnExitTigCallback(code, cmd, mode) abort
@@ -106,47 +103,60 @@ function! s:RunTig(options) abort
     let s:goyo_enabled = exists('#goyo')
 
     if has('nvim')
-        if s:tig_mode ==# 'tab'
-            tabnew
-            call s:UpdateVimSettings()
-        else
-            enew
-        endif
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
-        let cmd_with_env = printf('env %s %s', s:TigEnvString(cwd), cmd)
-        call vim_helpers#LogCommand(cmd_with_env, 'nvim')
-        call termopen(cmd_with_env, {
-                    \ 'name': cmd,
-                    \ 'cwd': cwd,
-                    \ 'clear_env': v:false,
-                    \ 'env': s:TigEnvDict(cwd),
-                    \ 'on_exit': {job_id, code, event -> s:OnExitTigCallback(code, cmd_with_env, 'nvim')},
-                    \ })
-        startinsert
-    elseif has('terminal')
-        if s:tig_mode ==# 'tab'
-            tabnew
-            call s:UpdateVimSettings()
-        endif
-        call vim_helpers#LogCommand(cmd, 'terminal')
-        let term_options = {
-                    \ 'term_name': cmd,
-                    \ 'cwd': cwd,
-                    \ 'env': s:TigEnvDict(cwd),
-                    \ 'curwin': v:true,
-                    \ 'exit_cb': {channel, code -> s:OnExitTigCallback(code, cmd, 'terminal')},
-                    \ }
-        if v:version >= 802
-            let term_options['norestore'] = v:true
-        endif
-        silent call term_start(cmd, term_options)
+        call s:OpenTigInNvim(cmd, cwd)
+    elseif has('terminal') && !s:tig_use_shell
+        call s:OpenTigInTerminal(cmd, cwd)
     else
-        let cmd_with_env = printf('env %s %s', s:TigEnvString(cwd), cmd)
-        call vim_helpers#LogCommand(cmd_with_env, 'vim')
-        execute printf('silent !cd %s && %s', shellescape(cwd), cmd_with_env)
-        call s:OpenTigVimAction(cmd_with_env)
-        redraw!
+        call s:OpenTigInShell(cmd, cwd)
     endif
+endfunction
+
+function! s:OpenTigInNvim(tig_cmd, cwd) abort
+    if s:tig_mode ==# 'tab'
+        tabnew
+        call s:UpdateVimSettings()
+    else
+        enew
+    endif
+    setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
+    let cmd = printf('env %s %s', s:TigEnvString(a:cwd), a:tig_cmd)
+    call vim_helpers#LogCommand(cmd, 'nvim')
+    call termopen(cmd, {
+                \ 'name': cmd,
+                \ 'cwd': a:cwd,
+                \ 'clear_env': v:false,
+                \ 'env': s:TigEnvDict(a:cwd),
+                \ 'on_exit': {job_id, code, event -> s:OnExitTigCallback(code, cmd, 'nvim')},
+                \ })
+    startinsert
+endfunction
+
+function! s:OpenTigInTerminal(tig_cmd, cwd) abort
+    if s:tig_mode ==# 'tab'
+        tabnew
+        call s:UpdateVimSettings()
+    endif
+    let cmd = a:tig_cmd
+    call vim_helpers#LogCommand(cmd, 'terminal')
+    let term_options = {
+                \ 'term_name': cmd,
+                \ 'cwd': a:cwd,
+                \ 'env': s:TigEnvDict(a:cwd),
+                \ 'curwin': v:true,
+                \ 'exit_cb': {channel, code -> s:OnExitTigCallback(code, cmd, 'terminal')},
+                \ }
+    if v:version >= 802
+        let term_options['norestore'] = v:true
+    endif
+    silent call term_start(cmd, term_options)
+endfunction
+
+function! s:OpenTigInShell(tig_cmd, cwd) abort
+    let cmd = printf('cd %s && env %s %s', shellescape(a:cwd), s:TigEnvString(a:cwd), a:tig_cmd)
+    call vim_helpers#LogCommand(cmd, 'shell')
+    execute printf('silent !%s', cmd)
+    call s:OpenTigVimAction(cmd)
+    redraw!
 endfunction
 
 function! vim_helpers#tig#Tig(options) abort
