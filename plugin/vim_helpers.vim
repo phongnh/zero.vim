@@ -210,9 +210,14 @@ if executable('tig')
 
     augroup CommandHelpersTig
         autocmd!
-        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gB :call vim_helpers#tig#TigOnBlame()<CR>
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gT :call vim_helpers#tig#TigOnBlame()<CR>
     augroup END
 endif
+
+augroup CommandHelpersGBrowse
+    autocmd!
+    autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gB :call vim_helpers#git#GBrowseOnBlame()<CR>
+augroup END
 
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %

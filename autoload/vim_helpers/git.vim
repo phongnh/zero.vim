@@ -103,3 +103,12 @@ function! vim_helpers#git#ParseRef() abort
         return s:ParseFugitiveRef()
     endif
 endfunction
+
+function! vim_helpers#git#GBrowseOnBlame() abort
+    if exists(':GBrowse') == 2
+        let ref = vim_helpers#git#ParseRef()
+        if !empty(ref)
+            execute ':GBrowse ' ref
+        endif
+    endif
+endfunction
