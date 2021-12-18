@@ -173,14 +173,15 @@ function! s:TigShellEscape(path) abort
 endfunction
 
 function! s:TigOldPaths(path) abort
-    return printf('$(' . s:tig_log_cmd . ')', s:TigShellEscape(a:path))
+    let cmd = printf(s:tig_log_cmd, s:TigShellEscape(a:path))
+    return map(split(system(cmd)), 's:TigShellEscape(v:val)')
 endfunction
 
 function! vim_helpers#tig#TigFile(path, bang) abort
     let l:path = vim_helpers#git#BuildPath(a:path)
 
     if a:bang
-        let l:path = s:TigOldPaths(l:path)
+        let l:path = join(s:TigOldPaths(l:path), ' ')
     else
         let l:path = s:TigShellEscape(l:path)
     endif
