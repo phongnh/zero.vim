@@ -58,23 +58,25 @@ endif
 " }}}
 
 " Highlight commands {{{
-" Highlight current line
-command! HighlightLine call matchadd('Search', '\%' . line('.') . 'l')
+if get(g:, 'vim_helpers_highlight_enabled', 0)
+    " Highlight current line
+    command! HighlightLine call matchadd('Search', '\%' . line('.') . 'l')
 
-" Highlight the word underneath the cursor
-command! HighlightWord call matchadd('Search', '\<\w*\%' . line('.') . 'l\%' . col('.') . 'c\w*\>')
+    " Highlight the word underneath the cursor
+    command! HighlightWord call matchadd('Search', '\<\w*\%' . line('.') . 'l\%' . col('.') . 'c\w*\>')
 
-" Highlight the words contained in the virtual column
-command! HighlightColumns call matchadd('Search', '\<\w*\%' . virtcol('.') . 'v\w*\>')
+    " Highlight the words contained in the virtual column
+    command! HighlightColumns call matchadd('Search', '\<\w*\%' . virtcol('.') . 'v\w*\>')
 
-" Clear the permanent highlights
-command! ClearHightlights call clearmatches()
+    " Clear the permanent highlights
+    command! ClearHightlights call clearmatches()
 
-if get(g:, 'vim_helpers_highlight_mappings', 0)
-    nnoremap <silent> <Leader>hl :HighlightLine<CR>
-    nnoremap <silent> <Leader>hw :HighlightWord<CR>
-    nnoremap <silent> <Leader>hv :HighlightColumns<CR>
-    nnoremap <silent> <Leader>hc :ClearHightlights<CR>
+    if get(g:, 'vim_helpers_highlight_mappings', 0)
+        nnoremap <silent> <Leader>hl :HighlightLine<CR>
+        nnoremap <silent> <Leader>hw :HighlightWord<CR>
+        nnoremap <silent> <Leader>hv :HighlightColumns<CR>
+        nnoremap <silent> <Leader>hc :ClearHightlights<CR>
+    endif
 endif
 " }}}
 
