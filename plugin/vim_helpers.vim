@@ -58,7 +58,7 @@ endif
 " }}}
 
 " Highlight commands {{{
-if get(g:, 'vim_helpers_highlight_enabled', 0)
+if get(g:, 'vim_helpers_highlight_commands', 0)
     " Highlight current line
     command! HighlightLine call matchadd('Search', '\%' . line('.') . 'l')
 
