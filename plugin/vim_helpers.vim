@@ -182,6 +182,13 @@ if get(g:, 'vim_helpers_grep_commands', 0)
         autocmd QuickFixCmdPost grep*  cwindow | redraw!
         autocmd QuickFixCmdPost lgrep* lwindow | redraw!
     augroup END
+else
+    " Grep
+    command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | cwindow | redraw!
+    " LGrep
+    command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
+    " BGrep
+    command! -bar -nargs=1                BGrep silent! lgrep! <args> % | lwindow | redraw!
 endif
 
 " Gitk
