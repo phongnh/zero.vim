@@ -85,6 +85,7 @@ if get(g:, 'vim_helpers_insert_mappings', 1)
     cnoremap <C-r><C-t> <C-r>=vim_helpers#InsertWord()<CR>
     cnoremap <C-r><C-b> <C-r>=vim_helpers#InsertCCword()<CR>
     cnoremap <C-r><C-_> <C-r>=vim_helpers#InsertPword()<CR>
+    cnoremap <C-r>?     <C-r>=vim_helpers#PwordForGrep()<CR>
     cnoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
     inoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
 endif
