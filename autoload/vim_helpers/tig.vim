@@ -178,28 +178,40 @@ function! s:TigOldPaths(path) abort
 endfunction
 
 function! vim_helpers#tig#TigFile(path, bang) abort
-    let l:path = vim_helpers#git#BuildPath(a:path)
+    try
+        call vim_helpers#git#FindRepo()
 
-    if a:bang
-        let l:path = join(s:TigOldPaths(l:path), ' ')
-    else
-        let l:path = s:TigShellEscape(l:path)
-    endif
+        let l:path = vim_helpers#git#BuildPath(a:path)
 
-    call vim_helpers#tig#Tig('-- ' . l:path)
+        if a:bang
+            let l:path = join(s:TigOldPaths(l:path), ' ')
+        else
+            let l:path = s:TigShellEscape(l:path)
+        endif
+
+        call s:RunTig('-- ' . l:path)
+    catch
+        call vim_helpers#Error('TigFile: ' . v:exception)
+    endtry
 endfunction
 
 function! vim_helpers#tig#TigBlame(path) abort
-    let opts = ['blame']
+    try
+        call vim_helpers#git#FindRepo()
 
-    if empty(a:path)
-        let l:path = vim_helpers#git#BuildPath('')
-        call add(opts, '+' . line('.'))
-    endif
+        let opts = ['blame']
 
-    call extend(opts, ['--', s:TigShellEscape(l:path)])
+        if empty(a:path)
+            let l:path = vim_helpers#git#BuildPath('')
+            call add(opts, '+' . line('.'))
+        endif
 
-    call vim_helpers#tig#Tig(join(opts, ' '))
+        call extend(opts, ['--', s:TigShellEscape(l:path)])
+
+        call s:RunTig(join(opts, ' '))
+    catch
+        call vim_helpers#Error('TigBlame: ' . v:exception)
+    endtry
 endfunction
 
 function! vim_helpers#tig#TigStatus() abort
