@@ -223,7 +223,7 @@ if executable('tig')
 
     augroup CommandHelpersTig
         autocmd!
-        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gT :call vim_helpers#tig#TigOnBlame()<CR>
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> T :call vim_helpers#tig#TigOnBlame()<CR>
     augroup END
 endif
 
