@@ -201,6 +201,7 @@ if executable('gitk')
 
     augroup CommandHelpersGitk
         autocmd!
+        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gK :call vim_helpers#gitk#GitkOnBlame()<CR>
         autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gh :call vim_helpers#gitk#GitkOnBlame()<CR>
         autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> K  :call vim_helpers#gitk#GitkOnBlame()<CR>
     augroup END
@@ -229,6 +230,7 @@ endif
 
 augroup CommandHelpersGBrowse
     autocmd!
+    autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gB :call vim_helpers#git#GBrowseOnBlame()<CR>
     autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gb :call vim_helpers#git#GBrowseOnBlame()<CR>
 augroup END
 
