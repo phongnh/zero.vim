@@ -39,21 +39,21 @@ if has('clipboard')
     command! CopyYankedText let [@+, @*] = [@", @"]
 endif
 
-command! -bang CopyRelativePath         call vim_helpers#path#CopyRelativePath(<bang>0)
-command! -bang CopyRelativePathWithCwd  call vim_helpers#path#CopyRelativePathWithCwd(<bang>0)
+command! -bang CopyPath                 call vim_helpers#path#CopyPath(<bang>0)
 command! -bang CopyFullPath             call vim_helpers#path#CopyFullPath(<bang>0)
-command! -bang CopyParentDirPath        call vim_helpers#path#CopyParentDirPath(<bang>0)
-command! -bang CopyParentDirPathWithCwd call vim_helpers#path#CopyParentDirPathWithCwd()
+command! -bang CopyAbsolutePath         call vim_helpers#path#CopyAbsolutePath(<bang>0)
+command! -bang CopyDirPath              call vim_helpers#path#CopyDirPath(<bang>0)
+command! -bang CopyAbsoluteDirPath      call vim_helpers#path#CopyAbsoluteDirPath(<bang>0)
 
 if get(g:, 'vim_helpers_path_mappings', 1)
-    nnoremap <silent> yp :CopyRelativePath<CR>
-    nnoremap <silent> yP :CopyRelativePath!<CR>
-    nnoremap <silent> yc :CopyRelativePathWithCwd<CR>
-    nnoremap <silent> yC :CopyRelativePathWithCwd!<CR>
-    nnoremap <silent> yu :CopyFullPath<CR>
-    nnoremap <silent> yU :CopyFullPath!<CR>
-    nnoremap <silent> yd :CopyParentDirPath<CR>
-    nnoremap <silent> yD :CopyParentDirPathWithCwd<CR>
+    nnoremap <silent> yp :CopyPath<CR>
+    nnoremap <silent> yP :CopyPath!<CR>
+    nnoremap <silent> yc :CopyFullPath<CR>
+    nnoremap <silent> yC :CopyFullPath!<CR>
+    nnoremap <silent> yu :CopyAbsolutePath<CR>
+    nnoremap <silent> yU :CopyAbsolutePath!<CR>
+    nnoremap <silent> yd :CopyDirPath<CR>
+    nnoremap <silent> yD :CopyDirPath!<CR>
 endif
 " }}}
 

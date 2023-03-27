@@ -38,11 +38,11 @@
 * RemoveZeroWidthSpaces
 * ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
 * CopyYankedText
-* CopyRelativePath
-* CopyRelativePathWithCwd
+* CopyPath
 * CopyFullPath
-* CopyParentPath
-* CopyParentPathWithCwd
+* CopyAbsolutePath
+* CopyDirPath
+* CopyAbsoluteDirPath
 * HighlightLine
 * HighlightWord
 * HighlightColumns
