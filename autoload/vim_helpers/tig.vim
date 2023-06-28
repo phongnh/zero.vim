@@ -201,6 +201,8 @@ function! vim_helpers#tig#TigBlame(path) abort
 
         let opts = ['blame']
 
+        let l:path = a:path
+
         if empty(a:path)
             let l:path = vim_helpers#git#BuildPath('')
             call add(opts, '+' . line('.'))
