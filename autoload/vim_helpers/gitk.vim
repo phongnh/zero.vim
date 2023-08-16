@@ -1,7 +1,7 @@
 " Gitk
 let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
 let s:gitk_cmd = 'gitk %s'
-let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' : '')
+let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s'
 
 function! s:RunGitk(options) abort
     let cwd = vim_helpers#git#WorkTree()
@@ -46,7 +46,7 @@ endfunction
 
 function! s:GitOldPaths(path) abort
     let cmd = printf(s:gitk_log_cmd, a:path)
-    return map(split(system(cmd)), 's:GitkShellEscape(v:val)')
+    return map(uniq(split(system(cmd))), 's:GitkShellEscape(v:val)')
 endfunction
 
 function! vim_helpers#gitk#Gitk(options) abort

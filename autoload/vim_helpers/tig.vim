@@ -1,5 +1,5 @@
 let s:tig_cmd = 'tig %s'
-let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s' . (executable('uniq') ? ' | uniq' : '')
+let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s'
 let s:tigrc_user_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h') . '/config/vim.tigrc'
 let s:tig_mode = get(g:, 'tig_mode', 'tab')
 let s:tig_use_shell = 1
@@ -174,7 +174,7 @@ endfunction
 
 function! s:TigOldPaths(path) abort
     let cmd = printf(s:tig_log_cmd, s:TigShellEscape(a:path))
-    return map(split(system(cmd)), 's:TigShellEscape(v:val)')
+    return map(uniq(split(system(cmd))), 's:TigShellEscape(v:val)')
 endfunction
 
 function! vim_helpers#tig#TigFile(path, bang) abort
