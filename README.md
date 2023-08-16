@@ -52,6 +52,6 @@
 * BGrep, BGrepCCword, BGrepCword, BGrepWord, BGrepVword
 * GrepCode, GrepCodeCCword, GrepCodeCword, GrepCodeWord, GrepCodeVword
 * Gitk, GitkFile
-* Tig, TigFile, TigStatus, TigBlame
+* Tig, TigFile, TigBlame
 * SW
 * Cls
