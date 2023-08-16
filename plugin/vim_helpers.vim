@@ -173,9 +173,7 @@ if executable('tig')
     command! -nargs=? -complete=custom,vim_helpers#git#Branches Tig call vim_helpers#tig#Tig(<q-args>)
     command! -bang -nargs=? -complete=file TigFile call vim_helpers#tig#TigFile(<q-args>, <bang>0)
     command! -nargs=? -complete=file TigBlame call vim_helpers#tig#TigBlame(<q-args>)
-    command! -nargs=? TigStatus call vim_helpers#tig#TigStatus()
 
-    nnoremap <silent> gC :TigStatus<CR>
     nnoremap <silent> gL :TigFile<CR>
     nnoremap <silent> gB :TigBlame<CR>
 

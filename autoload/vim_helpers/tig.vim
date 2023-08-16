@@ -216,10 +216,6 @@ function! vim_helpers#tig#TigBlame(path) abort
     endtry
 endfunction
 
-function! vim_helpers#tig#TigStatus() abort
-    call vim_helpers#tig#Tig('status')
-endfunction
-
 function! vim_helpers#tig#TigOnBlame() abort
     let ref = vim_helpers#git#ParseRef()
     if !empty(ref)
