@@ -35,22 +35,6 @@ function! vim_helpers#grep#BGrep(...) abort
     call call(function('s:Grep'), ['BGrep'] + a:000)
 endfunction
 
-function! s:ParseFileTypeOption() abort
-    let l:cmd = get(a:, 1, s:GrepCmd())
-
-    if l:cmd ==# 'rg'
-        return vim_helpers#RgFileTypeOption()
-    elseif l:cmd ==# 'grep'
-        return vim_helpers#GrepFileTypeOption()
-    endif
-
-    return ''
-endfunction
-
-function! vim_helpers#grep#TGrep(...) abort
-    call call(function('s:Grep'), ['Grep', s:ParseFileTypeOption()] + a:000)
-endfunction
-
 function! vim_helpers#grep#FGrep(...) abort
     call call(function('s:Grep'), ['Grep', '--fixed-strings'] + a:000)
 endfunction

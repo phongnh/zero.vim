@@ -92,17 +92,6 @@ endif
 " }}}
 
 " Grep Settings
-let s:rg_default_filetype_mappings = {
-            \ 'bash':            'sh',
-            \ 'javascript':      'js',
-            \ 'javascript.jsx':  'js',
-            \ 'javascriptreact': 'js',
-            \ 'jsx':             'js',
-            \ 'python':          'py',
-            \ }
-
-let g:rg_filetype_mappings = extend(s:rg_default_filetype_mappings, get(g:, 'rg_filetype_mappings', {}))
-
 let g:vim_helpers_code_ignore  = get(g:, 'vim_helpers_code_ignore', '.code.ignore')
 let g:vim_helpers_grep_ignores = get(g:, 'vim_helpers_grep_ignores', [])
 
@@ -143,14 +132,6 @@ if get(g:, 'vim_helpers_grep_commands', 0)
     command!      -nargs=0        BGrepPword  call vim_helpers#grep#BGrep(vim_helpers#PwordForGrep())
 
     if s:GrepCmd() =~# 'rg\|grep'
-        " TGrep
-        command! -nargs=+ -complete=dir         TGrep       call vim_helpers#grep#TGrep(<f-args>)
-        command! -nargs=? -complete=dir         TGrepCCword call vim_helpers#grep#TGrep(vim_helpers#CCwordForGrep(), <f-args>)
-        command! -nargs=? -complete=dir         TGrepCword  call vim_helpers#grep#TGrep(vim_helpers#CwordForGrep(), <f-args>)
-        command! -nargs=? -complete=dir         TGrepWord   call vim_helpers#grep#TGrep(vim_helpers#WordForGrep(), <f-args>)
-        command! -nargs=? -complete=file -range TGrepVword  call vim_helpers#grep#TGrep(vim_helpers#VwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        TGrepPword  call vim_helpers#grep#TGrep(vim_helpers#PwordForGrep(), <f-args>)
-
         " FGrep
         command! -nargs=+ -complete=file        FGrep       call vim_helpers#grep#FGrep(<f-args>)
         command! -nargs=? -complete=file        FGrepCCword call vim_helpers#grep#FGrep('-w', vim_helpers#CwordForGrep(), <f-args>)

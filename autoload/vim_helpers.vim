@@ -235,59 +235,6 @@ function! vim_helpers#PwordForSubstitute() range abort
     return search
 endfunction
 
-function! s:RgKnownFileTypes() abort
-    if exists('g:rg_known_filetypes')
-        return g:rg_known_filetypes
-    endif
-    if executable('rg')
-        let g:rg_known_filetypes = systemlist("rg --type-list | cut -d ':' -f 1")
-    else
-        let g:rg_known_filetypes = []
-    endif
-    return g:rg_known_filetypes
-endfunction
-
-function! vim_helpers#RgFileType(ft) abort
-    return get(g:rg_filetype_mappings, a:ft, a:ft)
-endfunction
-
-function! vim_helpers#IsRgKnownFileType(ft) abort
-    return index(s:RgKnownFileTypes(), a:ft) >= 0
-endfunction
-
-function! vim_helpers#RgFileTypeOption() abort
-    let ext = expand('%:e')
-    let ft = vim_helpers#RgFileType(&filetype)
-
-    if strlen(ft) && (ft ==# 'vim' || ft ==# 'nvim')
-        return "-g '*.vim' -g '*.nvim'"
-    elseif strlen(ft) && vim_helpers#IsRgKnownFileType(ft)
-        return printf("-t %s", ft)
-    elseif strlen(ext)
-        if ext ==# 'vim' || ext ==# 'nvim'
-            return "-g '*.vim' -g '*.nvim'"
-        else
-            return printf("-g '*.%s'", ext)
-        endif
-    endif
-
-    return ''
-endfunction
-
-function! vim_helpers#GrepFileTypeOption() abort
-    let ext = expand('%:e')
-
-    if strlen(ext)
-        if ext ==# 'vim' || ext ==# 'nvim'
-            return "-include='*.vim' -include='*.nvim'"
-        else
-            return printf("-include='*.%s'", ext)
-        endif
-    endif
-
-    return ''
-endfunction
-
 function! s:IsSubstituteCommand(cmd) abort
     return a:cmd =~# '^%\?\(s\|substitute\|S\|Subvert\)/' ||
                 \ a:cmd =~# '^\(c\|l\)do \(s\|substitute\|S\|Subvert\)/' ||
