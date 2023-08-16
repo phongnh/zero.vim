@@ -35,10 +35,6 @@ function! vim_helpers#grep#BGrep(...) abort
     call call(function('s:Grep'), ['BGrep'] + a:000)
 endfunction
 
-function! vim_helpers#grep#FGrep(...) abort
-    call call(function('s:Grep'), ['Grep', '--fixed-strings'] + a:000)
-endfunction
-
 " Grep Code
 if executable('rg')
     function! s:GrepCodeOption() abort

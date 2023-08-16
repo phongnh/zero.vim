@@ -131,16 +131,6 @@ if get(g:, 'vim_helpers_grep_commands', 0)
     command!      -nargs=0 -range BGrepVword  call vim_helpers#grep#BGrep(vim_helpers#VwordForGrep())
     command!      -nargs=0        BGrepPword  call vim_helpers#grep#BGrep(vim_helpers#PwordForGrep())
 
-    if s:GrepCmd() =~# 'rg\|grep'
-        " FGrep
-        command! -nargs=+ -complete=file        FGrep       call vim_helpers#grep#FGrep(<f-args>)
-        command! -nargs=? -complete=file        FGrepCCword call vim_helpers#grep#FGrep('-w', vim_helpers#CwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        FGrepCword  call vim_helpers#grep#FGrep(vim_helpers#CwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        FGrepWord   call vim_helpers#grep#FGrep(vim_helpers#WordForGrep(), <f-args>)
-        command! -nargs=? -complete=file -range FGrepVword  call vim_helpers#grep#FGrep(vim_helpers#VwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        FGrepPword  call vim_helpers#grep#FGrep(vim_helpers#PwordForGrep(), <f-args>)
-    endif
-
     if s:GrepCmd() =~# 'rg'
         " GrepCode
         command! -nargs=+ -complete=dir         GrepCode       call vim_helpers#grep#GrepCode(<f-args>)
