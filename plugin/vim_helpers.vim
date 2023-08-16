@@ -85,9 +85,6 @@ endif
 " }}}
 
 " Grep Settings
-let g:vim_helpers_code_ignore  = get(g:, 'vim_helpers_code_ignore', '.code.ignore')
-let g:vim_helpers_grep_ignores = get(g:, 'vim_helpers_grep_ignores', [])
-
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading -n -S --hidden'
@@ -96,10 +93,6 @@ if executable('rg')
 endif
 
 if get(g:, 'vim_helpers_grep_commands', 0)
-    function! s:GrepCmd() abort
-        return split(&grepprg, '\s\+')[0]
-    endfunction
-
     " Grep
     command! -bar -nargs=+ -complete=file        Grep       silent! grep! <args>
     command!      -nargs=? -complete=file        GrepCCword call vim_helpers#grep#Grep(vim_helpers#CCwordForGrep(), <f-args>)

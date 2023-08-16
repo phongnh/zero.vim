@@ -1,8 +1,4 @@
 " Grep Helpers
-function! s:GrepCmd() abort
-    return split(&grepprg, '\s\+')[0]
-endfunction
-
 function! s:GrepDir(dir) abort
     let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
     let l:dir = vim_helpers#Strip(l:dir)
