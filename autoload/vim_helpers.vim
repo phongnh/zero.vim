@@ -242,7 +242,7 @@ function! s:IsSubstituteCommand(cmd) abort
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
-    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|GrepCode\|LGrepCode\|grep\|lgrep\)\s' ||
+    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|grep\|lgrep\)\s' ||
                 \ a:cmd =~# '^\(Ggrep!\?\|Gcgrep!\?\|Glgrep!\?\)\s' ||
                 \ a:cmd =~# '^\(Git!\?\s\+grep\)\s'
 endfunction

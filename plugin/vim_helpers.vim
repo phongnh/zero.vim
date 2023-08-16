@@ -121,22 +121,6 @@ if get(g:, 'vim_helpers_grep_commands', 0)
     command!      -nargs=0        BGrepWord   call vim_helpers#grep#BGrep(vim_helpers#WordForGrep())
     command!      -nargs=0 -range BGrepVword  call vim_helpers#grep#BGrep(vim_helpers#VwordForGrep())
 
-    if s:GrepCmd() =~# 'rg'
-        " GrepCode
-        command! -nargs=+ -complete=dir         GrepCode       call vim_helpers#grep#GrepCode(<f-args>)
-        command! -nargs=? -complete=dir         GrepCodeCCword call vim_helpers#grep#GrepCode(vim_helpers#CCwordForGrep(), <f-args>)
-        command! -nargs=? -complete=dir         GrepCodeCword  call vim_helpers#grep#GrepCode(vim_helpers#CwordForGrep(), <f-args>)
-        command! -nargs=? -complete=dir         GrepCodeWord   call vim_helpers#grep#GrepCode(vim_helpers#WordForGrep(), <f-args>)
-        command! -nargs=? -complete=file -range GrepCodeVword  call vim_helpers#grep#GrepCode(vim_helpers#VwordForGrep(), <f-args>)
-
-        " LGrepCode
-        command! -nargs=+ -complete=file        LGrepCode       call vim_helpers#grep#LGrepCode(<f-args>)
-        command! -nargs=? -complete=file        LGrepCodeCCword call vim_helpers#grep#LGrepCode(vim_helpers#CCwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        LGrepCodeCword  call vim_helpers#grep#LGrepCode(vim_helpers#CwordForGrep(), <f-args>)
-        command! -nargs=? -complete=file        LGrepCodeWord   call vim_helpers#grep#LGrepCode(vim_helpers#WordForGrep(), <f-args>)
-        command! -nargs=? -complete=file -range LGrepCodeVword  call vim_helpers#grep#LGrepCode(vim_helpers#VwordForGrep(), <f-args>)
-    endif
-
     augroup CommandHelpersGrep
         autocmd!
         autocmd QuickFixCmdPost grep*  cwindow | redraw!

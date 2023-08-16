@@ -50,7 +50,6 @@
 * Grep, GrepCCword, GrepCword, GrepWord, GrepVword
 * LGrep, LGrepCCword, LGrepCword, LGrepWord, LGrepVword
 * BGrep, BGrepCCword, BGrepCword, BGrepWord, BGrepVword
-* GrepCode, GrepCodeCCword, GrepCodeCword, GrepCodeWord, GrepCodeVword
 * Gitk, GitkFile
 * Tig, TigFile, TigBlame
 * SW
