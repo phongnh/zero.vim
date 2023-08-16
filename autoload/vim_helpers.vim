@@ -242,15 +242,13 @@ function! s:IsSubstituteCommand(cmd) abort
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
-    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|TGrep\|FGrep\|GrepCode\|LGrepCode\|grep\|lgrep\)\s' ||
+    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|GrepCode\|LGrepCode\|grep\|lgrep\)\s' ||
                 \ a:cmd =~# '^\(Ggrep!\?\|Gcgrep!\?\|Glgrep!\?\)\s' ||
                 \ a:cmd =~# '^\(Git!\?\s\+grep\)\s'
 endfunction
 
 function! s:IsCtrlSFCommand(cmd) abort
-    return a:cmd =~# '^CtrlSF' ||
-                \ a:cmd =~# '^PCtrlSF' ||
-                \ a:cmd =~# '^TCtrlSF'
+    return a:cmd =~# '^\(CtrlSF\|PCtrlSF\)'
 endfunction
 
 function! vim_helpers#InsertWord() abort
