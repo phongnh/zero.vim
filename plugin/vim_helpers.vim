@@ -116,12 +116,12 @@ if get(g:, 'vim_helpers_grep_commands', 0)
 
     augroup CommandHelpersGrep
         autocmd!
-        autocmd QuickFixCmdPost grep*  cwindow | redraw!
+        autocmd QuickFixCmdPost grep*  botright cwindow | redraw!
         autocmd QuickFixCmdPost lgrep* lwindow | redraw!
     augroup END
 else
     " Grep
-    command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | cwindow | redraw!
+    command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | botright cwindow | redraw!
     " LGrep
     command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
     " BGrep
