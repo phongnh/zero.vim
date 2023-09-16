@@ -133,8 +133,6 @@ if executable('gitk')
     command! -nargs=? -complete=custom,vim_helpers#git#Branches Gitk call vim_helpers#gitk#Gitk(<q-args>)
     command! -bang -nargs=? -complete=file GitkFile call vim_helpers#gitk#GitkFile(<q-args>, <bang>0)
 
-    nnoremap <silent> gK :GitkFile<CR>
-
     augroup CommandHelpersGitk
         autocmd!
         autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> K  :<C-u>call vim_helpers#gitk#GitkOnBlame()<CR>
@@ -150,9 +148,6 @@ if executable('tig')
     command! -nargs=? -complete=custom,vim_helpers#git#Branches Tig call vim_helpers#tig#Tig(<q-args>)
     command! -bang -nargs=? -complete=file TigFile call vim_helpers#tig#TigFile(<q-args>, <bang>0)
     command! -nargs=? -complete=file TigBlame call vim_helpers#tig#TigBlame(<q-args>)
-
-    nnoremap <silent> gL :TigFile<CR>
-    nnoremap <silent> gB :TigBlame<CR>
 
     augroup CommandHelpersTig
         autocmd!
