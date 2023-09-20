@@ -92,41 +92,10 @@ if executable('rg')
     let &grepprg .= get(g:, 'grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
 
-if get(g:, 'vim_helpers_grep_commands', 0)
-    " Grep
-    command! -bar -nargs=+ -complete=file        Grep       silent! grep! <args>
-    command!      -nargs=? -complete=file        GrepCCword call vim_helpers#grep#Grep(vim_helpers#CCwordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file        GrepCword  call vim_helpers#grep#Grep(vim_helpers#CwordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file        GrepWord   call vim_helpers#grep#Grep(vim_helpers#WordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file -range GrepVword  call vim_helpers#grep#Grep(vim_helpers#VwordForGrep(), <f-args>)
-
-    " LGrep
-    command! -bar -nargs=+ -complete=file        LGrep       silent! lgrep! <args>
-    command!      -nargs=? -complete=file        LGrepCCword call vim_helpers#grep#LGrep(vim_helpers#CCwordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file        LGrepCword  call vim_helpers#grep#LGrep(vim_helpers#CwordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file        LGrepWord   call vim_helpers#grep#LGrep(vim_helpers#WordForGrep(), <f-args>)
-    command!      -nargs=? -complete=file -range LGrepVword  call vim_helpers#grep#LGrep(vim_helpers#VwordForGrep(), <f-args>)
-
-    " BGrep
-    command! -bar -nargs=1        BGrep       silent! lgrep! <args> %
-    command!      -nargs=0        BGrepCCword call vim_helpers#grep#BGrep(vim_helpers#CCwordForGrep())
-    command!      -nargs=0        BGrepCword  call vim_helpers#grep#BGrep(vim_helpers#CwordForGrep())
-    command!      -nargs=0        BGrepWord   call vim_helpers#grep#BGrep(vim_helpers#WordForGrep())
-    command!      -nargs=0 -range BGrepVword  call vim_helpers#grep#BGrep(vim_helpers#VwordForGrep())
-
-    augroup CommandHelpersGrep
-        autocmd!
-        autocmd QuickFixCmdPost grep*  botright cwindow | redraw!
-        autocmd QuickFixCmdPost lgrep* lwindow | redraw!
-    augroup END
-else
-    " Grep
-    command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | botright cwindow | redraw!
-    " LGrep
-    command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
-    " BGrep
-    command! -bar -nargs=1                BGrep silent! lgrep! <args> % | lwindow | redraw!
-endif
+" Grep
+command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | botright cwindow | redraw!
+command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
+command! -bar -nargs=1                BGrep silent! lgrep! <args> % | lwindow | redraw!
 
 " Gitk
 if executable('gitk')
