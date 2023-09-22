@@ -34,7 +34,7 @@ else
 endif
 
 " Search Helpers
-function! s:TrimNewLines(text) abort
+function! zero#TrimNewLines(text) abort
     let text = substitute(a:text, '^\n\+', '', 'g')
     let text = substitute(text, '\n\+$', '', 'g')
     return text
@@ -44,13 +44,14 @@ let s:shell_escape_characters      = '\^$.*+?()[]{}|-'
 let s:grep_escape_characters       = '^$.*+?()[]{}|-'
 let s:substitute_escape_characters = '^$.*\/~[]'
 
-function! s:ShellEscape(text) abort
+function! zero#ShellEscape(text, ...) abort
     if empty(a:text)
         return ''
     endif
 
     " Escape some characters
     let escaped_text = escape(a:text, s:shell_escape_characters)
+
     return shellescape(escaped_text)
 endfunction
 
@@ -66,6 +67,16 @@ function! zero#GrepShellEscape(text) abort
     let escaped_text = escape(escaped_text, s:grep_escape_characters)
 
     return shellescape(escaped_text)
+endfunction
+
+function! zero#SubstituteEscape(text) abort
+    " Escape regex characters
+    let text = escape(a:text, s:substitute_escape_characters)
+
+    " Escape the line endings
+    let text = substitute(text, '\n', '\\n', 'g')
+
+    return text
 endfunction
 
 function! zero#CCword(...) abort
@@ -118,140 +129,103 @@ function! zero#Pword() abort
 endfunction
 
 function! zero#CCwordForShell() abort
-    let cword = s:TrimNewLines(zero#Cword())
-    let cword = escape(cword, s:shell_escape_characters)
-    return shellescape('\b' . cword . '\b')
+    return zero#shell#CCword()
 endfunction
 
 function! zero#CwordForShell() abort
-    let cword = s:TrimNewLines(zero#Cword())
-    return s:ShellEscape(cword)
+    return zero#shell#Cword()
 endfunction
 
 function! zero#WordForShell() abort
-    let word = s:TrimNewLines(zero#Word())
-    return s:ShellEscape(word)
+    return zero#shell#Word()
 endfunction
 
 function! zero#VwordForShell() range abort
-    let selection = s:TrimNewLines(zero#Vword())
-    return s:ShellEscape(selection)
+    return zero#shell#Vword()
 endfunction
 
 function! zero#PwordForShell() abort
-    let search = zero#Pword()
-    return s:ShellEscape(search)
+    return zero#shell#Pword()
 endfunction
 
 function! zero#CCwordForCtrlSF() abort
-    if get(g:, 'ctrlsf_backend', '') ==# 'rg'
-        return '-R -- ' . shellescape(zero#CCword())
-    else
-        return shellescape(zero#Cword())
-    endif
+    return zero#ctrlsf#CCword()
 endfunction
 
 function! zero#CwordForCtrlSF() abort
-    return '-- ' . shellescape(zero#Cword())
+    return zero#ctrlsf#Cword()
 endfunction
 
 function! zero#WordForCtrlSF() abort
-    return '-- ' . shellescape(zero#Word())
+    return zero#ctrlsf#Word()
 endfunction
 
 function! zero#VwordForCtrlSF() abort
-    return '-- ' . shellescape(zero#Vword())
+    return zero#ctrlsf#Vword()
 endfunction
 
 function! zero#PwordForCtrlSF() abort
-    let l:pword = zero#Pword()
-    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . shellescape(l:pword)
+    return zero#ctrlsf#Pword()
 endfunction
 
 function! zero#CCwordForFerret(...) abort
-    return call('zero#CCword', a:000)
+    return call('zero#ferret#CCword', a:000)
 endfunction
 
 function! zero#CwordForFerret() abort
-    return zero#Cword()
+    return zero#ferret#Cword()
 endfunction
 
 function! zero#WordForFerret() abort
-    return zero#Word()
+    return zero#ferret#Word()
 endfunction
 
 function! zero#VwordForFerret() abort
-    return escape(zero#Vword(), ' ')
+    return zero#ferret#Vword()
 endfunction
 
 function! zero#PwordForFerret()abort
-    return escape(zero#Pword(), ' ')
+    return zero#ferret#Pword()
 endfunction
 
 function! zero#CCwordForGrep() abort
-    let cword = zero#CCword()
-    return zero#GrepShellEscape(cword)
+    return zero#grep#CCword()
 endfunction
 
 function! zero#CwordForGrep() abort
-    let cword = zero#Cword()
-    return zero#GrepShellEscape(cword)
+    return zero#grep#Cword()
 endfunction
 
 function! zero#WordForGrep() abort
-    let word = zero#Word()
-    return zero#GrepShellEscape(word)
+    return zero#grep#Word()
 endfunction
 
 function! zero#VwordForGrep() range abort
-    let selection = zero#Vword()
-    return zero#GrepShellEscape(selection)
+    return zero#grep#Vword()
 endfunction
 
 function! zero#PwordForGrep() abort
-    let search = zero#Pword()
-    return zero#GrepShellEscape(search)
+    return zero#grep#Pword()
 endfunction
 
 function! zero#CCwordForSubstitute() abort
-    return '\<' . zero#Cword() . '\>'
+    return zero#substitute#CCword()
 endfunction
 
 function! zero#CwordForSubstitute() abort
-    return zero#Cword()
+    return zero#substitute#Cword()
 endfunction
 
 function! zero#WordForSubstitute() abort
-    let word = zero#Word()
-
-    " Escape regex characters
-    let word = escape(word, s:substitute_escape_characters)
-
-    return word
+    return zero#substitute#Word()
 endfunction
 
 function! zero#VwordForSubstitute() range abort
-    let selection = zero#Vword()
-
-    " Escape regex characters
-    let selection = escape(selection, s:substitute_escape_characters)
-
-    " Escape the line endings
-    let selection = substitute(selection, '\n', '\\n', 'g')
-
-    return selection
+    return zero#substitute#Vword()
 endfunction
 
 function! zero#PwordForSubstitute() range abort
-    let search = zero#Pword()
-
-    " Escape regex characters
-    let search = escape(search, '^$.*\/~[]')
-
-    " Escape the line endings
-    let search = substitute(search, '\n', '\\n', 'g')
-
-    return search
+    return zero#substitute#Pword()
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
@@ -280,57 +254,57 @@ endfunction
 function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return zero#WordForSubstitute()
+        return zero#substitute#Word()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#WordForSubstitute()
+        return zero#substitute#Word()
     elseif s:IsGrepCommand(l:cmd)
-        return zero#WordForGrep()
+        return zero#grep#Word()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#Word()
     elseif s:IsFerretCommand(l:cmd)
-        return zero#WordForFerret()
+        return zero#ferret#Word()
     elseif getcmdtype() == '@'
-        return zero#WordForShell()
+        return zero#shell#Word()
     else
-        return zero#WordForShell()
+        return zero#shell#Word()
     endif
 endfunction
 
 function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return zero#CCwordForSubstitute()
+        return zero#substitute#CCword()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#CCwordForSubstitute()
+        return zero#substitute#CCword()
     elseif s:IsGrepCommand(l:cmd)
-        return zero#CCwordForGrep()
+        return zero#grep#CCword()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#CCwordForCtrlSF()
+        return zero#ctrlsf#CCword()
     elseif s:IsFerretCommand(l:cmd)
-        return zero#CCwordForFerret()
+        return zero#ferret#CCword()
     elseif getcmdtype() == '@'
-        return zero#CCwordForShell()
+        return zero#shell#CCword()
     else
-        return zero#CCwordForShell()
+        return zero#shell#CCword()
     endif
 endfunction
 
 function! zero#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return zero#PwordForSubstitute()
+        return zero#substitute#Pword()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#PwordForSubstitute()
+        return zero#substitute#Pword()
     elseif s:IsGrepCommand(l:cmd)
-        return zero#PwordForGrep()
+        return zero#grep#Pword()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#PwordForCtrlSF()
+        return zero#ctrlsf#Pword()
     elseif s:IsFerretCommand(l:cmd)
-        return zero#PwordForFerret()
+        return zero#ferret#Pword()
     elseif getcmdtype() == '@'
-        return zero#PwordForShell()
+        return zero#shell#Pword()
     else
-        return zero#PwordForShell()
+        return zero#shell#Pword()
     endif
 endfunction
 

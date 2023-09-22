@@ -30,3 +30,28 @@ endfunction
 function! zero#grep#BGrep(...) abort
     call call(function('s:Grep'), ['BGrep'] + a:000)
 endfunction
+
+function! zero#grep#CCword() abort
+    let cword = zero#CCword()
+    return zero#GrepShellEscape(cword)
+endfunction
+
+function! zero#grep#Cword() abort
+    let cword = zero#Cword()
+    return zero#GrepShellEscape(cword)
+endfunction
+
+function! zero#grep#Word() abort
+    let word = zero#Word()
+    return zero#GrepShellEscape(word)
+endfunction
+
+function! zero#grep#Vword() range abort
+    let selection = zero#Vword()
+    return zero#GrepShellEscape(selection)
+endfunction
+
+function! zero#grep#Pword() abort
+    let search = zero#Pword()
+    return zero#GrepShellEscape(search)
+endfunction
