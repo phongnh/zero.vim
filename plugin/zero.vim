@@ -101,11 +101,6 @@ command! -bar -nargs=1                BGrep silent! lgrep! <args> % | lwindow | 
 if executable('gitk')
     command! -nargs=? -complete=custom,zero#git#Branches Gitk     call zero#gitk#Gitk(<q-args>)
     command! -bang -nargs=? -complete=file               GitkFile call zero#gitk#GitkFile(<q-args>, <bang>0)
-
-    augroup CommandHelpersGitk
-        autocmd!
-        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> K  :<C-u>call zero#gitk#GitkOnBlame()<CR>
-    augroup END
 endif
 
 if s:is_windows
@@ -117,18 +112,7 @@ if executable('tig')
     command! -nargs=? -complete=custom,zero#git#Branches Tig      call zero#tig#Tig(<q-args>)
     command! -bang -nargs=? -complete=file               TigFile  call zero#tig#TigFile(<q-args>, <bang>0)
     command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
-
-    augroup CommandHelpersTig
-        autocmd!
-        autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> T :<C-u>call zero#tig#TigOnBlame()<CR>
-    augroup END
 endif
-
-augroup CommandHelpersGBrowse
-    autocmd!
-    autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> gb :<C-u>call zero#git#GBrowseOnBlame()<CR>
-    autocmd FileType fugitiveblame,gitmessengerpopup nnoremap <buffer> <silent> go :<C-u>call zero#git#GBrowseOnBlame()<CR>
-augroup END
 
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
