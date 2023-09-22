@@ -278,9 +278,15 @@ function! s:IsFerretCommand(cmd) abort
     return a:cmd =~# '^\(Ack\|Lack\|Back\|Black\|PAck\|PLack\)'
 endfunction
 
+function! s:IsFerretSubstituteCommand(cmd) abort
+    return a:cmd =~# '^\(Acks\|Lacks\)'
+endfunction
+
 function! vim_helpers#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
+        return vim_helpers#WordForSubstitute()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
         return vim_helpers#WordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
         return vim_helpers#WordForGrep()
@@ -299,6 +305,8 @@ function! vim_helpers#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return vim_helpers#CCwordForSubstitute()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
+        return vim_helpers#CCwordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
         return vim_helpers#CCwordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
@@ -315,6 +323,8 @@ endfunction
 function! vim_helpers#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
+        return vim_helpers#PwordForSubstitute()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
         return vim_helpers#PwordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
         return vim_helpers#PwordForGrep()
