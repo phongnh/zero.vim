@@ -1,4 +1,4 @@
-" vim_helpers.vim
+" zero.vim
 " Maintainer: Phong Nguyen
 " Version:    0.1.0
 
@@ -9,12 +9,12 @@ function! s:Print(msg) abort
     echohl WarningMsg | echomsg a:msg | echohl None
 endfunction
 
-function! vim_helpers#Error(msg) abort
+function! zero#Error(msg) abort
     echohl ErrorMsg | echomsg a:msg | echohl None
 endfunction
 
-function! vim_helpers#LogCommand(cmd, ...) abort
-    if g:vim_helpers_debug
+function! zero#LogCommand(cmd, ...) abort
+    if g:zero_vim_debug
         let l:tag = get(a:, 1, '')
         if strlen(l:tag)
             let l:tag = '[' . l:tag . '] '
@@ -24,19 +24,14 @@ function! vim_helpers#LogCommand(cmd, ...) abort
 endfunction
 
 if exists('*trim')
-    function! vim_helpers#Strip(str) abort
+    function! zero#Strip(str) abort
         return trim(a:str)
     endfunction
 else
-    function! vim_helpers#Strip(str) abort
+    function! zero#Strip(str) abort
         return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
     endfunction
 endif
-
-" TODO: Remove this function
-function! vim_helpers#strip(str) abort
-    return vim_helpers#Strip(a:str)
-endfunction
 
 " Search Helpers
 function! s:TrimNewLines(text) abort
@@ -59,7 +54,7 @@ function! s:ShellEscape(text) abort
     return shellescape(escaped_text)
 endfunction
 
-function! vim_helpers#GrepShellEscape(text) abort
+function! zero#GrepShellEscape(text) abort
     if empty(a:text)
         return ''
     endif
@@ -73,7 +68,7 @@ function! vim_helpers#GrepShellEscape(text) abort
     return shellescape(escaped_text)
 endfunction
 
-function! vim_helpers#CCword(...) abort
+function! zero#CCword(...) abort
     if get(a:, 1, 0)
         return '-w ' . expand('<cword>')
     else
@@ -81,15 +76,15 @@ function! vim_helpers#CCword(...) abort
     endif
 endfunction
 
-function! vim_helpers#Cword() abort
+function! zero#Cword() abort
     return expand('<cword>')
 endfunction
 
-function! vim_helpers#Word() abort
+function! zero#Word() abort
     return expand('<cWORD>')
 endfunction
 
-function! vim_helpers#Vword() range abort
+function! zero#Vword() range abort
     " Save the current register and clipboard
     let reg_save     = getreg('"')
     let regtype_save = getregtype('"')
@@ -112,7 +107,7 @@ function! vim_helpers#Vword() range abort
     endif
 endfunction
 
-function! vim_helpers#Pword() abort
+function! zero#Pword() abort
     let search = @/
 
     if search ==# "\n" || empty(search)
@@ -122,112 +117,112 @@ function! vim_helpers#Pword() abort
     return substitute(search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
-function! vim_helpers#CCwordForShell() abort
-    let cword = s:TrimNewLines(vim_helpers#Cword())
+function! zero#CCwordForShell() abort
+    let cword = s:TrimNewLines(zero#Cword())
     let cword = escape(cword, s:shell_escape_characters)
     return shellescape('\b' . cword . '\b')
 endfunction
 
-function! vim_helpers#CwordForShell() abort
-    let cword = s:TrimNewLines(vim_helpers#Cword())
+function! zero#CwordForShell() abort
+    let cword = s:TrimNewLines(zero#Cword())
     return s:ShellEscape(cword)
 endfunction
 
-function! vim_helpers#WordForShell() abort
-    let word = s:TrimNewLines(vim_helpers#Word())
+function! zero#WordForShell() abort
+    let word = s:TrimNewLines(zero#Word())
     return s:ShellEscape(word)
 endfunction
 
-function! vim_helpers#VwordForShell() range abort
-    let selection = s:TrimNewLines(vim_helpers#Vword())
+function! zero#VwordForShell() range abort
+    let selection = s:TrimNewLines(zero#Vword())
     return s:ShellEscape(selection)
 endfunction
 
-function! vim_helpers#PwordForShell() abort
-    let search = vim_helpers#Pword()
+function! zero#PwordForShell() abort
+    let search = zero#Pword()
     return s:ShellEscape(search)
 endfunction
 
-function! vim_helpers#CCwordForCtrlSF() abort
+function! zero#CCwordForCtrlSF() abort
     if get(g:, 'ctrlsf_backend', '') ==# 'rg'
-        return '-R -- ' . shellescape(vim_helpers#CCword())
+        return '-R -- ' . shellescape(zero#CCword())
     else
-        return shellescape(vim_helpers#Cword())
+        return shellescape(zero#Cword())
     endif
 endfunction
 
-function! vim_helpers#CwordForCtrlSF() abort
-    return '-- ' . shellescape(vim_helpers#Cword())
+function! zero#CwordForCtrlSF() abort
+    return '-- ' . shellescape(zero#Cword())
 endfunction
 
-function! vim_helpers#WordForCtrlSF() abort
-    return '-- ' . shellescape(vim_helpers#Word())
+function! zero#WordForCtrlSF() abort
+    return '-- ' . shellescape(zero#Word())
 endfunction
 
-function! vim_helpers#VwordForCtrlSF() abort
-    return '-- ' . shellescape(vim_helpers#Vword())
+function! zero#VwordForCtrlSF() abort
+    return '-- ' . shellescape(zero#Vword())
 endfunction
 
-function! vim_helpers#PwordForCtrlSF() abort
-    let l:pword = vim_helpers#Pword()
+function! zero#PwordForCtrlSF() abort
+    let l:pword = zero#Pword()
     return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . shellescape(l:pword)
 endfunction
 
-function! vim_helpers#CCwordForFerret(...) abort
-    return call('vim_helpers#CCword', a:000)
+function! zero#CCwordForFerret(...) abort
+    return call('zero#CCword', a:000)
 endfunction
 
-function! vim_helpers#CwordForFerret() abort
-    return vim_helpers#Cword()
+function! zero#CwordForFerret() abort
+    return zero#Cword()
 endfunction
 
-function! vim_helpers#WordForFerret() abort
-    return vim_helpers#Word()
+function! zero#WordForFerret() abort
+    return zero#Word()
 endfunction
 
-function! vim_helpers#VwordForFerret() abort
-    return escape(vim_helpers#Vword(), ' ')
+function! zero#VwordForFerret() abort
+    return escape(zero#Vword(), ' ')
 endfunction
 
-function! vim_helpers#PwordForFerret()abort
-    return escape(vim_helpers#Pword(), ' ')
+function! zero#PwordForFerret()abort
+    return escape(zero#Pword(), ' ')
 endfunction
 
-function! vim_helpers#CCwordForGrep() abort
-    let cword = vim_helpers#CCword()
-    return vim_helpers#GrepShellEscape(cword)
+function! zero#CCwordForGrep() abort
+    let cword = zero#CCword()
+    return zero#GrepShellEscape(cword)
 endfunction
 
-function! vim_helpers#CwordForGrep() abort
-    let cword = vim_helpers#Cword()
-    return vim_helpers#GrepShellEscape(cword)
+function! zero#CwordForGrep() abort
+    let cword = zero#Cword()
+    return zero#GrepShellEscape(cword)
 endfunction
 
-function! vim_helpers#WordForGrep() abort
-    let word = vim_helpers#Word()
-    return vim_helpers#GrepShellEscape(word)
+function! zero#WordForGrep() abort
+    let word = zero#Word()
+    return zero#GrepShellEscape(word)
 endfunction
 
-function! vim_helpers#VwordForGrep() range abort
-    let selection = vim_helpers#Vword()
-    return vim_helpers#GrepShellEscape(selection)
+function! zero#VwordForGrep() range abort
+    let selection = zero#Vword()
+    return zero#GrepShellEscape(selection)
 endfunction
 
-function! vim_helpers#PwordForGrep() abort
-    let search = vim_helpers#Pword()
-    return vim_helpers#GrepShellEscape(search)
+function! zero#PwordForGrep() abort
+    let search = zero#Pword()
+    return zero#GrepShellEscape(search)
 endfunction
 
-function! vim_helpers#CCwordForSubstitute() abort
-    return '\<' . vim_helpers#Cword() . '\>'
+function! zero#CCwordForSubstitute() abort
+    return '\<' . zero#Cword() . '\>'
 endfunction
 
-function! vim_helpers#CwordForSubstitute() abort
-    return vim_helpers#Cword()
+function! zero#CwordForSubstitute() abort
+    return zero#Cword()
 endfunction
 
-function! vim_helpers#WordForSubstitute() abort
-    let word = vim_helpers#Word()
+function! zero#WordForSubstitute() abort
+    let word = zero#Word()
 
     " Escape regex characters
     let word = escape(word, s:substitute_escape_characters)
@@ -235,8 +230,8 @@ function! vim_helpers#WordForSubstitute() abort
     return word
 endfunction
 
-function! vim_helpers#VwordForSubstitute() range abort
-    let selection = vim_helpers#Vword()
+function! zero#VwordForSubstitute() range abort
+    let selection = zero#Vword()
 
     " Escape regex characters
     let selection = escape(selection, s:substitute_escape_characters)
@@ -247,8 +242,8 @@ function! vim_helpers#VwordForSubstitute() range abort
     return selection
 endfunction
 
-function! vim_helpers#PwordForSubstitute() range abort
-    let search = vim_helpers#Pword()
+function! zero#PwordForSubstitute() range abort
+    let search = zero#Pword()
 
     " Escape regex characters
     let search = escape(search, '^$.*\/~[]')
@@ -282,60 +277,60 @@ function! s:IsFerretSubstituteCommand(cmd) abort
     return a:cmd =~# '^\(Acks\|Lacks\)'
 endfunction
 
-function! vim_helpers#InsertWord() abort
+function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return vim_helpers#WordForSubstitute()
+        return zero#WordForSubstitute()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return vim_helpers#WordForSubstitute()
+        return zero#WordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
-        return vim_helpers#WordForGrep()
+        return zero#WordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return vim_helpers#Word()
+        return zero#Word()
     elseif s:IsFerretCommand(l:cmd)
-        return vim_helpers#WordForFerret()
+        return zero#WordForFerret()
     elseif getcmdtype() == '@'
-        return vim_helpers#WordForShell()
+        return zero#WordForShell()
     else
-        return vim_helpers#WordForShell()
+        return zero#WordForShell()
     endif
 endfunction
 
-function! vim_helpers#InsertCCword() abort
+function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return vim_helpers#CCwordForSubstitute()
+        return zero#CCwordForSubstitute()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return vim_helpers#CCwordForSubstitute()
+        return zero#CCwordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
-        return vim_helpers#CCwordForGrep()
+        return zero#CCwordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return vim_helpers#CCwordForCtrlSF()
+        return zero#CCwordForCtrlSF()
     elseif s:IsFerretCommand(l:cmd)
-        return vim_helpers#CCwordForFerret()
+        return zero#CCwordForFerret()
     elseif getcmdtype() == '@'
-        return vim_helpers#CCwordForShell()
+        return zero#CCwordForShell()
     else
-        return vim_helpers#CCwordForShell()
+        return zero#CCwordForShell()
     endif
 endfunction
 
-function! vim_helpers#InsertPword() abort
+function! zero#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
-        return vim_helpers#PwordForSubstitute()
+        return zero#PwordForSubstitute()
     elseif s:IsFerretSubstituteCommand(l:cmd)
-        return vim_helpers#PwordForSubstitute()
+        return zero#PwordForSubstitute()
     elseif s:IsGrepCommand(l:cmd)
-        return vim_helpers#PwordForGrep()
+        return zero#PwordForGrep()
     elseif s:IsCtrlSFCommand(l:cmd)
-        return vim_helpers#PwordForCtrlSF()
+        return zero#PwordForCtrlSF()
     elseif s:IsFerretCommand(l:cmd)
-        return vim_helpers#PwordForFerret()
+        return zero#PwordForFerret()
     elseif getcmdtype() == '@'
-        return vim_helpers#PwordForShell()
+        return zero#PwordForShell()
     else
-        return vim_helpers#PwordForShell()
+        return zero#PwordForShell()
     endif
 endfunction
 

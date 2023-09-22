@@ -1,7 +1,7 @@
 let s:tig_cmd = 'tig %s'
 let s:tig_log_cmd = 'git log --name-only --format= --follow -- %s'
 let s:tigrc_user_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h') . '/config/vim.tigrc'
-let s:tig_mode = get(g:, 'tig_mode', 'tab')
+let s:tig_mode = get(g:, 'zero_vim_tig_mode', 'tab')
 let s:tig_use_shell = 1
 
 function! s:UpdateVimSettings() abort
@@ -40,7 +40,7 @@ endfunction
 
 function! s:OnExitTigCallback(code, cmd, mode) abort
     if a:code != 0
-        call vim_helpers#Error(printf('[%s] %s: failed!', a:mode, a:cmd))
+        call zero#Error(printf('[%s] %s: failed!', a:mode, a:cmd))
         return
     endif
 
@@ -63,7 +63,7 @@ endfunction
 
 function! s:OpenTigVimAction(cmd)
     if !filereadable(s:tig_vim_action_file)
-        call vim_helpers#Error(printf('%s: failed to open vim action file %s!', a:cmd, s:tig_vim_action_file))
+        call zero#Error(printf('%s: failed to open vim action file %s!', a:cmd, s:tig_vim_action_file))
         unlet! s:tig_vim_action_file
         return
     endif
@@ -94,8 +94,8 @@ function! s:OpenTigVimAction(cmd)
 endfunction
 
 function! s:RunTig(options) abort
-    let cwd = vim_helpers#git#WorkTree()
-    let cmd = vim_helpers#Strip('tig ' . a:options)
+    let cwd = zero#git#WorkTree()
+    let cmd = zero#Strip('tig ' . a:options)
 
     " Use echo as fallback command
     call writefile(['echo'], s:GetTigVimActionFile())
@@ -120,7 +120,7 @@ function! s:OpenTigInNvim(tig_cmd, cwd) abort
     endif
     setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
     let cmd = printf('env %s %s', s:TigEnvString(a:cwd), a:tig_cmd)
-    call vim_helpers#LogCommand(cmd, 'nvim')
+    call zero#LogCommand(cmd, 'nvim')
     call termopen(cmd, {
                 \ 'name': cmd,
                 \ 'cwd': a:cwd,
@@ -137,7 +137,7 @@ function! s:OpenTigInTerminal(tig_cmd, cwd) abort
         call s:UpdateVimSettings()
     endif
     let cmd = a:tig_cmd
-    call vim_helpers#LogCommand(cmd, 'terminal')
+    call zero#LogCommand(cmd, 'terminal')
     let term_options = {
                 \ 'term_name': cmd,
                 \ 'cwd': a:cwd,
@@ -153,18 +153,18 @@ endfunction
 
 function! s:OpenTigInShell(tig_cmd, cwd) abort
     let cmd = printf('cd %s && env %s %s', shellescape(a:cwd), s:TigEnvString(a:cwd), a:tig_cmd)
-    call vim_helpers#LogCommand(cmd, 'shell')
+    call zero#LogCommand(cmd, 'shell')
     execute printf('silent !%s', cmd)
     call s:OpenTigVimAction(cmd)
     redraw!
 endfunction
 
-function! vim_helpers#tig#Tig(options) abort
+function! zero#tig#Tig(options) abort
     try
-        call vim_helpers#git#FindRepo()
+        call zero#git#FindRepo()
         call s:RunTig(a:options)
     catch
-        call vim_helpers#Error('Tig: ' . v:exception)
+        call zero#Error('Tig: ' . v:exception)
     endtry
 endfunction
 
@@ -177,11 +177,11 @@ function! s:TigOldPaths(path) abort
     return map(uniq(split(system(cmd))), 's:TigShellEscape(v:val)')
 endfunction
 
-function! vim_helpers#tig#TigFile(path, bang) abort
+function! zero#tig#TigFile(path, bang) abort
     try
-        call vim_helpers#git#FindRepo()
+        call zero#git#FindRepo()
 
-        let l:path = vim_helpers#git#BuildPath(a:path)
+        let l:path = zero#git#BuildPath(a:path)
 
         if a:bang
             let l:path = join(s:TigOldPaths(l:path), ' ')
@@ -191,20 +191,20 @@ function! vim_helpers#tig#TigFile(path, bang) abort
 
         call s:RunTig('-- ' . l:path)
     catch
-        call vim_helpers#Error('TigFile: ' . v:exception)
+        call zero#Error('TigFile: ' . v:exception)
     endtry
 endfunction
 
-function! vim_helpers#tig#TigBlame(path) abort
+function! zero#tig#TigBlame(path) abort
     try
-        call vim_helpers#git#FindRepo()
+        call zero#git#FindRepo()
 
         let opts = ['blame']
 
         let l:path = a:path
 
         if empty(a:path)
-            let l:path = vim_helpers#git#BuildPath('')
+            let l:path = zero#git#BuildPath('')
             call add(opts, '+' . line('.'))
         endif
 
@@ -212,13 +212,13 @@ function! vim_helpers#tig#TigBlame(path) abort
 
         call s:RunTig(join(opts, ' '))
     catch
-        call vim_helpers#Error('TigBlame: ' . v:exception)
+        call zero#Error('TigBlame: ' . v:exception)
     endtry
 endfunction
 
-function! vim_helpers#tig#TigOnBlame() abort
-    let ref = vim_helpers#git#ParseRef()
+function! zero#tig#TigOnBlame() abort
+    let ref = zero#git#ParseRef()
     if !empty(ref)
-        call vim_helpers#tig#Tig('show ' . ref)
+        call zero#tig#Tig('show ' . ref)
     endif
 endfunction

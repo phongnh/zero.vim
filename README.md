@@ -1,41 +1,41 @@
-# vim-helpers
+# zero.vim
 
 ### This plugin defines the following functions for manipulating text for search and substitute:
 
-* vim_helpers#Strip()
-* vim_helpers#CCword()
-* vim_helpers#Cword()
-* vim_helpers#Word()
-* vim_helpers#Vword()
-* vim_helpers#Pword()
-* vim_helpers#CCwordForShell()
-* vim_helpers#CwordForShell()
-* vim_helpers#WordForShell()
-* vim_helpers#VwordForShell()
-* vim_helpers#PwordForShell()
-* vim_helpers#CCwordForCtrlSF()
-* vim_helpers#CwordForCtrlSF()
-* vim_helpers#WordForCtrlSF()
-* vim_helpers#VwordForCtrlSF()
-* vim_helpers#PwordForCtrlSF()
-* vim_helpers#CCwordForFerret()
-* vim_helpers#CwordForFerret()
-* vim_helpers#WordForFerret()
-* vim_helpers#VwordForFerret()
-* vim_helpers#PwordForFerret()
-* vim_helpers#CCwordForGrep()
-* vim_helpers#CwordForGrep()
-* vim_helpers#WordForGrep()
-* vim_helpers#VwordForGrep()
-* vim_helpers#PwordForGrep()
-* vim_helpers#CCwordForSubstitute()
-* vim_helpers#CwordForSubstitute()
-* vim_helpers#WordForSubstitute()
-* vim_helpers#VwordForSubstitute()
-* vim_helpers#PwordForSubstitute()
-* vim_helpers#InsertCCWord()
-* vim_helpers#InsertWord()
-* vim_helpers#InsertPWord()
+* zero#Strip()
+* zero#CCword()
+* zero#Cword()
+* zero#Word()
+* zero#Vword()
+* zero#Pword()
+* zero#CCwordForShell()
+* zero#CwordForShell()
+* zero#WordForShell()
+* zero#VwordForShell()
+* zero#PwordForShell()
+* zero#CCwordForCtrlSF()
+* zero#CwordForCtrlSF()
+* zero#WordForCtrlSF()
+* zero#VwordForCtrlSF()
+* zero#PwordForCtrlSF()
+* zero#CCwordForFerret()
+* zero#CwordForFerret()
+* zero#WordForFerret()
+* zero#VwordForFerret()
+* zero#PwordForFerret()
+* zero#CCwordForGrep()
+* zero#CwordForGrep()
+* zero#WordForGrep()
+* zero#VwordForGrep()
+* zero#PwordForGrep()
+* zero#CCwordForSubstitute()
+* zero#CwordForSubstitute()
+* zero#WordForSubstitute()
+* zero#VwordForSubstitute()
+* zero#PwordForSubstitute()
+* zero#InsertCCWord()
+* zero#InsertWord()
+* zero#InsertPWord()
 
 ### This plugin defines the following commands:
 
@@ -52,9 +52,9 @@
 * HighlightWord
 * HighlightColumns
 * ClearHightlights
-* Grep, GrepCCword, GrepCword, GrepWord, GrepVword
-* LGrep, LGrepCCword, LGrepCword, LGrepWord, LGrepVword
-* BGrep, BGrepCCword, BGrepCword, BGrepWord, BGrepVword
+* Grep
+* LGrep
+* BGrep
 * Gitk, GitkFile
 * Tig, TigFile, TigBlame
 * SW

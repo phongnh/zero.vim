@@ -4,8 +4,8 @@ let s:gitk_cmd = 'gitk %s'
 let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s'
 
 function! s:RunGitk(options) abort
-    let cwd = vim_helpers#git#WorkTree()
-    let cmd = vim_helpers#Strip(printf(s:gitk_cmd, a:options))
+    let cwd = zero#git#WorkTree()
+    let cmd = zero#Strip(printf(s:gitk_cmd, a:options))
     if has('nvim')
         call s:OpenGitkInNvim(cmd, cwd)
     elseif has('terminal')
@@ -17,7 +17,7 @@ endfunction
 
 function! s:OpenGitkInNvim(gitk_cmd, cwd) abort
     let cmd = a:gitk_cmd
-    call vim_helpers#LogCommand(cmd, 'nvim')
+    call zero#LogCommand(cmd, 'nvim')
     call jobstart(cmd, {
                 \ 'cwd': a:cwd,
                 \ 'clear_env': v:false,
@@ -26,7 +26,7 @@ endfunction
 
 function! s:OpenGitkInTerminal(gitk_cmd, cwd) abort
     let cmd = a:gitk_cmd
-    call vim_helpers#LogCommand(cmd, 'terminal')
+    call zero#LogCommand(cmd, 'terminal')
     silent call job_start(cmd, {
                 \ 'cwd': a:cwd,
                 \ })
@@ -35,7 +35,7 @@ endfunction
 function! s:OpenGitkInShell(gitk_cmd, cwd) abort
     let cmd = printf('cd %s && %s', shellescape(a:cwd), a:gitk_cmd)
     let cmd .= !s:is_windows ? ' >/dev/null 2>&1 &' : ''
-    call vim_helpers#LogCommand(cmd, 'shell')
+    call zero#LogCommand(cmd, 'shell')
     execute printf('silent !%s', cmd)
     redraw!
 endfunction
@@ -49,20 +49,20 @@ function! s:GitOldPaths(path) abort
     return map(uniq(split(system(cmd))), 's:GitkShellEscape(v:val)')
 endfunction
 
-function! vim_helpers#gitk#Gitk(options) abort
+function! zero#gitk#Gitk(options) abort
     try
-        call vim_helpers#git#FindRepo()
+        call zero#git#FindRepo()
         call s:RunGitk(a:options)
     catch
-        call vim_helpers#Error('Gitk: ' . v:exception)
+        call zero#Error('Gitk: ' . v:exception)
     endtry
 endfunction
 
-function! vim_helpers#gitk#GitkFile(path, bang) abort
+function! zero#gitk#GitkFile(path, bang) abort
     try
-        call vim_helpers#git#FindRepo()
+        call zero#git#FindRepo()
 
-        let path = vim_helpers#git#BuildPath(a:path)
+        let path = zero#git#BuildPath(a:path)
 
         if a:bang
             let path = join(s:GitOldPaths(path), ' ')
@@ -72,13 +72,13 @@ function! vim_helpers#gitk#GitkFile(path, bang) abort
 
         call s:RunGitk('-- ' . path)
     catch
-        call vim_helpers#Error('GitkFile: ' . v:exception)
+        call zero#Error('GitkFile: ' . v:exception)
     endtry
 endfunction
 
-function! vim_helpers#gitk#GitkOnBlame() abort
-    let ref = vim_helpers#git#ParseRef()
+function! zero#gitk#GitkOnBlame() abort
+    let ref = zero#git#ParseRef()
     if !empty(ref)
-        call vim_helpers#gitk#Gitk(ref)
+        call zero#gitk#Gitk(ref)
     endif
 endfunction

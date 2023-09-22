@@ -1,7 +1,7 @@
 " Grep Helpers
 function! s:GrepDir(dir) abort
     let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
-    let l:dir = vim_helpers#Strip(l:dir)
+    let l:dir = zero#Strip(l:dir)
 
     if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
         return ''
@@ -11,22 +11,22 @@ function! s:GrepDir(dir) abort
 endfunction
 
 function! s:Grep(cmd, ...) abort
-    let l:cmd = vim_helpers#Strip(a:cmd . ' ' . join(a:000, ' '))
-    call vim_helpers#LogCommand(l:cmd)
+    let l:cmd = zero#Strip(a:cmd . ' ' . join(a:000, ' '))
+    call zero#LogCommand(l:cmd)
     try
         execute l:cmd
     catch
     endtry
 endfunction
 
-function! vim_helpers#grep#Grep(...) abort
+function! zero#grep#Grep(...) abort
     call call(function('s:Grep'), ['Grep'] + a:000)
 endfunction
 
-function! vim_helpers#grep#LGrep(...) abort
+function! zero#grep#LGrep(...) abort
     call call(function('s:Grep'), ['LGrep'] + a:000)
 endfunction
 
-function! vim_helpers#grep#BGrep(...) abort
+function! zero#grep#BGrep(...) abort
     call call(function('s:Grep'), ['BGrep'] + a:000)
 endfunction

@@ -1,5 +1,5 @@
 " Git helpers
-function! vim_helpers#git#BuildPath(path) abort
+function! zero#git#BuildPath(path) abort
     let l:path = empty(a:path) ? expand('%') : a:path
 
     if empty(l:path)
@@ -7,11 +7,11 @@ function! vim_helpers#git#BuildPath(path) abort
     endif
 
     let l:path = fnamemodify(l:path, ':p')
-    let l:path = substitute(l:path, vim_helpers#git#WorkTree() . '/', '', 'g')
+    let l:path = substitute(l:path, zero#git#WorkTree() . '/', '', 'g')
     return l:path
 endfunction
 
-function! vim_helpers#git#FindRepo() abort
+function! zero#git#FindRepo() abort
     if exists('b:git_dir') && strlen(b:git_dir)
         return fnamemodify(b:git_dir, ':h')
     endif
@@ -31,7 +31,7 @@ function! vim_helpers#git#FindRepo() abort
     return fnamemodify(b:git_dir, ':h')
 endfunction
 
-function! vim_helpers#git#WorkTree() abort
+function! zero#git#WorkTree() abort
     if exists('b:__gitmessenger_popup')
         return gitmessenger#git#root_dir(b:__gitmessenger_popup.opener_bufnr)
     else
@@ -49,7 +49,7 @@ function! s:SystemRun(cmd, ...) abort
     endif
 
     try
-        call vim_helpers#LogCommand(cmd)
+        call zero#LogCommand(cmd)
         return system(cmd)
     catch /E684/
     endtry
@@ -57,9 +57,9 @@ function! s:SystemRun(cmd, ...) abort
     return ''
 endfunction
 
-function! vim_helpers#git#Branches(A, L, P) abort
+function! zero#git#Branches(A, L, P) abort
     try
-        let repo_dir = vim_helpers#git#FindRepo()
+        let repo_dir = zero#git#FindRepo()
         let output = s:SystemRun('git branch -a | cut -c 3-', repo_dir)
         let output = substitute(output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
         let output = substitute(output, 'remotes/', '', 'g')
@@ -73,7 +73,7 @@ endfunction
 function! s:ParseGitMessengerRef() abort
     for line in get(b:__gitmessenger_popup, 'contents', [])
         if line =~# '^\s\+Commit:\s\+[a-z0-9]\{40,\}$'
-            return get(split(vim_helpers#Strip(line), '\s\+'), -1, '')
+            return get(split(zero#Strip(line), '\s\+'), -1, '')
         endif
     endfor
 
@@ -82,7 +82,7 @@ endfunction
 
 " Fugitive Blame
 function! s:ParseFugitiveRef() abort
-    let line = vim_helpers#Strip(getline('.'))
+    let line = zero#Strip(getline('.'))
 
     let ref = get(split(line, '\s\+'), 0, '')
     if ref !~# '^0\{7,\}$' && ref =~# '^\^\?[a-z0-9]\{7,\}$'
@@ -96,7 +96,7 @@ function! s:ParseFugitiveRef() abort
     return ''
 endfunction
 
-function! vim_helpers#git#ParseRef() abort
+function! zero#git#ParseRef() abort
     if exists('b:__gitmessenger_popup')
         return s:ParseGitMessengerRef()
     else
@@ -104,9 +104,9 @@ function! vim_helpers#git#ParseRef() abort
     endif
 endfunction
 
-function! vim_helpers#git#GBrowseOnBlame() abort
+function! zero#git#GBrowseOnBlame() abort
     if exists(':GBrowse') == 2
-        let ref = vim_helpers#git#ParseRef()
+        let ref = zero#git#ParseRef()
         if !empty(ref)
             execute ':GBrowse ' ref
         endif
