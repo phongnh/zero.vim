@@ -256,7 +256,7 @@ endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
     return a:cmd =~# '^%\?\(s\|substitute\|S\|Subvert\)/' ||
-                \ a:cmd =~# '^\(silent!\?\s\+)\?\(c\|l\)\(fdo\|do\)\s\+\(s\|substitute\|S\|Subvert\)/'
+                \ a:cmd =~# '^\(silent!\?\s\+\)\?\(c\|l\)\(fdo\|do\)\s\+\(s\|substitute\|S\|Subvert\)/'
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
