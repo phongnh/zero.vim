@@ -84,7 +84,7 @@ endfunction
 function! s:ParseGitRebaseLine() abort
     let line = zero#Strip(getline('.'))
 
-    if line =~# '^(pick\|edit\|fixup\|squash\|reword\|drop)\s'
+    if line =~# '^\(pick\|edit\|fixup\|squash\|reword\|drop\)\s'
         let [_action, hash; _text] = split(line)
         return hash
     endif
