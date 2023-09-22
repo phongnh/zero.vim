@@ -70,7 +70,7 @@ function! zero#git#Branches(A, L, P) abort
 endfunction
 
 " Git Messenger Popup
-function! s:ParseGitMessengerRef() abort
+function! s:ParseGitMessengerContent() abort
     for line in get(b:__gitmessenger_popup, 'contents', [])
         if line =~# '^\s\+Commit:\s\+[a-z0-9]\{40,\}$'
             return get(split(zero#Strip(line), '\s\+'), -1, '')
@@ -80,35 +80,76 @@ function! s:ParseGitMessengerRef() abort
     return ''
 endfunction
 
-" Fugitive Blame
-function! s:ParseFugitiveRef() abort
+" Git Rebase
+function! s:ParseGitRebaseLine() abort
     let line = zero#Strip(getline('.'))
 
-    let ref = get(split(line, '\s\+'), 0, '')
-    if ref !~# '^0\{7,\}$' && ref =~# '^\^\?[a-z0-9]\{7,\}$'
-        if ref[0] == '^'
-            return printf('"$(git show --summary --format=format:%%h %s)"', ref)
+    if line =~# '^(pick\|edit\|fixup\|squash\|reword\|drop)\s'
+        let [_action, hash; _text] = split(line)
+        return hash
+    endif
+
+    return ''
+endfunction
+
+" Fugitive Blame
+function! s:ParseFugitiveBlameLine() abort
+    let line = zero#Strip(getline('.'))
+
+    let [hash; _text] = split(line)
+    if hash !~# '^0\{7,\}$' && hash =~# '^\^\?[a-z0-9]\{7,\}$'
+        if hash[0] == '^'
+            let new_hash = system('git show -s --format=format:%h ' . hash)
+            return strlen(new_hash) ? new_hash : hash[1:]
         else
-            return ref
+            return hash
         endif
     endif
 
     return ''
 endfunction
 
-function! zero#git#ParseRef() abort
+function! s:ParseCommitHash() abort
     if exists('b:__gitmessenger_popup')
-        return s:ParseGitMessengerRef()
+        return s:ParseGitMessengerContent()
+    elseif &filetype ==# 'gitrebase'
+        return s:ParseGitRebaseLine()
     else
-        return s:ParseFugitiveRef()
+        return s:ParseFugitiveBlameLine()
     endif
 endfunction
 
-function! zero#git#GBrowseOnBlame() abort
+function! zero#git#ViewCommit(command)
+    let hash = s:ParseCommitHash()
+    if empty(hash)
+        return
+    endif
+    if exists(a:command) == 2
+        execute a:command hash
+    elseif a:command ==# 'gitk'
+        call zero#gitk#Gitk(hash)
+    elseif a:command ==# 'tig'
+        call zero#tig#Tig('show ' . hash)
+    endif
+endfunction
+
+function! zero#git#SetupViewCommit()
+    if executable('gitk')
+        command! -buffer ViewCommitWithGitk call zero#git#ViewCommit('gitk')
+        nnoremap <buffer> <silent> K :<C-u>ViewCommitWithGitk<CR>
+    endif
+
+    if executable('tig')
+        command! -buffer ViewCommitWithTig call zero#git#ViewCommit('tig')
+        nnoremap <buffer> <silent> T :<C-u>ViewCommitWithTig<CR>
+    endif
+
     if exists(':GBrowse') == 2
-        let ref = zero#git#ParseRef()
-        if !empty(ref)
-            execute ':GBrowse ' ref
-        endif
+        command! -buffer ViewCommitWithGBrowse call zero#git#ViewCommit(':GBrowse')
+        nnoremap <buffer> <silent> gb :<C-u>ViewCommitWithGBrowse<CR>
+    endif
+
+    if exists(':OpenGithubCommit') == 2
+        command! -buffer ViewCommitWithGithub call zero#git#ViewCommit(':OpenGithubCommit')
     endif
 endfunction

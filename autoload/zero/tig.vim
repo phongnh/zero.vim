@@ -215,10 +215,3 @@ function! zero#tig#TigBlame(path) abort
         call zero#Error('TigBlame: ' . v:exception)
     endtry
 endfunction
-
-function! zero#tig#TigOnBlame() abort
-    let ref = zero#git#ParseRef()
-    if !empty(ref)
-        call zero#tig#Tig('show ' . ref)
-    endif
-endfunction

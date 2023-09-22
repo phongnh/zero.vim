@@ -75,10 +75,3 @@ function! zero#gitk#GitkFile(path, bang) abort
         call zero#Error('GitkFile: ' . v:exception)
     endtry
 endfunction
-
-function! zero#gitk#GitkOnBlame() abort
-    let ref = zero#git#ParseRef()
-    if !empty(ref)
-        call zero#gitk#Gitk(ref)
-    endif
-endfunction
