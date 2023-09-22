@@ -88,7 +88,7 @@ endif
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg -H --no-heading -n -S --hidden'
-    let &grepprg .= get(g:, 'zero_vim_grep_follow_links', 0) ? ' --follow' : ''
+    let &grepprg .= get(g:, 'zero_vim_grep_follow_links', get(g:, 'zero_vim_follow_links', 0)) ? ' --follow' : ''
     let &grepprg .= get(g:, 'zero_vim_grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
 
