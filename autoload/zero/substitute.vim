@@ -82,16 +82,16 @@ function! zero#substitute#Prompt(cmd, ...) abort
     let l:search = l:opts.search
     if &filetype == 'qf'
         if strlen(l:opts.qf)
-            let l:search = '/' . "\<C-r>=" . l:opts.qf . "\<CR>"
+            let l:search = '/' . "\<C-r>=" . l:opts.qf . "\<CR>/"
         elseif l:search == '\%V'
             let l:search = ''
         elseif strlen(l:search)
-            let l:search = '/' . "\<C-r>=" . l:search . "\<CR>"
+            let l:search = '/' . "\<C-r>=" . l:search . "\<CR>/"
         endif
-    else
-        let l:search = strlen(l:search) ? ('/' . (l:opts.raw ? l:search : ("\<C-r>=" . l:search . "\<CR>"))) : ''
+    elseif strlen(l:search)
+        let l:search = l:opts.raw ? ('/' . l:search) : ("/\<C-r>=" . l:search . "\<CR>/")
     endif
-    let l:search .= '//'
+    let l:search .= strlen(l:search) ? '/' : '//'
 
     let l:flags = l:opts['+flags'] . l:opts.flags
     let l:flags = (l:opts.ignore ? 'I' : '') . l:flags
