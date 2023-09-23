@@ -63,7 +63,7 @@ function! zero#substitute#Prompt(cmd, ...) abort
     endif
 
     let l:defaults = {
-                \ 'esc': mode() =~# '^\(v\|V\|\)$',
+                \ 'esc': 0,
                 \ 'search': '',
                 \ 'raw': 0,
                 \ 'flags': (&filetype == 'qf' ? 'e' : 'c') . (&gdefault ? '' : 'g'),
@@ -76,7 +76,7 @@ function! zero#substitute#Prompt(cmd, ...) abort
     let l:opts = extend(deepcopy(l:defaults), l:opts, 'force')
     " echomsg '==> l:opts' string(l:opts)
 
-    let l:esc = l:opts.esc ? "\<Esc>" : ''
+    let l:esc = l:opts.esc || &filetype == 'qf' ? "\<Esc>" : ''
 
     let l:search = &filetype == 'qf' ? substitute(l:opts.search, '\%V', '', '') : l:opts.search
     let l:search = strlen(l:search) ? ('/' . (l:opts.raw ? l:search : ("\<C-r>=" . l:search . "\<CR>"))) : ''
