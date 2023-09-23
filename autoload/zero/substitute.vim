@@ -63,7 +63,7 @@ function! zero#substitute#Prompt(cmd, ...) abort
     endif
 
     let l:defaults = {
-                \ 'esc': 0,
+                \ 'esc': mode() =~# '^\(v\|V\|\)$',
                 \ 'search': '',
                 \ 'flags': (&filetype == 'qf' ? 'e' : 'c') . (&gdefault ? '' : 'g'),
                 \ '+flags': '',
