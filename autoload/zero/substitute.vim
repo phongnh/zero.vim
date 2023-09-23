@@ -66,6 +66,7 @@ function! zero#substitute#Prompt(cmd, ...) abort
                 \ 'esc': 0,
                 \ 'search': '',
                 \ 'raw': 0,
+                \ 'qf': '',
                 \ 'flags': (&filetype == 'qf' ? 'e' : 'c') . (&gdefault ? '' : 'g'),
                 \ '+flags': '',
                 \ 'ignore': 0,
@@ -78,8 +79,18 @@ function! zero#substitute#Prompt(cmd, ...) abort
 
     let l:esc = l:opts.esc || &filetype == 'qf' ? "\<Esc>" : ''
 
-    let l:search = &filetype == 'qf' ? substitute(l:opts.search, '\%V', '', '') : l:opts.search
-    let l:search = strlen(l:search) ? ('/' . (l:opts.raw ? l:search : ("\<C-r>=" . l:search . "\<CR>"))) : ''
+    let l:search = l:opts.search
+    if &filetype == 'qf'
+        if strlen(l:opts.qf)
+            let l:search = '/' . "\<C-r>=" . l:opts.qf . "\<CR>"
+        elseif l:search == '\%V'
+            let l:search = ''
+        elseif strlen(l:search)
+            let l:search = '/' . "\<C-r>=" . l:search . "\<CR>"
+        endif
+    else
+        let l:search = strlen(l:search) ? ('/' . (l:opts.raw ? l:search : ("\<C-r>=" . l:search . "\<CR>"))) : ''
+    endif
     let l:search .= '//'
 
     let l:flags = l:opts['+flags'] . l:opts.flags
