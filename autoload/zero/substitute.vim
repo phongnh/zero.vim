@@ -30,7 +30,7 @@ function! zero#substitute#Vword(...) range abort
     endif
 endfunction
 
-function! zero#substitute#Pword() range abort
+function! zero#substitute#Pword() abort
     return s:SubstituteEscape(zero#Pword())
 endfunction
 

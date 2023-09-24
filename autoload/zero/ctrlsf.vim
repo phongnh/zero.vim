@@ -14,7 +14,7 @@ function! zero#ctrlsf#Word() abort
     return '-- ' . shellescape(zero#Word())
 endfunction
 
-function! zero#ctrlsf#Vword() abort
+function! zero#ctrlsf#Vword() range abort
     return '-- ' . shellescape(zero#Vword())
 endfunction
 

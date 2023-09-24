@@ -20,7 +20,7 @@ function! zero#ferret#Word() abort
     return s:Escape(zero#Word())
 endfunction
 
-function! zero#ferret#Vword() abort
+function! zero#ferret#Vword() range abort
     return s:Escape(zero#Vword())
 endfunction
 
