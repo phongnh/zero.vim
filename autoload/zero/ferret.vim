@@ -24,6 +24,10 @@ function! zero#ferret#Vword() range abort
     return s:Escape(zero#Vword())
 endfunction
 
-function! zero#ferret#Pword()abort
+function! zero#ferret#Pword() abort
     return s:Escape(zero#Pword())
+endfunction
+
+function! zero#ferret#LastSearch() abort
+    return s:Escape(get(g:, 'ferret_lastsearch', ''))
 endfunction
