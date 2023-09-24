@@ -106,25 +106,6 @@ function! s:IsInputCommand() abort
     return getcmdtype() == '@'
 endfunction
 
-function! zero#InsertWord() abort
-    let l:cmd = getcmdline()
-    if s:IsSubstituteCommand(l:cmd)
-        return zero#substitute#Word()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Word()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#Word()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#Word()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Word()
-    elseif s:IsInputCommand()
-        return zero#shell#Word()
-    else
-        return zero#shell#Word()
-    endif
-endfunction
-
 function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
@@ -160,6 +141,44 @@ function! zero#InsertCword() abort
         return zero#shell#Cword()
     else
         return zero#Cword()
+    endif
+endfunction
+
+function! zero#InsertWord() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return zero#substitute#Word()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
+        return zero#substitute#Word()
+    elseif s:IsGrepCommand(l:cmd)
+        return zero#grep#Word()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        return zero#Word()
+    elseif s:IsFerretCommand(l:cmd)
+        return zero#ferret#Word()
+    elseif s:IsInputCommand()
+        return zero#shell#Word()
+    else
+        return zero#shell#Word()
+    endif
+endfunction
+
+function! zero#InsertVword() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return zero#substitute#Vword()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
+        return zero#substitute#Vword()
+    elseif s:IsGrepCommand(l:cmd)
+        return zero#grep#Vword()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        return zero#ctrlsf#Vword()
+    elseif s:IsFerretCommand(l:cmd)
+        return zero#ferret#Vword()
+    elseif s:IsInputCommand()
+        return zero#shell#Vword()
+    else
+        return zero#Vword()
     endif
 endfunction
 
