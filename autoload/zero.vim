@@ -159,5 +159,9 @@ function! zero#InsertPword() abort
     endif
 endfunction
 
+function! zero#InsertGrepPword() abort
+    return zero#grep#Pword()
+endfunction
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo

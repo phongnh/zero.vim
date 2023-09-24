@@ -78,7 +78,7 @@ if get(g:, 'zero_vim_insert_mappings', 1)
     cnoremap <C-r><C-t> <C-r>=zero#InsertWord()<CR>
     cnoremap <C-r><C-b> <C-r>=zero#InsertCCword()<CR>
     cnoremap <C-r><C-_> <C-r>=zero#InsertPword()<CR>
-    cnoremap <C-r>?     <C-r>=zero#PwordForGrep()<CR>
+    cnoremap <C-r>?     <C-r>=zero#InsertGrepPword()<CR>
     cnoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
     inoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
 endif
