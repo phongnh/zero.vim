@@ -29,5 +29,7 @@ function! zero#ferret#Pword() abort
 endfunction
 
 function! zero#ferret#LastSearch() abort
-    return s:Escape(get(g:, 'ferret_lastsearch', ''))
+    let text = get(g:, 'ferret_lastsearch', '')
+    " Last search has been already escaped, just need to escape space.
+    return escape(text, ' ')
 endfunction
