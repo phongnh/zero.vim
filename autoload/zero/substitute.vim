@@ -11,9 +11,13 @@ function! zero#substitute#Word() abort
     return zero#SubstituteEscape(word)
 endfunction
 
-function! zero#substitute#Vword() range abort
+function! zero#substitute#Vword(...) range abort
     let selection = zero#Vword()
-    return zero#SubstituteEscape(selection)
+    if get(a:, 1, 0)
+        return '\<' . zero#SubstituteEscape(selection) . '\>'
+    else
+        return zero#SubstituteEscape(selection)
+    endif
 endfunction
 
 function! zero#substitute#Pword() range abort
