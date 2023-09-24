@@ -45,7 +45,7 @@ function! zero#grep#BGrep(...) abort
 endfunction
 
 function! zero#grep#CCword() abort
-    return '\b' . s:GrepEscape(zero#Cword()) . '\b'
+    return s:GrepEscape(zero#CCword())
 endfunction
 
 function! zero#grep#Cword() abort
