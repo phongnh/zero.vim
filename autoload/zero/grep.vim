@@ -53,7 +53,7 @@ function! zero#grep#Cword() abort
 endfunction
 
 function! zero#grep#Word() abort
-    return s:GrepEscape(zero#word())
+    return s:GrepEscape(zero#Word())
 endfunction
 
 function! zero#grep#Vword() range abort
