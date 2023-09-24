@@ -1,7 +1,7 @@
-let s:ferret_escape_characters = '() '
+let s:escape_characters = '\^$.*+?()[]{}|- '
 
-function! s:FerretEscapeCharacters(text) abort
-    return escape(a:text, s:ferret_escape_characters)
+function! s:Escape(text) abort
+    return escape(a:text, s:escape_characters)
 endfunction
 
 function! zero#ferret#CCword(...) abort
@@ -17,13 +17,13 @@ function! zero#ferret#Cword() abort
 endfunction
 
 function! zero#ferret#Word() abort
-    return s:FerretEscapeCharacters(zero#Word())
+    return s:Escape(zero#Word())
 endfunction
 
 function! zero#ferret#Vword() abort
-    return s:FerretEscapeCharacters(zero#Vword())
+    return s:Escape(zero#Vword())
 endfunction
 
 function! zero#ferret#Pword()abort
-    return s:FerretEscapeCharacters(zero#Pword())
+    return s:Escape(zero#Pword())
 endfunction
