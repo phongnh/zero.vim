@@ -1,3 +1,16 @@
+let s:escape_characters = '^$.*+?()[]{}|-'
+
+function! s:Escape(text) abort
+    return escape(a:text, s:escape_characters)
+endfunction
+
+function! s:GrepEscape(text) abort
+    " Escape alternative file
+    let text = substitute(a:text, '#', '\\\\#', 'g')
+    let text = s:Escape(text)
+    return shellescape(text)
+endfunction
+
 " Grep Helpers
 function! s:GrepDir(dir) abort
     let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
@@ -32,26 +45,25 @@ function! zero#grep#BGrep(...) abort
 endfunction
 
 function! zero#grep#CCword() abort
-    let cword = zero#CCword()
-    return zero#GrepShellEscape(cword)
+    return '\b' . s:GrepEscape(zero#Cword()) . '\b'
 endfunction
 
 function! zero#grep#Cword() abort
-    let cword = zero#Cword()
-    return zero#GrepShellEscape(cword)
+    return s:GrepEscape(zero#Cword())
 endfunction
 
 function! zero#grep#Word() abort
-    let word = zero#Word()
-    return zero#GrepShellEscape(word)
+    return s:GrepEscape(zero#word())
 endfunction
 
 function! zero#grep#Vword() range abort
-    let selection = zero#Vword()
-    return zero#GrepShellEscape(selection)
+    return s:GrepEscape(zero#Vword())
 endfunction
 
 function! zero#grep#Pword() abort
-    let search = zero#Pword()
-    return zero#GrepShellEscape(search)
+    return s:GrepEscape(zero#Pword())
+endfunction
+
+function! zero#grep#Escape(text) abort
+    return s:GrepEscape(a:text)
 endfunction

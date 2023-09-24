@@ -40,22 +40,6 @@ function! zero#TrimNewLines(text) abort
     return text
 endfunction
 
-let s:grep_escape_characters       = '^$.*+?()[]{}|-'
-
-function! zero#GrepShellEscape(text) abort
-    if empty(a:text)
-        return ''
-    endif
-
-    " Escape alternative file
-    let escaped_text = substitute(a:text, '#', '\\\\#', 'g')
-
-    " Escape some characters
-    let escaped_text = escape(escaped_text, s:grep_escape_characters)
-
-    return shellescape(escaped_text)
-endfunction
-
 function! zero#CCword() abort
     return '\b' . expand('<cword>') . '\b'
 endfunction
