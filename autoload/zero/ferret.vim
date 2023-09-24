@@ -1,3 +1,9 @@
+let s:ferret_escape_characters = '() '
+
+function! s:FerretEscapeCharacters(text) abort
+    return escape(a:text, s:ferret_escape_characters)
+endfunction
+
 function! zero#ferret#CCword(...) abort
     if get(a:, 1, 0)
         return '-w ' . zero#Cword()
@@ -11,13 +17,13 @@ function! zero#ferret#Cword() abort
 endfunction
 
 function! zero#ferret#Word() abort
-    return zero#Word()
+    return s:FerretEscapeCharacters(zero#Word())
 endfunction
 
 function! zero#ferret#Vword() abort
-    return escape(zero#Vword(), ' ')
+    return s:FerretEscapeCharacters(zero#Vword())
 endfunction
 
-function! zero#ferret#Pword() abort
-    return escape(zero#Pword(), ' ')
+function! zero#ferret#Pword()abort
+    return s:FerretEscapeCharacters(zero#Pword())
 endfunction
