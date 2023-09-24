@@ -1,3 +1,15 @@
+" Escape regex characters
+let s:escape_characters = '^$.*\/~[]'
+
+function! s:Escape(text) abort
+    return escape(a:text, s:escape_characters)
+endfunction
+
+function! s:SubstituteEscape(text) abort
+    " Escape the line endings
+    return substitute(s:Escape(a:text), '\n', '\\n', 'g')
+endfunction
+
 function! zero#substitute#CCword() abort
     return '\<' . zero#Cword() . '\>'
 endfunction
@@ -7,28 +19,25 @@ function! zero#substitute#Cword() abort
 endfunction
 
 function! zero#substitute#Word() abort
-    let word = zero#Word()
-    return zero#SubstituteEscape(word)
+    return s:SubstituteEscape(zero#Word())
 endfunction
 
 function! zero#substitute#Vword(...) range abort
-    let selection = zero#Vword()
     if get(a:, 1, 0)
-        return '\<' . zero#SubstituteEscape(selection) . '\>'
+        return '\<' . s:SubstituteEscape(zero#Vword()) . '\>'
     else
-        return zero#SubstituteEscape(selection)
+        return s:SubstituteEscape(zero#Vword())
     endif
 endfunction
 
 function! zero#substitute#Pword() range abort
-    let search = zero#Pword()
-    return zero#SubstituteEscape(search)
+    return s:SubstituteEscape(zero#Pword())
 endfunction
 
-" zero#substitute#Prompt('%s')                                   
+" zero#substitute#Prompt('%s')
 " :%s//cg
 "
-" zero#substitute#Prompt('%s', 'zero#substitute#Cword()')        
+" zero#substitute#Prompt('%s', 'zero#substitute#Cword()')
 " :%s/<C-r>=zero#substitute#Cword()<CR>//cg
 "
 " zero#substitute#Prompt('%s', 'zero#substitute#Cword()', 'Ieg')

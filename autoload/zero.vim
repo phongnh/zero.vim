@@ -41,7 +41,6 @@ function! zero#TrimNewLines(text) abort
 endfunction
 
 let s:grep_escape_characters       = '^$.*+?()[]{}|-'
-let s:substitute_escape_characters = '^$.*\/~[]'
 
 function! zero#GrepShellEscape(text) abort
     if empty(a:text)
@@ -55,16 +54,6 @@ function! zero#GrepShellEscape(text) abort
     let escaped_text = escape(escaped_text, s:grep_escape_characters)
 
     return shellescape(escaped_text)
-endfunction
-
-function! zero#SubstituteEscape(text) abort
-    " Escape regex characters
-    let text = escape(a:text, s:substitute_escape_characters)
-
-    " Escape the line endings
-    let text = substitute(text, '\n', '\\n', 'g')
-
-    return text
 endfunction
 
 function! zero#CCword() abort
