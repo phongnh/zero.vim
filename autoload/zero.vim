@@ -34,12 +34,6 @@ else
 endif
 
 " Search Helpers
-function! zero#TrimNewLines(text) abort
-    let text = substitute(a:text, '^\n\+', '', 'g')
-    let text = substitute(text, '\n\+$', '', 'g')
-    return text
-endfunction
-
 function! zero#CCword() abort
     return '\b' . expand('<cword>') . '\b'
 endfunction
