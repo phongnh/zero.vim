@@ -1,13 +1,13 @@
-function! zero#ctrlsf#CCword() abort
-    if get(g:, 'ctrlsf_backend', '') ==# 'rg'
-        return '-R -- ' . shellescape(zero#CCword())
+function! zero#ctrlsf#CCword(...) abort
+    if get(a:, 1, 0)
+        return '-W -- ' . zero#Cword()
     else
-        return shellescape(zero#Cword())
+        return '-R -- ' . zero#CCword()
     endif
 endfunction
 
 function! zero#ctrlsf#Cword() abort
-    return '-- ' . shellescape(zero#Cword())
+    return '-- ' . zero#Cword()
 endfunction
 
 function! zero#ctrlsf#Word() abort
@@ -22,4 +22,3 @@ function! zero#ctrlsf#Pword() abort
     let l:pword = zero#Pword()
     return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . shellescape(l:pword)
 endfunction
-

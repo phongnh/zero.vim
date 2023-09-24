@@ -79,12 +79,8 @@ function! zero#SubstituteEscape(text) abort
     return text
 endfunction
 
-function! zero#CCword(...) abort
-    if get(a:, 1, 0)
-        return '-w ' . expand('<cword>')
-    else
-        return '\b' . expand('<cword>') . '\b'
-    endif
+function! zero#CCword() abort
+    return '\b' . expand('<cword>') . '\b'
 endfunction
 
 function! zero#Cword() abort

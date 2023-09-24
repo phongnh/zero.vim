@@ -1,5 +1,9 @@
 function! zero#ferret#CCword(...) abort
-    return call('zero#CCword', a:000)
+    if get(a:, 1, 0)
+        return '-w ' . zero#Cword()
+    else
+        return zero#CCword()
+    endif
 endfunction
 
 function! zero#ferret#Cword() abort
@@ -14,6 +18,6 @@ function! zero#ferret#Vword() abort
     return escape(zero#Vword(), ' ')
 endfunction
 
-function! zero#ferret#Pword()abort
+function! zero#ferret#Pword() abort
     return escape(zero#Pword(), ' ')
 endfunction
