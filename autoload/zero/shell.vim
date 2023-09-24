@@ -1,24 +1,31 @@
+let s:escape_characters = '\^$.*+?()[]{}|-'
+
+function! s:Escape(text) abort
+    return escape(a:text, s:escape_characters)
+endfunction
+
+function! s:ShellEscape(text) abort
+    return s:Escape(a:text)
+endfunction
+
 function! zero#shell#CCword() abort
-    let cword = zero#TrimNewLines(zero#Cword())
-    return '\b' . zero#ShellEscape(cword) . '\b'
+    return zero#CCword()
 endfunction
 
 function! zero#shell#Cword() abort
-    let cword = zero#TrimNewLines(zero#Cword())
-    return zero#ShellEscape(cword)
+    return zero#Cword()
 endfunction
 
 function! zero#shell#Word() abort
-    let word = zero#TrimNewLines(zero#Word())
-    return zero#ShellEscape(word)
+    return s:ShellEscape(zero#Word())
 endfunction
 
 function! zero#shell#Vword() range abort
-    let selection = zero#TrimNewLines(zero#Vword())
-    return zero#ShellEscape(selection)
+    let text = zero#Strip(zero#Vword())
+    return s:ShellEscape(text)
 endfunction
 
 function! zero#shell#Pword() abort
-    let search = zero#Pword()
-    return zero#ShellEscape(search)
+    let text = zero#Strip(zero#Pword())
+    return s:ShellEscape(text)
 endfunction

@@ -40,20 +40,8 @@ function! zero#TrimNewLines(text) abort
     return text
 endfunction
 
-let s:shell_escape_characters      = '\^$.*+?()[]{}|-'
 let s:grep_escape_characters       = '^$.*+?()[]{}|-'
 let s:substitute_escape_characters = '^$.*\/~[]'
-
-function! zero#ShellEscape(text, ...) abort
-    if empty(a:text)
-        return ''
-    endif
-
-    " Escape some characters
-    let escaped_text = escape(a:text, s:shell_escape_characters)
-
-    return shellescape(escaped_text)
-endfunction
 
 function! zero#GrepShellEscape(text) abort
     if empty(a:text)
