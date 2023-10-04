@@ -116,6 +116,13 @@ if executable('tig')
     command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
 endif
 
+" Depends on vim-fugitive
+if findfile('plugin/fugitive.vim', &rtp) != ''
+    command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
+    command! OpenCircleCIProject   call zero#git#OpenCircleCIProject()
+    command! OpenCircleCIBranch    call zero#git#OpenCircleCIBranch()
+endif
+
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
 

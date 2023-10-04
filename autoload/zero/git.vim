@@ -153,3 +153,45 @@ function! zero#git#SetupViewCommit()
         command! -buffer ViewCommitWithGithub call zero#git#ViewCommit(':OpenGithubCommit')
     endif
 endfunction
+
+function! s:UrlEncode(str) abort
+  " iconv trick to convert utf-8 bytes to 8bits indiviual char.
+  return substitute(iconv(a:str, 'latin1', 'utf-8'), '[^A-Za-z0-9_.~-]', '\="%".printf("%02X",char2nr(submatch(0)))', 'g')
+endfunction
+
+function! s:ParseFugitiveRemoteUrl() abort
+    let l:remote_url = fnamemodify(FugitiveRemoteUrl(), ':r')
+    let [l:user_with_host, l:project; _ignore] = split(remote_url, ':')
+    let [_user, l:host] = split(l:user_with_host, '@')
+    let [l:owner, l:repo] = split(l:project, '/')
+    return [l:host, l:owner, l:repo]
+endfunction
+
+function! zero#git#OpenCircleCIDashboard() abort
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    if l:host ==# 'github.com'
+        let l:url = printf('https://app.circleci.com/pipelines/github/%s', l:owner)
+        execute 'GBrowse' l:url
+    endif
+endfunction
+
+function! zero#git#OpenCircleCIProject() abort
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    if l:host ==# 'github.com'
+        let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s', l:owner, l:repo)
+        execute 'GBrowse' l:url
+    endif
+endfunction
+
+function! zero#git#OpenCircleCIBranch() abort
+    let l:branch = FugitiveHead()
+    if empty(l:branch)
+        call zero#git#OpenCircleCIProject()
+    else
+        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+        if l:host ==# 'github.com'
+            let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s?branch=%s', l:owner, l:repo, s:UrlEncode(l:branch))
+            execute 'GBrowse' l:url
+        endif
+    endif
+endfunction
