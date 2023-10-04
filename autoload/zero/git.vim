@@ -190,7 +190,7 @@ function! zero#git#OpenCircleCIBranch() abort
     else
         let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
         if l:host ==# 'github.com'
-            let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s?branch=%s', l:owner, l:repo, s:UrlEncode(l:branch))
+            let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s?branch=%s', l:owner, l:repo, l:branch)
             execute 'GBrowse' l:url
         endif
     endif
