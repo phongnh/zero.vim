@@ -4,6 +4,15 @@ function! s:Escape(text) abort
     return escape(a:text, s:escape_characters)
 endfunction
 
+function! zero#ferret#Escape(text) abort
+    return s:Escape(a:text)
+endfunction
+
+function! zero#ferret#Input(...) abort
+    let l:prompt = get(a:, 1, 'Ferret: ')
+    return s:Escape(input(l:prompt)) . ' '
+endfunction
+
 function! zero#ferret#CCword(...) abort
     if get(a:, 1, 0)
         return '-w ' . zero#Cword()
