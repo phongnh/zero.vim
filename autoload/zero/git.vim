@@ -195,3 +195,82 @@ function! zero#git#OpenCircleCIBranch() abort
         endif
     endif
 endfunction
+
+function! zero#git#OpenGithubRepo() abort
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    if l:host ==# 'github.com'
+        let l:url = printf('https://github.com/%s/%s', l:owner, l:repo)
+        execute 'GBrowse' l:url
+    endif
+endfunction
+
+function! zero#git#OpenGithubPulls() abort
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    if l:host ==# 'github.com'
+        let l:url = printf('https://github.com/%s/%s/pulls', l:owner, l:repo)
+        execute 'GBrowse' l:url
+    endif
+endfunction
+
+" phongnh/zero.vim#100
+" zero.vim#100
+" #100
+" 100
+function! zero#git#OpenGithubPR(text) abort
+    let l:parts = split(a:text, '#')
+    if empty(l:parts) || len(l:parts) > 2
+        return
+    endif
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    let l:pr = l:parts[-1]
+    if len(l:parts) == 2
+        let l:parts = split(l:parts[0], '/')
+        if len(l:parts) > 1
+            let l:owner = l:parts[0]
+            let l:repo = l:parts[1]
+        else
+            let l:repo = l:parts[0]
+        endif
+    endif
+    if l:host ==# 'github.com'
+        let l:url = printf('https://github.com/%s/%s/pull/%s', l:owner, l:repo, l:pr)
+        execute 'GBrowse' l:url
+    endif
+endfunction
+
+function! zero#git#OpenGithubBranch() abort
+    let l:branch = FugitiveHead()
+    if empty(l:branch)
+        call zero#git#OpenGithubRepo()
+    else
+        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+        if l:host ==# 'github.com'
+            let l:url = printf('https://github.com/%s/%s/tree/%s', l:owner, l:repo, l:branch)
+            execute 'GBrowse' l:url
+        endif
+    endif
+endfunction
+
+function! zero#git#OpenGithubDir() abort
+    let l:branch = FugitiveHead()
+    let l:dir = expand('%:h')
+    if strlen(l:branch) && strlen(l:dir)
+        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+        if l:host ==# 'github.com'
+            let l:url = printf('https://github.com/%s/%s/tree/%s/%s', l:owner, l:repo, l:branch, l:dir)
+            execute 'GBrowse' l:url
+        endif
+    endif
+endfunction
+
+function! zero#git#OpenGithubFile() abort
+    let l:branch = FugitiveHead()
+    let l:file = expand('%')
+    if strlen(l:branch) && strlen(l:file)
+        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+        if l:host ==# 'github.com'
+            let l:url = printf('https://github.com/%s/%s/blob/%s/%s', l:owner, l:repo, l:branch, l:file)
+            execute 'GBrowse' l:url
+        endif
+    endif
+endfunction

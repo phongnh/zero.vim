@@ -118,9 +118,29 @@ endif
 
 " Depends on vim-fugitive
 if findfile('plugin/fugitive.vim', &rtp) != ''
-    command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
-    command! OpenCircleCIProject   call zero#git#OpenCircleCIProject()
-    command! OpenCircleCIBranch    call zero#git#OpenCircleCIBranch()
+    function! s:SetupCommands() abort
+        " CircleCI
+        command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
+        command! OpenCircleCIProject call zero#git#OpenCircleCIProject()
+        command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
+
+        " GitHub
+        if exists(':OpenGithubRepo') != 2
+            command! OpenGithubRepo call zero#git#OpenGithubRepo()
+        endif
+        command! OpenGithubPulls  call zero#git#OpenGithubPulls()
+        command! -nargs=1 OpenGithubPR call zero#git#OpenGithubPR(<q-args>)
+        command! OpenGithubBranch call zero#git#OpenGithubBranch()
+        command! OpenGithubDir call zero#git#OpenGithubDir()
+        if exists(':OpenGithubFile') != 2
+            command! OpenGithubFile call zero#git#OpenGithubFile()
+        endif
+    endfunction
+
+    augroup ZeroVimGithubCommands
+        autocmd!
+        autocmd VimEnter * call <SID>SetupCommands()
+    augroup END
 endif
 
 " Sudo write
