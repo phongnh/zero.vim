@@ -161,7 +161,7 @@ endfunction
 
 function! s:ParseFugitiveRemoteUrl() abort
     let l:remote_url = fnamemodify(FugitiveRemoteUrl(), ':r')
-    let [l:user_with_host, l:project; _ignore] = split(remote_url, ':')
+    let [l:user_with_host, l:project; _ignore] = split(l:remote_url, ':')
     let [_user, l:host] = split(l:user_with_host, '@')
     let [l:owner, l:repo] = split(l:project, '/')
     return [l:host, l:owner, l:repo]
