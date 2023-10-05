@@ -133,6 +133,7 @@ if findfile('plugin/fugitive.vim', &rtp) != ''
         if exists(':OpenGithubFile') != 2
             command! OpenGithubFile call zero#git#OpenGithubFile()
         endif
+        command! InsertGithubPR call zero#git#InsertGithubPR()
     endfunction
 
     augroup ZeroVimGithubCommands

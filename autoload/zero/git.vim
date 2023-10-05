@@ -296,3 +296,26 @@ function! zero#git#OpenGithubFile() abort
         endif
     endif
 endfunction
+
+function! zero#git#InsertGithubPR() abort
+    let l:parts = split(input('Enter PR (owner/repo#number): '), '#')
+    if empty(l:parts) || len(l:parts) > 2 || l:parts[-1] !~# '^\d\+$'
+        return
+    endif
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    let l:pr = l:parts[-1]
+    if len(l:parts) == 1
+        " It is a PR number
+        let l:path = printf('%s/%s/pull/%s', l:owner, l:repo, l:pr)
+    else
+        if stridx(l:parts[0], '/') > -1
+            " Assume that is in the format <owner>/<repo>!?
+            let [l:owner, l:repo; _ignore] = split(l:parts[0], '/')
+        else
+            " It is a repo name
+            let l:repo = l:parts[0]
+        endif
+        let l:path = printf('%s/%s/pull/%s', l:owner, l:repo, l:pr)
+    endif
+    return printf('https://github.com/%s', l:path)
+endfunction
