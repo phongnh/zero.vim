@@ -205,50 +205,71 @@ function! zero#git#OpenGithubRepo() abort
     endif
 endfunction
 
-function! zero#git#OpenGithubPulls() abort
+" phongnh/zero.vim#100
+" phongnh/zero.vim
+" zero.vim#100
+" #100
+" 100
+function! zero#git#OpenGithubPRs(...) abort
+    let l:parts = split(get(a:, 1, ''), '#')
+    if len(l:parts) > 2
+        return
+    endif
     let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    if empty(l:parts)
+        let l:path = printf('%s/%s/pulls', l:owner, l:repo)
+    elseif len(l:parts) == 1
+        if l:parts[0] =~# '^\d\+$'
+            " It is a PR number
+            let l:path = printf('%s/%s/pull/%s', l:owner, l:repo, l:parts[0])
+        elseif stridx(l:parts[0], '/') > -1
+            " Assume that is in the format <owner>/<repo>!?
+            let [l:owner, l:repo; _ignore] = split(l:parts[0], '/')
+            let l:path = printf('%s/%s/pulls', l:owner, l:repo)
+        else
+            " It is a repo name
+            let l:path = printf('%s/%s/pulls', l:owner, l:parts[0])
+        endif
+    else
+        let l:pr = l:parts[-1]
+        if stridx(l:parts[0], '/') > -1
+            " Assume that is in the format <owner>/<repo>!?
+            let [l:owner, l:repo; _ignore] = split(l:parts[0], '/')
+        else
+            " It is a repo name
+            let l:repo = l:parts[0]
+        endif
+        if l:pr =~# '^\d\+$'
+            let l:path = printf('%s/%s/pull/%s', l:owner, l:repo, l:pr)
+        else
+            let l:path = printf('%s/%s/pulls', l:owner, l:repo)
+        endif
+    endif
     if l:host ==# 'github.com'
-        let l:url = printf('https://github.com/%s/%s/pulls', l:owner, l:repo)
+        let l:url = printf('https://github.com/%s', l:path)
         execute 'GBrowse' l:url
     endif
 endfunction
 
-" phongnh/zero.vim#100
-" zero.vim#100
-" #100
-" 100
-function! zero#git#OpenGithubPR(text) abort
-    let l:parts = split(a:text, '#')
-    if empty(l:parts) || len(l:parts) > 2
-        return
-    endif
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    let l:pr = l:parts[-1]
-    if len(l:parts) == 2
-        let l:parts = split(l:parts[0], '/')
-        if len(l:parts) > 1
-            let l:owner = l:parts[0]
-            let l:repo = l:parts[1]
-        else
-            let l:repo = l:parts[0]
-        endif
-    endif
-    if l:host ==# 'github.com'
-        let l:url = printf('https://github.com/%s/%s/pull/%s', l:owner, l:repo, l:pr)
+function! zero#git#OpenGithubMyPRs() abort
+    let l:url = 'https://github.com/pulls'
+    if exists(':OpenBrowser') == 2
+        execute 'OpenBrowser' l:url
+    else
         execute 'GBrowse' l:url
     endif
 endfunction
 
 function! zero#git#OpenGithubBranch() abort
     let l:branch = FugitiveHead()
-    if empty(l:branch)
-        call zero#git#OpenGithubRepo()
-    else
+    if strlen(l:branch)
         let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
         if l:host ==# 'github.com'
             let l:url = printf('https://github.com/%s/%s/tree/%s', l:owner, l:repo, l:branch)
             execute 'GBrowse' l:url
         endif
+    else
+        call zero#git#OpenGithubRepo()
     endif
 endfunction
 

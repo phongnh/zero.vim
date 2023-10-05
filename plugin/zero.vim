@@ -125,11 +125,9 @@ if findfile('plugin/fugitive.vim', &rtp) != ''
         command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
 
         " GitHub
-        if exists(':OpenGithubRepo') != 2
-            command! OpenGithubRepo call zero#git#OpenGithubRepo()
-        endif
-        command! OpenGithubPulls  call zero#git#OpenGithubPulls()
-        command! -nargs=1 OpenGithubPR call zero#git#OpenGithubPR(<q-args>)
+        command! OpenGithubRepo call zero#git#OpenGithubRepo()
+        command! -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
+        command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
         command! OpenGithubBranch call zero#git#OpenGithubBranch()
         command! OpenGithubDir call zero#git#OpenGithubDir()
         if exists(':OpenGithubFile') != 2
