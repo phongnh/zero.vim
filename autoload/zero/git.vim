@@ -167,33 +167,34 @@ function! s:ParseFugitiveRemoteUrl() abort
     return [l:host, l:owner, l:repo]
 endfunction
 
-function! zero#git#OpenCircleCIDashboard() abort
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    if l:host ==# 'github.com'
-        let l:url = printf('https://app.circleci.com/pipelines/github/%s', l:owner)
+function! s:OpenCircleCIUrl(opts) abort
+    if has_key(a:opts, 'branch') && strlen(a:opts.branch)
+        let l:path = printf('%s/%s?branch=%s', a:opts.owner, a:opts.repo, a:opts.branch)
+    elseif has_key(a:opts, 'repo')
+        let l:path = printf('%s/%s', a:opts.owner, a:opts.repo)
+    else
+        let l:path = printf('%s', a:opts.owner)
+    endif
+    if a:opts.host ==# 'github.com'
+        let l:provider = 'github'
+        let l:url = printf('https://app.circleci.com/pipelines/%s/%s', l:provider, l:path)
         execute 'GBrowse' l:url
     endif
+endfunction
+
+function! zero#git#OpenCircleCIDashboard() abort
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner })
 endfunction
 
 function! zero#git#OpenCircleCIProject() abort
     let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    if l:host ==# 'github.com'
-        let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s', l:owner, l:repo)
-        execute 'GBrowse' l:url
-    endif
+    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner, 'repo': l:repo })
 endfunction
 
 function! zero#git#OpenCircleCIBranch() abort
-    let l:branch = FugitiveHead()
-    if empty(l:branch)
-        call zero#git#OpenCircleCIProject()
-    else
-        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-        if l:host ==# 'github.com'
-            let l:url = printf('https://app.circleci.com/pipelines/github/%s/%s?branch=%s', l:owner, l:repo, l:branch)
-            execute 'GBrowse' l:url
-        endif
-    endif
+    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner, 'repo': l:repo, 'branch': FugitiveHead() })
 endfunction
 
 function! zero#git#OpenGithubRepo() abort
