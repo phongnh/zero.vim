@@ -119,26 +119,32 @@ endif
 " Depends on vim-fugitive
 if findfile('plugin/fugitive.vim', &rtp) != ''
     function! s:SetupCommands() abort
+        if empty(FugitiveGitDir())
+            return
+        endif
+
         " CircleCI
-        command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
-        command! OpenCircleCIProject call zero#git#OpenCircleCIProject()
-        command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
+        command! -buffer OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
+        command! -buffer OpenCircleCIProject call zero#git#OpenCircleCIProject()
+        command! -buffer OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
 
         " GitHub
-        command! OpenGithubRepo call zero#git#OpenGithubRepo()
-        command! -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
-        command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
-        command! OpenGithubBranch call zero#git#OpenGithubBranch()
-        command! OpenGithubDir call zero#git#OpenGithubDir()
+        command! -buffer OpenGithubRepo call zero#git#OpenGithubRepo()
+        command! -buffer -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
+        command! -buffer OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
+        command! -buffer OpenGithubBranch call zero#git#OpenGithubBranch()
+        command! -buffer OpenGithubDir call zero#git#OpenGithubDir()
         if exists(':OpenGithubFile') != 2
-            command! OpenGithubFile call zero#git#OpenGithubFile()
+            command! -buffer OpenGithubFile call zero#git#OpenGithubFile()
         endif
-        command! InsertGithubPR call zero#git#InsertGithubPR()
+
+        inoremap <buffer> <C-x>g <C-r>=zero#git#InsertGithubPR()<CR>
     endfunction
 
     augroup ZeroVimGithubCommands
         autocmd!
         autocmd VimEnter * call <SID>SetupCommands()
+        autocmd BufNewFile,BufReadPost * call <SID>SetupCommands()
     augroup END
 endif
 
