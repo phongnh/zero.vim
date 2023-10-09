@@ -117,31 +117,33 @@ if executable('tig')
 endif
 
 " Depends on openbrowser
-if findfile('plugin/openbrowser.vim', &rtp) != ''
-    function! s:SetupCommands() abort
-        " CircleCI
-        command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
-        command! OpenCircleCIProject call zero#git#OpenCircleCIProject()
-        command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
+function! s:SetupCommands() abort
+    if exists(':OpenBrowser') != 2
+        return
+    endif
 
-        " GitHub
-        command! OpenGithubRepo call zero#git#OpenGithubRepo()
-        command! -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
-        command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
-        command! OpenGithubBranch call zero#git#OpenGithubBranch()
-        command! OpenGithubDir call zero#git#OpenGithubDir()
-        if exists(':OpenGithubFile') != 2
-            command! OpenGithubFile call zero#git#OpenGithubFile()
-        endif
+    " CircleCI
+    command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
+    command! OpenCircleCIProject call zero#git#OpenCircleCIProject()
+    command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
 
-        inoremap <C-x>g <C-r>=zero#git#InsertGithubPR()<CR>
-    endfunction
+    " GitHub
+    command! OpenGithubRepo call zero#git#OpenGithubRepo()
+    command! -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
+    command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
+    command! OpenGithubBranch call zero#git#OpenGithubBranch()
+    command! OpenGithubDir call zero#git#OpenGithubDir()
+    if exists(':OpenGithubFile') != 2
+        command! OpenGithubFile call zero#git#OpenGithubFile()
+    endif
 
-    augroup ZeroVimGithubCommands
-        autocmd!
-        autocmd VimEnter * call <SID>SetupCommands()
-    augroup END
-endif
+    inoremap <C-x>g <C-r>=zero#git#InsertGithubPR()<CR>
+endfunction
+
+augroup ZeroVimGithubCommands
+    autocmd!
+    autocmd VimEnter * call <SID>SetupCommands()
+augroup END
 
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
