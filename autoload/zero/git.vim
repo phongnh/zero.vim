@@ -159,10 +159,44 @@ function! s:UrlEncode(str) abort
   return substitute(iconv(a:str, 'latin1', 'utf-8'), '[^A-Za-z0-9_.~-]', '\="%".printf("%02X",char2nr(submatch(0)))', 'g')
 endfunction
 
-function! s:ParseFugitiveRemoteUrl() abort
-    let l:remote = FugitiveRemote()
-    let l:path = strlen(l:remote.path) ? l:remote.path : l:remote.pathname
-    return extend([l:remote.host], split(substitute(l:path, '.git$', '', ''), '/'))
+function! zero#git#ParseGithubRemote() abort
+    return s:ParseGithubRemote()
+endfunction
+
+function! s:ParseGithubRemote() abort
+    let l:remote_url = zero#Strip(system('git ls-remote --get-url'))
+    let l:https_repo = '^https\?://\(\%([[:alnum:]-_]\+\.\)*github\.com\)/\([^/]\+\)/\([^/]\+\)$'
+    let l:https_personal_access_token_repo = '^https\?://[[:alnum:]]\+:\%(ghp_\)\?[[:alnum:]]\+@\(\%([[:alnum:]-_]\+\.\)*github\.com\)/\([^/]\+\)/\([^/]\+\)$'
+    let l:ssh_over_https_repo = '^ssh://git@ssh\.github\.com:443/\([^/]\+\)/\([^/]\+\)$'
+    let l:ssh_over_git_repo = '^ssh://git@\(\%([[:alnum:]-_]\+\.\)*github\.com\)/\([^/]\+\)/\([^/]\+\)$'
+    let l:git_repo = '^git@\(\%([[:alnum:]-_]\+\.\)*github\.com\):\([^/]\+\)/\([^/]\+\)$'
+    if l:remote_url =~# l:https_repo
+        let [l:url, l:host, l:owner, l:repo; _ignores] = matchlist(l:remote_url, l:https_repo)
+    elseif l:remote_url =~# l:https_personal_access_token_repo
+        let [l:url, l:host, l:owner, l:repo; _ignores] = matchlist(l:remote_url, l:https_personal_access_token_repo)
+    elseif l:remote_url =~# l:ssh_over_https_repo
+        let [l:url, l:host, l:owner, l:repo; _ignores] = matchlist(l:remote_url, l:ssh_over_https_repo)
+    elseif l:remote_url =~# l:ssh_over_git_repo
+        let [l:url, l:host, l:owner, l:repo; _ignores] = matchlist(l:remote_url, l:ssh_over_git_repo)
+    elseif l:remote_url =~# l:git_repo
+        let [l:url, l:host, l:owner, l:repo; _ignores] = matchlist(l:remote_url, l:git_repo)
+    else
+        return {}
+    endif
+    let l:repo = substitute(l:repo, '\.git$', '', '')
+    return { 'host': l:host, 'owner': l:owner, 'repo': l:repo }
+endfunction
+
+function! s:GitBranch() abort
+    if exists('*FugitiveHead') == 1
+        return FugitiveHead()
+    else
+        let l:branch = zero#Strip(system('git symbolic-ref --short -q HEAD'))
+        if l:branch ==# ''
+            let l:branch = zero#Strip(system('git rev-parse HEAD'))
+        endif
+        return l:branch
+    endif
 endfunction
 
 function! s:OpenCircleCIUrl(opts) abort
@@ -173,33 +207,39 @@ function! s:OpenCircleCIUrl(opts) abort
     else
         let l:path = printf('%s', a:opts.owner)
     endif
-    if a:opts.host ==# 'github.com'
+    if a:opts.host =~# 'github.com'
         let l:provider = 'github'
         let l:url = printf('https://app.circleci.com/pipelines/%s/%s', l:provider, l:path)
-        execute 'GBrowse' l:url
+        call s:OpenUrl(l:url)
+    endif
+endfunction
+
+function! s:OpenUrl(url) abort
+    if exists(':OpenBrowser') == 2
+        execute 'OpenBrowser' a:url
     endif
 endfunction
 
 function! zero#git#OpenCircleCIDashboard() abort
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner })
+    let l:remote = s:ParseGithubRemote()
+    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner })
 endfunction
 
 function! zero#git#OpenCircleCIProject() abort
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner, 'repo': l:repo })
+    let l:remote = s:ParseGithubRemote()
+    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'repo': l:remote.repo })
 endfunction
 
 function! zero#git#OpenCircleCIBranch() abort
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    call s:OpenCircleCIUrl({ 'host': host, 'owner': l:owner, 'repo': l:repo, 'branch': FugitiveHead() })
+    let l:remote = s:ParseGithubRemote()
+    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'repo': l:remote.repo, 'branch': s:GitBranch() })
 endfunction
 
 function! zero#git#OpenGithubRepo() abort
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-    if l:host ==# 'github.com'
-        let l:url = printf('https://github.com/%s/%s', l:owner, l:repo)
-        execute 'GBrowse' l:url
+    let l:remote = s:ParseGithubRemote()
+    if l:remote.host =~# 'github.com'
+        let l:url = printf('https://github.com/%s/%s', l:remote.owner, l:remote.repo)
+        call s:OpenUrl(l:url)
     endif
 endfunction
 
@@ -213,7 +253,8 @@ function! zero#git#OpenGithubPRs(...) abort
     if len(l:parts) > 2
         return
     endif
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    let l:remote = s:ParseGithubRemote()
+    let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
     if empty(l:parts)
         let l:path = printf('%s/%s/pulls', l:owner, l:repo)
     elseif len(l:parts) == 1
@@ -243,28 +284,25 @@ function! zero#git#OpenGithubPRs(...) abort
             let l:path = printf('%s/%s/pulls', l:owner, l:repo)
         endif
     endif
-    if l:host ==# 'github.com'
+    if l:host =~# 'github.com'
         let l:url = printf('https://github.com/%s', l:path)
-        execute 'GBrowse' l:url
+        call s:OpenUrl(l:url)
     endif
 endfunction
 
 function! zero#git#OpenGithubMyPRs() abort
     let l:url = 'https://github.com/pulls'
-    if exists(':OpenBrowser') == 2
-        execute 'OpenBrowser' l:url
-    else
-        execute 'GBrowse' l:url
-    endif
+    call s:OpenUrl(l:url)
 endfunction
 
 function! zero#git#OpenGithubBranch() abort
-    let l:branch = FugitiveHead()
+    let l:branch = s:GitBranch()
     if strlen(l:branch)
-        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-        if l:host ==# 'github.com'
+        let l:remote = s:ParseGithubRemote()
+        let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
+        if l:host =~# 'github.com'
             let l:url = printf('https://github.com/%s/%s/tree/%s', l:owner, l:repo, l:branch)
-            execute 'GBrowse' l:url
+            call s:OpenUrl(l:url)
         endif
     else
         call zero#git#OpenGithubRepo()
@@ -272,25 +310,27 @@ function! zero#git#OpenGithubBranch() abort
 endfunction
 
 function! zero#git#OpenGithubDir() abort
-    let l:branch = FugitiveHead()
+    let l:branch = s:GitBranch()
     let l:dir = expand('%:h')
     if strlen(l:branch) && strlen(l:dir)
-        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-        if l:host ==# 'github.com'
+        let l:remote = s:ParseGithubRemote()
+        let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
+        if l:host =~# 'github.com'
             let l:url = printf('https://github.com/%s/%s/tree/%s/%s', l:owner, l:repo, l:branch, l:dir)
-            execute 'GBrowse' l:url
+            call s:OpenUrl(l:url)
         endif
     endif
 endfunction
 
 function! zero#git#OpenGithubFile() abort
-    let l:branch = FugitiveHead()
+    let l:branch = s:GitBranch()
     let l:file = expand('%')
     if strlen(l:branch) && strlen(l:file)
-        let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
-        if l:host ==# 'github.com'
+        let l:remote = s:ParseGithubRemote()
+        let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
+        if l:host =~# 'github.com'
             let l:url = printf('https://github.com/%s/%s/blob/%s/%s', l:owner, l:repo, l:branch, l:file)
-            execute 'GBrowse' l:url
+            call s:OpenUrl(l:url)
         endif
     endif
 endfunction
@@ -300,7 +340,8 @@ function! zero#git#InsertGithubPR() abort
     if empty(l:parts) || len(l:parts) > 2 || l:parts[-1] !~# '^\d\+$'
         return
     endif
-    let [l:host, l:owner, l:repo] = s:ParseFugitiveRemoteUrl()
+    let l:remote = s:ParseGithubRemote()
+    let [l:owner, l:repo] = [l:remote.owner, l:remote.repo]
     let l:pr = l:parts[-1]
     if len(l:parts) == 1
         " It is a PR number
