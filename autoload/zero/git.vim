@@ -214,9 +214,19 @@ function! s:OpenCircleCIUrl(opts) abort
     endif
 endfunction
 
-function! s:OpenUrl(url) abort
+function! s:OpenUrl(opts) abort
     if exists(':OpenBrowser') == 2
-        execute 'OpenBrowser' a:url
+        if type(a:opts) == v:t_string
+            execute 'OpenBrowser' a:opts
+        else
+            let l:host = get(a:opts, 'host', 'github.com')
+            let l:path = get(a:opts, 'path', '/')
+            let l:query = get(a:opts, 'query', '')
+            let l:url = printf('https://%s', l:host)
+            let l:url .= l:path
+            let l:url .= strlen(l:query) ? '?' . query : ''
+            execute 'OpenBrowser' l:url
+        endif
     endif
 endfunction
 
