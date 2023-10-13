@@ -291,8 +291,7 @@ function! zero#git#OpenGithubPRs(...) abort
 endfunction
 
 function! zero#git#OpenGithubMyPRs() abort
-    let l:url = 'https://github.com/pulls'
-    call s:OpenUrl(l:url)
+    call s:OpenUrl('https://github.com/pulls')
 endfunction
 
 function! zero#git#OpenGithubBranch() abort
