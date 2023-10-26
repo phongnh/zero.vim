@@ -1,5 +1,14 @@
-function! s:CtrlSFEscape(text) abort
+function! s:Escape(text) abort
     return shellescape(a:text)
+endfunction
+
+function! zero#ctrlsf#Escape(text) abort
+    return s:Escape(a:text)
+endfunction
+
+function! zero#ctrlsf#Input(...) abort
+    let l:prompt = get(a:, 1, 'CtrlSF: ')
+    return s:Escape(input(l:prompt)) . ' '
 endfunction
 
 function! zero#ctrlsf#CCword(...) abort
@@ -15,14 +24,14 @@ function! zero#ctrlsf#Cword() abort
 endfunction
 
 function! zero#ctrlsf#Word() abort
-    return '-- ' . s:CtrlSFEscape(zero#Word())
+    return '-- ' . s:Escape(zero#Word())
 endfunction
 
 function! zero#ctrlsf#Vword() range abort
-    return '-- ' . s:CtrlSFEscape(zero#Vword())
+    return '-- ' . s:Escape(zero#Vword())
 endfunction
 
 function! zero#ctrlsf#Pword() abort
     let l:pword = zero#Pword()
-    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . s:CtrlSFEscape(l:pword)
+    return (stridx(l:pword, '\b') > -1 ? '-R ' : '') . '-- ' . s:Escape(l:pword)
 endfunction

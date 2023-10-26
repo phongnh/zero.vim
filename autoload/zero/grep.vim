@@ -1,14 +1,19 @@
 let s:escape_characters = '^$.*+?()[]{}|-'
 
 function! s:Escape(text) abort
-    return escape(a:text, s:escape_characters)
-endfunction
-
-function! s:GrepEscape(text) abort
     " Escape alternative file
     let text = substitute(a:text, '#', '\\\\#', 'g')
-    let text = s:Escape(text)
+    let text = escape(text, s:escape_characters)
     return shellescape(text)
+endfunction
+
+function! zero#grep#Escape(text) abort
+    return s:Escape(a:text)
+endfunction
+
+function! zero#grep#Input(...) abort
+    let l:prompt = get(a:, 1, 'Grep: ')
+    return s:Escape(input(l:prompt)) . ' '
 endfunction
 
 " Grep Helpers
@@ -45,25 +50,25 @@ function! zero#grep#BGrep(...) abort
 endfunction
 
 function! zero#grep#CCword() abort
-    return s:GrepEscape(zero#CCword())
+    return s:Escape(zero#CCword())
 endfunction
 
 function! zero#grep#Cword() abort
-    return s:GrepEscape(zero#Cword())
+    return s:Escape(zero#Cword())
 endfunction
 
 function! zero#grep#Word() abort
-    return s:GrepEscape(zero#Word())
+    return s:Escape(zero#Word())
 endfunction
 
 function! zero#grep#Vword() range abort
-    return s:GrepEscape(zero#Vword())
+    return s:Escape(zero#Vword())
 endfunction
 
 function! zero#grep#Pword() abort
-    return s:GrepEscape(zero#Pword())
+    return s:Escape(zero#Pword())
 endfunction
 
 function! zero#grep#Escape(text) abort
-    return s:GrepEscape(a:text)
+    return s:Escape(a:text)
 endfunction

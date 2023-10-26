@@ -2,12 +2,18 @@
 let s:escape_characters = '^$.*\/~[]'
 
 function! s:Escape(text) abort
-    return escape(a:text, s:escape_characters)
+    let text = escape(a:text, s:escape_characters)
+    " Escape the line endings
+    return substitute(text, '\n', '\\n', 'g')
 endfunction
 
-function! s:SubstituteEscape(text) abort
-    " Escape the line endings
-    return substitute(s:Escape(a:text), '\n', '\\n', 'g')
+function! zero#substitute#Escape(text) abort
+    return s:Escape(a:text)
+endfunction
+
+function! zero#substitute#Input(...) abort
+    let l:prompt = get(a:, 1, 'Substitute: ')
+    return s:Escape(input(l:prompt)) . ' '
 endfunction
 
 function! zero#substitute#CCword() abort
@@ -19,19 +25,19 @@ function! zero#substitute#Cword() abort
 endfunction
 
 function! zero#substitute#Word() abort
-    return s:SubstituteEscape(zero#Word())
+    return s:Escape(zero#Word())
 endfunction
 
 function! zero#substitute#Vword(...) range abort
     if get(a:, 1, 0)
-        return '\<' . s:SubstituteEscape(zero#Vword()) . '\>'
+        return '\<' . s:Escape(zero#Vword()) . '\>'
     else
-        return s:SubstituteEscape(zero#Vword())
+        return s:Escape(zero#Vword())
     endif
 endfunction
 
 function! zero#substitute#Pword() abort
-    return s:SubstituteEscape(zero#Pword())
+    return s:Escape(zero#Pword())
 endfunction
 
 " zero#substitute#Prompt('%s')

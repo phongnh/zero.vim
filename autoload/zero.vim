@@ -205,5 +205,24 @@ function! zero#InsertGrepPword() abort
     return zero#grep#Pword()
 endfunction
 
+function! zero#InsertInput() abort
+    let l:cmd = getcmdline()
+    if s:IsSubstituteCommand(l:cmd)
+        return zero#substitute#Input()
+    elseif s:IsFerretSubstituteCommand(l:cmd)
+        return zero#substitute#Input()
+    elseif s:IsGrepCommand(l:cmd)
+        return zero#grep#Input()
+    elseif s:IsCtrlSFCommand(l:cmd)
+        return zero#ctrlsf#Input()
+    elseif s:IsFerretCommand(l:cmd)
+        return zero#ferret#Input()
+    elseif s:IsInputCommand()
+        return zero#shell#Input()
+    else
+        return zero#shell#Input()
+    endif
+endfunction
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
