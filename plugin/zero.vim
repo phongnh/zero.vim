@@ -128,7 +128,7 @@ function! s:SetupCommands() abort
     command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
 
     " GitHub
-    command! OpenGithubRepo call zero#git#OpenGithubRepo()
+    command! -nargs=? OpenGithubRepo call zero#git#OpenGithubRepo(<f-args>)
     command! -nargs=* OpenGithubPRs call zero#git#OpenGithubPRs(<f-args>)
     command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
     command! OpenGithubBranch call zero#git#OpenGithubBranch()

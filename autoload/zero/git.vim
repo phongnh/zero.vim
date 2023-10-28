@@ -245,10 +245,23 @@ function! zero#git#OpenCircleCIBranch() abort
     call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'repo': l:remote.repo, 'branch': s:GitBranch() })
 endfunction
 
-function! zero#git#OpenGithubRepo() abort
+" phongnh/zero.vim
+" phongnh
+function! zero#git#OpenGithubRepo(...) abort
     let l:remote = s:ParseGithubRemote()
+    if a:0 > 0
+        if stridx(a:1, '/') > -1
+            " Assume that is in the format <owner>/<repo>!?
+            let [l:owner, l:repo; _ignore] = split(a:1, '/')
+            let l:path = printf('%s/%s', l:owner, l:repo)
+        else
+            let l:path = a:1
+        endif
+    else
+        let l:path = printf('%s/%s', l:remote.owner, l:remote.repo)
+    endif
     if l:remote.host =~# 'github.com'
-        let l:url = printf('https://github.com/%s/%s', l:remote.owner, l:remote.repo)
+        let l:url = printf('https://github.com/%s', l:path)
         call s:OpenUrl(l:url)
     endif
 endfunction
