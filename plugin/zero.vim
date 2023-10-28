@@ -132,9 +132,8 @@ function! s:SetupCommands() abort
     command! -nargs=* OpenGithubPRs call zero#git#OpenGithubPRs(<f-args>)
     command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
     command! OpenGithubBranch call zero#git#OpenGithubBranch()
-    command! OpenGithubDir call zero#git#OpenGithubDir()
     if exists(':OpenGithubFile') != 2
-        command! OpenGithubFile call zero#git#OpenGithubFile()
+        command! -nargs=? -complete=file OpenGithubFile call zero#git#OpenGithubFile(<f-args>)
     endif
 
     inoremap <C-x>g <C-r>=zero#git#InsertGithubPR()<CR>

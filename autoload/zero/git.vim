@@ -337,22 +337,10 @@ function! zero#git#OpenGithubBranch() abort
     endif
 endfunction
 
-function! zero#git#OpenGithubDir() abort
+function! zero#git#OpenGithubFile(...) abort
     let l:branch = s:GitBranch()
-    let l:dir = expand('%:h')
-    if strlen(l:branch) && strlen(l:dir)
-        let l:remote = s:ParseGithubRemote()
-        let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
-        if l:host =~# 'github.com'
-            let l:url = printf('https://github.com/%s/%s/tree/%s/%s', l:owner, l:repo, l:branch, l:dir)
-            call s:OpenUrl(l:url)
-        endif
-    endif
-endfunction
-
-function! zero#git#OpenGithubFile() abort
-    let l:branch = s:GitBranch()
-    let l:file = expand('%')
+    let l:file = a:0 > 0 ? expand(a:1) : expand('%')
+    let l:file = fnamemodify(l:file, ':p:.')
     if strlen(l:branch) && strlen(l:file)
         let l:remote = s:ParseGithubRemote()
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
