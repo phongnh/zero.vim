@@ -131,7 +131,7 @@ function! s:SetupCommands() abort
     command! -nargs=? OpenGithubRepo call zero#git#OpenGithubRepo(<f-args>)
     command! -nargs=* OpenGithubPRs call zero#git#OpenGithubPRs(<f-args>)
     command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
-    command! OpenGithubBranch call zero#git#OpenGithubBranch()
+    command! -nargs=? -complete=custom,zero#git#RemoteBranches OpenGithubBranch call zero#git#OpenGithubBranch(<f-args>)
     if exists(':OpenGithubFile') != 2
         command! -nargs=? -complete=file OpenGithubFile call zero#git#OpenGithubFile(<f-args>)
     endif

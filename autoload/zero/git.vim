@@ -323,8 +323,18 @@ function! zero#git#OpenGithubMyPRs() abort
     call s:OpenUrl('https://github.com/pulls')
 endfunction
 
-function! zero#git#OpenGithubBranch() abort
-    let l:branch = s:GitBranch()
+function! zero#git#RemoteBranches(A, L, P) abort
+    try
+        let repo_dir = zero#git#FindRepo()
+        let output = s:SystemRun('git branch -r | cut -f2- -d "/"', repo_dir)
+        return output
+    catch
+        return ''
+    endtry
+endfunction
+
+function! zero#git#OpenGithubBranch(...) abort
+    let l:branch = a:0 > 0 ? a:1 : s:GitBranch()
     if strlen(l:branch)
         let l:remote = s:ParseGithubRemote()
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
