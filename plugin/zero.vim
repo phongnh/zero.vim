@@ -129,7 +129,7 @@ function! s:SetupCommands() abort
 
     " GitHub
     command! OpenGithubRepo call zero#git#OpenGithubRepo()
-    command! -nargs=? OpenGithubPRs call zero#git#OpenGithubPRs(<q-args>)
+    command! -nargs=* OpenGithubPRs call zero#git#OpenGithubPRs(<f-args>)
     command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
     command! OpenGithubBranch call zero#git#OpenGithubBranch()
     command! OpenGithubDir call zero#git#OpenGithubDir()

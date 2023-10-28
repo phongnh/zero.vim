@@ -253,13 +253,19 @@ function! zero#git#OpenGithubRepo() abort
     endif
 endfunction
 
+" #100 phongnh/zero.vim
+" #100 zero.vim
 " phongnh/zero.vim#100
 " phongnh/zero.vim
 " zero.vim#100
 " #100
 " 100
 function! zero#git#OpenGithubPRs(...) abort
-    let l:parts = split(get(a:, 1, ''), '#')
+    if a:0 > 1
+        let l:parts = split(printf(a:1 =~# '^#' ? '%s%s' : '%s#%s', a:2, a:1), '#')
+    else
+        let l:parts = split(get(a:, 1, ''), '#')
+    endif
     if len(l:parts) > 2
         return
     endif
