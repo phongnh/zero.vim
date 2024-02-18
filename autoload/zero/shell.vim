@@ -1,7 +1,7 @@
 let s:escape_characters = '\^$.*+?()[]{}|-'
 
 function! s:Escape(text) abort
-    return escape(a:text, s:escape_characters)
+    return shellescape(escape(a:text, s:escape_characters))
 endfunction
 
 function! zero#shell#Escape(text) abort
@@ -14,7 +14,7 @@ function! zero#shell#Input(...) abort
 endfunction
 
 function! zero#shell#CCword() abort
-    return zero#CCword()
+    return s:Escape(zero#CCword())
 endfunction
 
 function! zero#shell#Cword() abort
