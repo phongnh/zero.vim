@@ -14,7 +14,7 @@ function! zero#shell#Input(...) abort
 endfunction
 
 function! zero#shell#CCword() abort
-    return s:Escape(zero#CCword())
+    return zero#CCword()
 endfunction
 
 function! zero#shell#Cword() abort
