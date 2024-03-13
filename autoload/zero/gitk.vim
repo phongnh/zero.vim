@@ -5,7 +5,7 @@ let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s'
 
 function! s:RunGitk(options) abort
     let cwd = zero#git#WorkTree()
-    let cmd = zero#Strip(printf(s:gitk_cmd, a:options))
+    let cmd = zero#Trim(printf(s:gitk_cmd, a:options))
     if has('nvim')
         call s:OpenGitkInNvim(cmd, cwd)
     elseif has('terminal')

@@ -73,7 +73,7 @@ endfunction
 function! s:ParseGitMessengerContent() abort
     for line in get(b:__gitmessenger_popup, 'contents', [])
         if line =~# '^\s\+Commit:\s\+[a-z0-9]\{40,\}$'
-            return get(split(zero#Strip(line), '\s\+'), -1, '')
+            return get(split(zero#Trim(line), '\s\+'), -1, '')
         endif
     endfor
 
@@ -82,7 +82,7 @@ endfunction
 
 " Git Rebase
 function! s:ParseGitRebaseLine() abort
-    let line = zero#Strip(getline('.'))
+    let line = zero#Trim(getline('.'))
 
     if line =~# '^\(pick\|edit\|fixup\|squash\|reword\|drop\)\s'
         let [_action, hash; _text] = split(line)
@@ -94,7 +94,7 @@ endfunction
 
 " Fugitive Blame
 function! s:ParseFugitiveBlameLine() abort
-    let line = zero#Strip(getline('.'))
+    let line = zero#Trim(getline('.'))
 
     let [hash; _text] = split(line)
     if hash !~# '^0\{7,\}$' && hash =~# '^\^\?[a-z0-9]\{7,\}$'
@@ -164,7 +164,7 @@ function! zero#git#ParseGithubRemote() abort
 endfunction
 
 function! s:ParseGithubRemote() abort
-    let l:remote_url = zero#Strip(system('git ls-remote --get-url'))
+    let l:remote_url = zero#Trim(system('git ls-remote --get-url'))
     let l:https_repo = '^https\?://\(\%([[:alnum:]-_]\+\.\)*github\.com\)/\([^/]\+\)/\([^/]\+\)$'
     let l:https_personal_access_token_repo = '^https\?://[[:alnum:]]\+:\%(ghp_\)\?[[:alnum:]]\+@\(\%([[:alnum:]-_]\+\.\)*github\.com\)/\([^/]\+\)/\([^/]\+\)$'
     let l:ssh_over_https_repo = '^ssh://git@ssh\.github\.com:443/\([^/]\+\)/\([^/]\+\)$'
@@ -191,9 +191,9 @@ function! s:GitBranch() abort
     if exists('*FugitiveHead') == 1
         return FugitiveHead()
     else
-        let l:branch = zero#Strip(system('git symbolic-ref --short -q HEAD'))
+        let l:branch = zero#Trim(system('git symbolic-ref --short -q HEAD'))
         if l:branch ==# ''
-            let l:branch = zero#Strip(system('git rev-parse HEAD'))
+            let l:branch = zero#Trim(system('git rev-parse HEAD'))
         endif
         return l:branch
     endif

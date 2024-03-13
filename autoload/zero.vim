@@ -23,13 +23,13 @@ function! zero#LogCommand(cmd, ...) abort
     endif
 endfunction
 
+function! zero#Trim(str) abort
+    return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
+
 if exists('*trim')
-    function! zero#Strip(str) abort
+    function! zero#Trim(str) abort
         return trim(a:str)
-    endfunction
-else
-    function! zero#Strip(str) abort
-        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
     endfunction
 endif
 

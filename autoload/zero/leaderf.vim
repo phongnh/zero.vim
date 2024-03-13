@@ -26,11 +26,11 @@ function! zero#leaderf#Word() abort
 endfunction
 
 function! zero#leaderf#Vword() range abort
-    let text = zero#Strip(zero#Vword())
+    let text = zero#Trim(zero#Vword())
     return s:Escape(text)
 endfunction
 
 function! zero#leaderf#Pword() abort
-    let text = zero#Strip(zero#Pword())
+    let text = zero#Trim(zero#Pword())
     return s:Escape(text)
 endfunction

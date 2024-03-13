@@ -2,7 +2,7 @@
 
 ### This plugin defines the following functions for manipulating text for search and substitute:
 
-* zero#Strip()
+* zero#Trim()
 * zero#CCword()
 * zero#Cword()
 * zero#Word()

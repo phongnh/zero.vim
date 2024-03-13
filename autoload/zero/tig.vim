@@ -95,7 +95,7 @@ endfunction
 
 function! s:RunTig(options) abort
     let cwd = zero#git#WorkTree()
-    let cmd = zero#Strip('tig ' . a:options)
+    let cmd = zero#Trim('tig ' . a:options)
 
     " Use echo as fallback command
     call writefile(['echo'], s:GetTigVimActionFile())
