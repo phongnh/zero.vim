@@ -15,22 +15,8 @@ command! -bar Remove200b silent! %s/\%u200b//g | update | redraw
 command! -bar RemoveZeroWidthSpaces Remove200b
 " }}}
 
-" Replace typographic characters
-" Copied from https://github.com/srstevenson/dotfiles {{{
-function! s:ReplaceTypographicCharacters() abort
-    let l:map = {}
-    let l:map['–'] = '--'
-    let l:map['—'] = '---'
-    let l:map['‘'] = "'"
-    let l:map['’'] = "'"
-    let l:map['“'] = '"'
-    let l:map['”'] = '"'
-    let l:map['•'] = '*'
-    let l:map['…'] = '...'
-    execute ':%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
-endfunction
-
-command! -bar ReplaceTypographicCharacters call <SID>ReplaceTypographicCharacters()
+" Replace typographic characters {{{
+command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacters()
 " }}}
 
 " Copy Commands {{{

@@ -224,5 +224,20 @@ function! zero#InsertInput() abort
     endif
 endfunction
 
+" Replace typographic characters
+" Copied from https://github.com/srstevenson/dotfiles {{{
+function! zero#ReplaceTypographicCharacters() abort
+    let l:map = {}
+    let l:map['–'] = '--'
+    let l:map['—'] = '---'
+    let l:map['‘'] = "'"
+    let l:map['’'] = "'"
+    let l:map['“'] = '"'
+    let l:map['”'] = '"'
+    let l:map['•'] = '*'
+    let l:map['…'] = '...'
+    execute ':keeppatterns :%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
+endfunction
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
