@@ -140,7 +140,10 @@ function! s:OpenTigInTerminal(tig_cmd, cwd) abort
     if s:tig_mode ==# 'tab'
         tabnew
         call s:UpdateVimSettings()
+    else
+        enew
     endif
+    setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile norelativenumber nonumber
     let cmd = a:tig_cmd
     call zero#LogCommand(cmd, 'terminal')
     let term_options = {
