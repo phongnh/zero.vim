@@ -31,7 +31,7 @@ command! -bang CopyAbsolutePath    call zero#path#CopyAbsolutePath(<bang>0)
 command! -bang CopyDirPath         call zero#path#CopyDirPath(<bang>0)
 command! -bang CopyAbsoluteDirPath call zero#path#CopyAbsoluteDirPath(<bang>0)
 
-if get(g:, 'zero_vim_mappings', 1)
+if get(g:, 'zero_vim_path_mappings', 1)
     nnoremap <silent> yp :CopyPath<CR>
     nnoremap <silent> yP :CopyPath!<CR>
     nnoremap <silent> yc :CopyFullPath<CR>
@@ -81,9 +81,16 @@ if executable('rg')
 endif
 
 " Grep
-command! -bar -nargs=+ -complete=file Grep  silent! grep! <args> | botright cwindow | redraw!
-command! -bar -nargs=+ -complete=file LGrep silent! lgrep! <args> | lwindow | redraw!
-command! -bar -nargs=1                BGrep silent! lgrep! <args> % | lwindow | redraw!
+command! -bar -nargs=+ -complete=file RunGrep  silent! grep! <args> | botright cwindow | redraw!
+command! -bar -nargs=+ -complete=file RunLGrep silent! lgrep! <args> | lwindow | redraw!
+command! -bar -nargs=1                RunBGrep silent! lgrep! <args> % | lwindow | redraw!
+
+command! -bar -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
+command! -bar -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
+command! -bar -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, '%')
+
+cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
+cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
 
 " Gitk
 if executable('gitk')

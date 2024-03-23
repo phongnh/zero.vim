@@ -37,16 +37,25 @@ function! s:Grep(cmd, ...) abort
     endtry
 endfunction
 
+function! s:BuildGrepCommand(...) abort
+    let l:opts = map(copy(a:000), 'expandcmd(v:val)')
+    let l:opts = len(l:opts) > 2 && (l:opts[-1] ==# '%' || l:opts[-1] ==# '#') ? l:opts[0:-2] : l:opts
+    let l:cmd = join([&grepprg] + l:opts, ' ')
+    return l:cmd
+endfunction
+
 function! zero#grep#Grep(...) abort
-    call call(function('s:Grep'), ['Grep'] + a:000)
+    let l:cmd = call('s:BuildGrepCommand', a:000)
+    cgetexpr system(l:cmd)
+    botright cwindow
+    call setqflist([], 'a', { 'title': l:cmd })
 endfunction
 
 function! zero#grep#LGrep(...) abort
-    call call(function('s:Grep'), ['LGrep'] + a:000)
-endfunction
-
-function! zero#grep#BGrep(...) abort
-    call call(function('s:Grep'), ['BGrep'] + a:000)
+    let l:cmd = call('s:BuildGrepCommand', a:000)
+    lgetexpr system(l:cmd)
+    lwindow
+    call setloclist(0, [], 'a', { 'title': l:cmd })
 endfunction
 
 function! zero#grep#CCword() abort
