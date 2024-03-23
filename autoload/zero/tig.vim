@@ -14,9 +14,12 @@ function! s:UpdateVimSettings() abort
 endfunction
 
 function! s:RestoreVimSettings() abort
-    for [k, v] in items(s:tig_vim_settings)
-        execute printf('set %s=%s', k, string(v))
-    endfor
+    if exists('s:tig_vim_settings')
+        for [k, v] in items(s:tig_vim_settings)
+            execute printf('set %s=%s', k, string(v))
+        endfor
+        unlet s:tig_vim_settings
+    endif
 endfunction
 
 function! s:GetTigVimActionFile() abort
