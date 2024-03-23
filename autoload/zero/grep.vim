@@ -37,8 +37,16 @@ function! s:Grep(cmd, ...) abort
     endtry
 endfunction
 
+function! s:ExpandGrepArgument(arg) abort
+    if stridx(a:arg, '\') > -1
+        return a:arg
+    else
+        return expandcmd(a:arg)
+    endif
+endfunction
+
 function! s:BuildGrepCommand(...) abort
-    let l:opts = map(copy(a:000), 'expandcmd(v:val)')
+    let l:opts = map(copy(a:000), 's:ExpandGrepArgument(v:val)')
     let l:opts = len(l:opts) > 2 && (l:opts[-1] ==# '%' || l:opts[-1] ==# '#') ? l:opts[0:-2] : l:opts
     let l:cmd = join([&grepprg] + l:opts, ' ')
     return l:cmd
