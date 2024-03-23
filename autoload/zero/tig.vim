@@ -44,7 +44,9 @@ function! s:OnExitTigCallback(code, cmd, mode) abort
         return
     endif
 
-    if exists(':Sayonara') == 2
+    if exists(':SmartQ') == 2
+        silent! SmartQ!
+    elseif exists(':Sayonara') == 2
         silent! Sayonara!
     elseif exists(':Bdelete') == 2
         silent! Bdelete
