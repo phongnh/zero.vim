@@ -17,26 +17,6 @@ function! zero#grep#Input(...) abort
 endfunction
 
 " Grep Helpers
-function! s:GrepDir(dir) abort
-    let l:dir = fnamemodify(empty(a:dir) ? expand('%') : a:dir, ':~:.:h')
-    let l:dir = zero#Trim(l:dir)
-
-    if empty(l:dir) || l:dir ==# '.' || l:dir =~ '^/' || l:dir =~ '^\~'
-        return ''
-    endif
-
-    return l:dir
-endfunction
-
-function! s:Grep(cmd, ...) abort
-    let l:cmd = zero#Trim(a:cmd . ' ' . join(a:000, ' '))
-    call zero#LogCommand(l:cmd)
-    try
-        execute l:cmd
-    catch
-    endtry
-endfunction
-
 function! s:ExpandGrepArgument(arg) abort
     if stridx(a:arg, '\') > -1
         return a:arg
