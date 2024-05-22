@@ -20,6 +20,8 @@ endfunction
 function! s:ExpandGrepArgument(arg) abort
     if stridx(a:arg, '\') > -1
         return a:arg
+    elseif a:arg =~? '^\*\..\+$'
+        return shellescape(a:arg)
     else
         return expandcmd(a:arg)
     endif
