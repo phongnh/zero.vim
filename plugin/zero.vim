@@ -105,33 +105,20 @@ if executable('tig')
     command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
 endif
 
-" Depends on openbrowser
-function! s:SetupCommands() abort
-    if exists(':OpenBrowser') != 2
-        return
-    endif
+" Integrate with openbrowser.vim
+" CircleCI
+command! OpenCircleCIDashboard call zero#github#OpenCircleCIDashboard()
+command! OpenCircleCIProject   call zero#github#OpenCircleCIProject()
+command! OpenCircleCIBranch    call zero#github#OpenCircleCIBranch()
 
-    " CircleCI
-    command! OpenCircleCIDashboard call zero#git#OpenCircleCIDashboard()
-    command! OpenCircleCIProject call zero#git#OpenCircleCIProject()
-    command! OpenCircleCIBranch call zero#git#OpenCircleCIBranch()
+" GitHub
+command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
+command! -nargs=?                                             OpenGitHubRepo   call zero#github#OpenRepo(<f-args>)
+command! -nargs=*                                             OpenGitHubPRs    call zero#github#OpenPRs(<f-args>)
+command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
+command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
 
-    " GitHub
-    command! -nargs=? OpenGithubRepo call zero#git#OpenGithubRepo(<f-args>)
-    command! -nargs=* OpenGithubPRs call zero#git#OpenGithubPRs(<f-args>)
-    command! OpenGithubMyPRs call zero#git#OpenGithubMyPRs()
-    command! -nargs=? -complete=custom,zero#git#RemoteBranches OpenGithubBranch call zero#git#OpenGithubBranch(<f-args>)
-    if exists(':OpenGithubFile') != 2
-        command! -nargs=? -complete=file OpenGithubFile call zero#git#OpenGithubFile(<f-args>)
-    endif
-
-    inoremap <C-x>g <C-r>=zero#git#InsertGithubPR()<CR>
-endfunction
-
-augroup ZeroVimGithubCommands
-    autocmd!
-    autocmd VimEnter * call <SID>SetupCommands()
-augroup END
+inoremap <C-x>g <C-r>=zero#github#InsertPR()<CR>
 
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
