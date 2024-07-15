@@ -72,6 +72,12 @@ if get(g:, 'zero_vim_insert_mappings', 1)
 endif
 " }}}
 
+" Toggle mappings {{{
+if get(g:, 'zero_vim_toggle_mappings', 1)
+    call zero#setup#ToggleMappings()
+endif
+" }}}
+
 " Grep Settings
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
