@@ -81,9 +81,56 @@ if executable('rg')
 endif
 
 " Grep
-command! -bar -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
-command! -bar -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
-command! -bar -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, '%')
+function! s:Grep(cmd, args, path) abort
+    let l:args = escape(a:args, '\"')
+    let l:grepprg = &grepprg . ' ' . l:args . ' '
+    let l:errorformat = &errorformat
+    let &errorformat = &grepformat
+    try
+        if a:path ==# ''
+            execute a:cmd . ' system("' . l:grepprg . '")'
+        else
+            execute a:cmd . ' system("' . l:grepprg . shellescape(a:path) . '")'
+        endif
+    catch
+        call zero#Error(printf('%s: `%s` failed!', a:cmd, l:grepprg))
+    finally
+        let &errorformat = l:errorformat
+    endtry
+endfunction
+
+command! -complete=file_in_path -nargs=+ Grep     call s:Grep('cgetexpr', <q-args>, ''            )
+command!                        -nargs=+ GrepDir  call s:Grep('cgetexpr', <q-args>, expand('%:p:h'))
+command! -complete=file_in_path -nargs=+ LGrep    call s:Grep('lgetexpr', <q-args>, ''            )
+command!                        -nargs=+ LGrepDir call s:Grep('lgetexpr', <q-args>, expand('%:p:h'))
+command!                        -nargs=+ BGrep    call s:Grep('lgetexpr', <q-args>, expand('%:p') )
+
+
+function! s:with_grep_format(cmd, prg, args, path) abort
+    let l:args = escape(a:args, '\"')
+    let l:saved_errorformat = &errorformat
+    let &errorformat = &grepformat
+    try
+        if a:path ==# ''
+            exe a:cmd . ' system("' . a:prg . ' ' . l:args . ' ")'
+        else
+            exe a:cmd . ' system("' . a:prg . ' ' . l:args . ' ' . shellescape(a:path) . '")'
+        endif
+    finally
+        let &errorformat = l:saved_errorformat
+    endtry
+endfunction
+
+command!  -complete=file_in_path -nargs=+ GrepProject  call s:with_grep_format('cgetexpr', &grepprg,    <q-args>, ''            )
+command!                         -nargs=+ GrepDir      call s:with_grep_format('cgetexpr', &grepprg,    <q-args>, expand('%:p:h'))
+command!  -complete=file_in_path -nargs=+ LGrepProject call s:with_grep_format('lgetexpr', &grepprg,    <q-args>, ''            )
+command!                         -nargs=+ LGrepDir     call s:with_grep_format('lgetexpr', &grepprg,    <q-args>, expand('%:p:h'))
+command!                         -nargs=+ LGrepFile    call s:with_grep_format('lgetexpr', &grepprg,    <q-args>, expand('%:p') )
+command!                         -nargs=+ GrepDiff     call s:with_grep_format('cgetexpr', 'grep_diff', <q-args>, ''            )
+
+command! -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<q-args>, '')
+command! -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<q-args>)
+command! -nargs=+                        BGrep call zero#grep#LGrep(<q-args>, expand('%:p'))
 
 cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
 cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'

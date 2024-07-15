@@ -17,35 +17,55 @@ function! zero#grep#Input(...) abort
 endfunction
 
 " Grep Helpers
-function! s:ExpandGrepArgument(arg) abort
-    if stridx(a:arg, '\') > -1
-        return a:arg
-    elseif a:arg =~? '^\*\..\+$'
-        return shellescape(a:arg)
-    else
-        return expandcmd(a:arg)
-    endif
-endfunction
-
-function! s:BuildGrepCommand(...) abort
-    let l:opts = map(copy(a:000), 's:ExpandGrepArgument(v:val)')
-    let l:opts = len(l:opts) > 2 && (l:opts[-1] ==# '%' || l:opts[-1] ==# '#') ? l:opts[0:-2] : l:opts
+function! s:BuildGrepCommand(args, path) abort
+    let l:opts = strlen(a:args) ? [a:args] : []
+    let l:opts = extend(l:opts, strlen(a:path) ? [shellescape(a:path)] : [])
     let l:cmd = join([&grepprg] + l:opts, ' ')
     return l:cmd
 endfunction
 
-function! zero#grep#Grep(...) abort
-    let l:cmd = call('s:BuildGrepCommand', a:000)
-    cgetexpr system(l:cmd)
-    botright cwindow
-    call setqflist([], 'a', { 'title': l:cmd })
+function! s:Log(grep, cmd) abort
+    echo printf('%s: Running `%s`!', a:grep, a:cmd)
 endfunction
 
-function! zero#grep#LGrep(...) abort
-    let l:cmd = call('s:BuildGrepCommand', a:000)
-    lgetexpr system(l:cmd)
-    lwindow
-    call setloclist(0, [], 'a', { 'title': l:cmd })
+function! s:PrintError(grep, cmd) abort
+    if strlen(v:errmsg)
+        call zero#Error(printf('%s: `%s` failed! (%s)', a:grep, a:cmd, v:errmsg))
+    else
+        call zero#Error(printf('%s: `%s` failed!', a:grep, a:cmd))
+    endif
+endfunction
+
+function! zero#grep#Grep(args, ...) abort
+    echomsg a:args
+    let l:errorformat = &errorformat
+    let &errorformat = &grepformat
+    let l:cmd = s:BuildGrepCommand(a:args, get(a:, 1, ''))
+    try
+        call s:Log('Grep', l:cmd)
+        cgetexpr system(l:cmd)
+        botright cwindow
+        call setqflist([], 'a', { 'title': l:cmd })
+    catch
+        call s:PrintError('Grep', l:cmd)
+    finally
+        let &errorformat = l:errorformat
+    endtry
+endfunction
+
+function! zero#grep#LGrep(args, ...) abort
+    let l:errorformat = &errorformat
+    let &errorformat = &grepformat
+    let l:cmd = s:BuildGrepCommand(a:args, get(a:, 1, ''))
+    try
+        lgetexpr system(l:cmd)
+        lwindow
+        call setloclist(0, [], 'a', { 'title': l:cmd })
+    catch
+        call s:PrintError('LGrep', l:cmd)
+    finally
+        let &errorformat = l:errorformat
+    endtry
 endfunction
 
 function! zero#grep#CCword() abort
