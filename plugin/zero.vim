@@ -81,9 +81,9 @@ if executable('rg')
 endif
 
 " Grep
-command! -bar -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
-command! -bar -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
-command! -bar -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, '%')
+command! -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
+command! -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
+command! -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, '%')
 
 cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
 cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
