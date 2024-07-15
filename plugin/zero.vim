@@ -75,16 +75,12 @@ endif
 " Grep Settings
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
-    let &grepprg = 'rg -H --no-heading -n -S --hidden'
+    let &grepprg = 'rg --line-buffered -H --no-heading -n -S --hidden'
     let &grepprg .= get(g:, 'zero_vim_grep_follow_links', get(g:, 'zero_vim_follow_links', 0)) ? ' --follow' : ''
     let &grepprg .= get(g:, 'zero_vim_grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
 
 " Grep
-command! -bar -nargs=+ -complete=file RunGrep  silent! grep! <args> | botright cwindow | redraw!
-command! -bar -nargs=+ -complete=file RunLGrep silent! lgrep! <args> | lwindow | redraw!
-command! -bar -nargs=1                RunBGrep silent! lgrep! <args> % | lwindow | redraw!
-
 command! -bar -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
 command! -bar -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
 command! -bar -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, '%')
