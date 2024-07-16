@@ -1,12 +1,12 @@
 function! zero#setup#ToggleMappings() abort
     " Change tab width
-    nnoremap <silent> yo2 :<C-u>setlocal tabstop=2 softtabstop=2 shiftwidth=2 shiftwidth<CR>
-    nnoremap <silent> yo4 :<C-u>setlocal tabstop=4 softtabstop=4 shiftwidth=4 shiftwidth<CR>
-    nnoremap <silent> yo8 :<C-u>setlocal tabstop=8 softtabstop=8 shiftwidth=8 shiftwidth<CR>
+    nnoremap <silent> yo2 :<C-u>setlocal softtabstop=2 shiftwidth=2 shiftwidth?<CR>
+    nnoremap <silent> yo4 :<C-u>setlocal softtabstop=4 shiftwidth=4 shiftwidth?<CR>
+    nnoremap <silent> yo8 :<C-u>setlocal softtabstop=8 shiftwidth=8 shiftwidth?<CR>
 
-    nnoremap <silent> yo@ :<C-u>setlocal tabstop=2 tabstop<CR>
-    nnoremap <silent> yo$ :<C-u>setlocal tabstop=4 tabstop<CR>
-    nnoremap <silent> yo* :<C-u>setlocal tabstop=8 tabstop<CR>
+    nnoremap <silent> yo@ :<C-u>setlocal tabstop=2 softtabstop=2 shiftwidth=2 shiftwidth?<CR>
+    nnoremap <silent> yo$ :<C-u>setlocal tabstop=4 softtabstop=4 shiftwidth=4 shiftwidth?<CR>
+    nnoremap <silent> yo* :<C-u>setlocal tabstop=8 softtabstop=8 shiftwidth=8 shiftwidth?<CR>
 
     " Toggle incsearch
     nnoremap <silent> yoI :<C-u>setlocal incsearch! incsearch?<CR>
