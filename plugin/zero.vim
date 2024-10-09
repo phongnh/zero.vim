@@ -116,9 +116,10 @@ endif
 
 " Integrate with openbrowser.vim
 " CircleCI
-command! OpenCircleCIDashboard call zero#github#OpenCircleCIDashboard()
-command! OpenCircleCIProject   call zero#github#OpenCircleCIProject()
-command! OpenCircleCIBranch    call zero#github#OpenCircleCIBranch()
+command! -bang OpenCircleCIDashboard   call zero#github#OpenCircleCIDashboard(<bang>0)
+command! -bang OpenCircleCIProject     call zero#github#OpenCircleCIProject(<bang>0)
+command! -bang OpenCircleCIBranch      call zero#github#OpenCircleCIBranch(<bang>0)
+command! -bang OpenCircleCIMyPipelines call zero#github#OpenCircleCIMyPipelines(<bang>0)
 
 " GitHub
 command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
