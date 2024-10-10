@@ -118,7 +118,6 @@ function! zero#setup#ToggleMappings() abort
         nnoremap <silent> yov     :<C-u>call <SID>ToggleVirtualEditAll()<CR>
         nnoremap <silent> yox     :<C-u>call <SID>ToggleCursorOptions()<CR>
         nnoremap <silent> yo+     :<C-u>call <SID>ToggleCursorOptions()<CR>
-        nnoremap <silent> yo+     :<C-u>call <SID>ToggleCursorOptions()<CR>
         nnoremap <silent> yot     :<C-u>call <SID>ToggleColorColumn()<CR>
     endif
 endfunction
