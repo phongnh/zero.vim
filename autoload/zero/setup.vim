@@ -72,8 +72,10 @@ function! zero#setup#ToggleMappings() abort
         function! s:ToggleVirtualEditAll() abort
             if &virtualedit =~# 'all'
                 set virtualedit-=all
+                echo 'set virtualedit-=all'
             else
                 set virtualedit+=all
+                echo 'set virtualedit+=all'
             endif
         endfunction
 
