@@ -49,4 +49,74 @@ function! zero#setup#ToggleMappings() abort
     nnoremap <silent> zi zi:<C-u>setlocal foldenable?<CR>
     nnoremap <silent> z] :<C-u>let &foldcolumn = &foldcolumn + 1<CR>:<C-u>setlocal foldcolumn?<CR>
     nnoremap <silent> z[ :<C-u>let &foldcolumn = &foldcolumn - 1<CR>:<C-u>setlocal foldcolumn?<CR>
+
+    if empty(globpath(&rtp, 'plugin/unimpaired.vim'))
+        function! s:ToggleBackground() abort
+            if &background == 'dark'
+                set background=light background?
+            else
+                set background=dark background?
+            endif
+        endfunction
+
+        function! s:ToggleDiff() abort
+            if &diff
+                diffoff
+                echo 'diffoff'
+            else
+                diffthis
+                echo 'diffthis'
+            endif
+        endfunction
+
+        function! s:ToggleVirtualEditAll() abort
+            if &virtualedit =~# 'all'
+                set virtualedit-=all
+            else
+                set virtualedit+=all
+            endif
+        endfunction
+
+        function! s:ToggleCursorOptions() abort
+            if &cursorline && &cursorcolumn
+                set nocursorline nocursorcolumn
+                echo 'set nocursorline nocursorcolumn'
+            else
+                set cursorline cursorcolumn
+                echo 'set cursorline cursorcolumn'
+            endif
+        endfunction
+
+        function! s:ToggleColorColumn() abort
+            if !empty(&colorcolumn)
+                let s:colorcolumn = &colorcolumn
+            endif
+            if !empty(&colorcolumn)
+                set colorcolumn=
+            else
+                execute printf('set colorcolumn=%s', get(s:, 'colorcolumn', '+1'))
+            endif
+            set colorcolumn?
+        endfunction
+
+        nnoremap <silent> yob     :<C-u>call <SID>ToggleBackground()<CR>
+        nnoremap <silent> yoc     :<C-u>setlocal cursorline! cursorline?<CR>
+        nnoremap <silent> yo-     :<C-u>setlocal cursorline! cursorline?<CR>
+        nnoremap <silent> yo_     :<C-u>setlocal cursorline! cursorline?<CR>
+        nnoremap <silent> you     :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
+        nnoremap <silent> yo<Bar> :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
+        nnoremap <silent> yod     :<C-u>call <SID>ToggleDiff()<CR>
+        nnoremap <silent> yoh     :<C-u>set hlsearch! hlsearch?<CR>
+        nnoremap <silent> yoi     :<C-u>set ignorecase! ignorecase?<CR>
+        nnoremap <silent> yol     :<C-u>setlocal list! list?<CR>
+        nnoremap <silent> yon     :<C-u>setlocal number! number?<CR>
+        nnoremap <silent> yor     :<C-u>setlocal relativenumber! relativenumber?<CR>
+        nnoremap <silent> yos     :<C-u>setlocal spell! spell?<CR>
+        nnoremap <silent> yow     :<C-u>setlocal wrap! wrap?<CR>
+        nnoremap <silent> yov     :<C-u>call <SID>ToggleVirtualEditAll()<CR>
+        nnoremap <silent> yox     :<C-u>call <SID>ToggleCursorOptions()<CR>
+        nnoremap <silent> yo+     :<C-u>call <SID>ToggleCursorOptions()<CR>
+        nnoremap <silent> yo+     :<C-u>call <SID>ToggleCursorOptions()<CR>
+        nnoremap <silent> yot     :<C-u>call <SID>ToggleColorColumn()<CR>
+    endif
 endfunction
