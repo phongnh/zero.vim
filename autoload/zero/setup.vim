@@ -119,5 +119,25 @@ function! zero#setup#ToggleMappings() abort
         nnoremap <silent> yox     :<C-u>call <SID>ToggleCursorOptions()<CR>
         nnoremap <silent> yo+     :<C-u>call <SID>ToggleCursorOptions()<CR>
         nnoremap <silent> yot     :<C-u>call <SID>ToggleColorColumn()<CR>
+
+        " Move lines up or down
+        nnoremap <silent> <M-j> <Cmd>move .+1<Bar>normal! ==<CR>
+        nnoremap <silent> <M-k> <Cmd>move .-2<Bar>normal! ==<CR>
+        vnoremap <silent> <M-j> :move '>+1<Bar>normal! gv=gv<CR>
+        vnoremap <silent> <M-k> :move '<-2<Bar>normal! gv=gv<CR>
+        inoremap <silent> <M-j> <Cmd>move .+1<Bar>normal! ==<CR>
+        inoremap <silent> <M-k> <Cmd>move .-2<Bar>normal! ==<CR>
+
+        nnoremap <silent> ∆ <Cmd>move .+1<Bar>normal! ==<CR>
+        nnoremap <silent> ˚ <Cmd>move .-2<Bar>normal! ==<CR>
+        vnoremap <silent> ∆ :move '>+1<Bar>normal! gv=gv<CR>
+        vnoremap <silent> ˚ :move '<-2<Bar>normal! gv=gv<CR>
+        inoremap <silent> ∆ <Cmd>move .+1<Bar>normal! ==<CR>
+        inoremap <silent> ˚ <Cmd>move .-2<Bar>normal! ==<CR>
+
+        nmap ]e <M-j>
+        nmap [e <M-k>
+        vmap ]e <M-j>
+        vmap [e <M-k>
     endif
 endfunction
