@@ -128,12 +128,12 @@ function! zero#setup#ToggleMappings() abort
         inoremap <silent> <M-j> <Cmd>move .+1<Bar>normal! ==<CR>
         inoremap <silent> <M-k> <Cmd>move .-2<Bar>normal! ==<CR>
 
-        nnoremap <silent> ∆ <Cmd>move .+1<Bar>normal! ==<CR>
-        nnoremap <silent> ˚ <Cmd>move .-2<Bar>normal! ==<CR>
-        vnoremap <silent> ∆ :move '>+1<Bar>normal! gv=gv<CR>
-        vnoremap <silent> ˚ :move '<-2<Bar>normal! gv=gv<CR>
-        inoremap <silent> ∆ <Cmd>move .+1<Bar>normal! ==<CR>
-        inoremap <silent> ˚ <Cmd>move .-2<Bar>normal! ==<CR>
+        nmap ∆ <M-j>
+        nmap ˚ <M-k>
+        vmap ∆ <M-j>
+        vmap ˚ <M-k>
+        imap ∆ <M-j>
+        imap ˚ <M-k>
 
         nmap ]e <M-j>
         nmap [e <M-k>
