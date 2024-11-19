@@ -41,6 +41,10 @@ function! zero#setup#ToggleMappings() abort
         nnoremap <silent> yoC :<C-u>call zero#toggle#ToggleConceallevel()<CR>
     endif
 
+    " Switch off diff mode for the current window and in all windows
+    " in the current tab page where 'diff' is set.
+    nnoremap <silent> yoD :<C-u>diffoff!<CR>
+
     " Improve folding mappings
     nnoremap <silent> zr zr:<C-u>setlocal foldlevel?<CR>
     nnoremap <silent> zm zm:<C-u>setlocal foldlevel?<CR>
