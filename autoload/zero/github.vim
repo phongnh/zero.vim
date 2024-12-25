@@ -47,28 +47,6 @@ function! s:GitBranch() abort
     endif
 endfunction
 
-function! s:OpenUrl(opts) abort
-    if type(a:opts) == v:t_string
-        let l:url = a:opts
-    else
-        let l:host = get(a:opts, 'host', 'github.com')
-        let l:path = get(a:opts, 'path', '/')
-        let l:query = get(a:opts, 'query', '')
-        let l:url = printf('https://%s', l:host)
-        let l:url .= l:path
-        let l:url .= strlen(l:query) ? '?' . query : ''
-    endif
-    if exists(':OpenBrowser') == 2
-        execute 'OpenBrowser' l:url
-    else
-        let @" = l:url
-        if has('clipboard')
-            let [@*, @+] = [@", @"]
-        endif
-        echo 'Copied: ' . @"
-    endif
-endfunction
-
 " phongnh/zero.vim
 " phongnh
 function! zero#github#OpenRepo(...) abort
@@ -86,7 +64,7 @@ function! zero#github#OpenRepo(...) abort
     endif
     if l:remote.host =~# 'github.com'
         let l:url = printf('https://github.com/%s', l:path)
-        call s:OpenUrl(l:url)
+        call zero#browser#Open(l:url)
     endif
 endfunction
 
@@ -139,12 +117,12 @@ function! zero#github#OpenPRs(...) abort
     endif
     if l:host =~# 'github.com'
         let l:url = printf('https://github.com/%s', l:path)
-        call s:OpenUrl(l:url)
+        call zero#browser#Open(l:url)
     endif
 endfunction
 
 function! zero#github#OpenMyPRs() abort
-    call s:OpenUrl('https://github.com/pulls')
+    call zero#browser#Open('https://github.com/pulls')
 endfunction
 
 function! s:SystemRun(cmd, ...) abort
@@ -182,7 +160,7 @@ function! zero#github#OpenBranch(...) abort
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
         if l:host =~# 'github.com'
             let l:url = printf('https://github.com/%s/%s/tree/%s', l:owner, l:repo, l:branch)
-            call s:OpenUrl(l:url)
+            call zero#browser#Open(l:url)
         endif
     else
         call zero#github#OpenRepo()
@@ -198,7 +176,7 @@ function! zero#github#OpenFile(...) abort
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
         if l:host =~# 'github.com'
             let l:url = printf('https://github.com/%s/%s/blob/%s/%s', l:owner, l:repo, l:branch, l:file)
-            call s:OpenUrl(l:url)
+            call zero#browser#Open(l:url)
         endif
     endif
 endfunction
