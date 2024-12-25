@@ -114,12 +114,11 @@ if executable('tig')
     command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
 endif
 
-" Integrate with openbrowser.vim
 " CircleCI
-command! -bang OpenCircleCIDashboard   call zero#github#OpenCircleCIDashboard(<bang>0)
-command! -bang OpenCircleCIProject     call zero#github#OpenCircleCIProject(<bang>0)
-command! -bang OpenCircleCIBranch      call zero#github#OpenCircleCIBranch(<bang>0)
-command! -bang OpenCircleCIMyPipelines call zero#github#OpenCircleCIMyPipelines(<bang>0)
+command! -bang OpenCircleCIDashboard   call zero#circleci#OpenDashboard(<bang>0)
+command! -bang OpenCircleCIProject     call zero#circleci#OpenProject(<bang>0)
+command! -bang OpenCircleCIBranch      call zero#circleci#OpenBranch(<bang>0)
+command! -bang OpenCircleCIMyPipelines call zero#circleci#OpenMyPipelines(<bang>0)
 
 " GitHub
 command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()

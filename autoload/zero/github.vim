@@ -31,6 +31,10 @@ function! s:ParseRemote() abort
     return { 'host': l:host, 'owner': l:owner, 'repo': l:repo }
 endfunction
 
+function! zero#github#Branch() abort
+    return s:GitBranch()
+endfunction
+
 function! s:GitBranch() abort
     if exists('*FugitiveHead') == 1
         return FugitiveHead()
@@ -40,22 +44,6 @@ function! s:GitBranch() abort
             let l:branch = zero#Trim(system('git rev-parse HEAD'))
         endif
         return l:branch
-    endif
-endfunction
-
-function! s:OpenCircleCIUrl(opts) abort
-    if has_key(a:opts, 'branch') && strlen(a:opts.branch)
-        let l:query = a:opts.filter ==# 'mine' ? 'filter=mine' : printf('branch=%s', a:opts.branch)
-        let l:path = printf('%s/%s?%s', a:opts.owner, a:opts.repo, l:query)
-    elseif has_key(a:opts, 'repo')
-        let l:path = printf('%s/%s?filter=%s', a:opts.owner, a:opts.repo, a:opts.filter)
-    else
-        let l:path = printf('%s?filter=%s', a:opts.owner, a:opts.filter)
-    endif
-    if a:opts.host =~# 'github.com'
-        let l:provider = 'github'
-        let l:url = printf('https://app.circleci.com/pipelines/%s/%s', l:provider, l:path)
-        call s:OpenUrl(l:url)
     endif
 endfunction
 
@@ -79,29 +67,6 @@ function! s:OpenUrl(opts) abort
         endif
         echo 'Copied: ' . @"
     endif
-endfunction
-
-function! zero#github#OpenCircleCIDashboard(...) abort
-    let l:remote = s:ParseRemote()
-    let l:filter = get(a:, 1, 0) ? 'mine' : 'all'
-    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'filter': l:filter })
-endfunction
-
-function! zero#github#OpenCircleCIProject(...) abort
-    let l:remote = s:ParseRemote()
-    let l:filter = get(a:, 1, 0) ? 'mine' : 'all'
-    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'repo': l:remote.repo, 'filter': l:filter })
-endfunction
-
-function! zero#github#OpenCircleCIBranch(...) abort
-    let l:remote = s:ParseRemote()
-    let l:filter = get(a:, 1, 0) ? 'mine' : 'all'
-    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'repo': l:remote.repo, 'branch': s:GitBranch(), 'filter': l:filter })
-endfunction
-
-function! zero#github#OpenCircleCIMyPipelines(...) abort
-    let l:remote = s:ParseRemote()
-    call s:OpenCircleCIUrl({ 'host': l:remote.host, 'owner': l:remote.owner, 'filter': 'mine' })
 endfunction
 
 " phongnh/zero.vim
