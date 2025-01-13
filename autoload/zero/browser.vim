@@ -19,9 +19,9 @@ function! zero#browser#Open(opts) abort
     if exists('*netrw#Open')
         call netrw#Open(l:url)
     elseif exists('*netrw#BrowseX')
-        call netrw#BrowseX(l:url)
+        call netrw#BrowseX(l:url, 0)
     elseif exists('*netrw#NetrwBrowseX')
-        call netrw#NetrwBrowseX(l:url)
+        call netrw#NetrwBrowseX(l:url, 0)
     else
         call s:CopyUrl(l:url)
     endif
