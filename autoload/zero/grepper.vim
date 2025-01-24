@@ -14,11 +14,11 @@ function! zero#grepper#Input(...) abort
 endfunction
 
 function! zero#grepper#CCword(...) abort
-    return zero#CCword()
+    return shellescape(zero#CCword())
 endfunction
 
 function! zero#grepper#Cword() abort
-    return zero#Cword()
+    return shellescape(zero#Cword())
 endfunction
 
 function! zero#grepper#Word() abort

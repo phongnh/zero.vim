@@ -49,11 +49,11 @@ function! zero#grep#LGrep(...) abort
 endfunction
 
 function! zero#grep#CCword() abort
-    return s:Escape(zero#CCword())
+    return shellescape(zero#CCword())
 endfunction
 
 function! zero#grep#Cword() abort
-    return s:Escape(zero#Cword())
+    return shellescape(zero#Cword())
 endfunction
 
 function! zero#grep#Word() abort
