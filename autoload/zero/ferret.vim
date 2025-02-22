@@ -17,7 +17,7 @@ function! zero#ferret#CCword(...) abort
     if get(a:, 1, 0)
         return '-w ' . zero#Cword()
     else
-        return shellescape(zero#CCword())
+        return zero#CCword()
     endif
 endfunction
 

@@ -14,11 +14,11 @@ function! zero#shell#Input(...) abort
 endfunction
 
 function! zero#shell#CCword() abort
-    return shellescape(zero#CCword())
+    return s:Escape(zero#CCword())
 endfunction
 
 function! zero#shell#Cword() abort
-    return shellescape(zero#Cword())
+    return zero#Cword()
 endfunction
 
 function! zero#shell#Word() abort
