@@ -74,7 +74,10 @@ endif
 
 " Toggle mappings {{{
 if get(g:, 'zero_vim_toggle_mappings', 1)
-    call zero#setup#ToggleMappings()
+    augroup ZeroVimToggleMappings
+        autocmd!
+        autocmd VimEnter * call zero#setup#ToggleMappings()
+    augroup END
 endif
 " }}}
 
