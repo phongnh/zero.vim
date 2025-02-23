@@ -69,6 +69,9 @@ if get(g:, 'zero_vim_insert_mappings', 1)
     cnoremap <C-r>?     <C-r>=zero#InsertGrepPword()<CR>
     cnoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
     inoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
+    " <C-r><C-h>: Innsert buffer project dir
+    inoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
+    cnoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
 endif
 " }}}
 
