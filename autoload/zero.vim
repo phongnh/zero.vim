@@ -94,14 +94,6 @@ function! s:IsCtrlSFCommand(cmd) abort
     return a:cmd =~# '^\(CtrlSF\|PCtrlSF\)'
 endfunction
 
-function! s:IsFerretCommand(cmd) abort
-    return a:cmd =~# '^\(Ack\|Lack\|Back\|Black\|PAck\|PLack\)'
-endfunction
-
-function! s:IsFerretSubstituteCommand(cmd) abort
-    return a:cmd =~# '^\(Acks\|Lacks\)'
-endfunction
-
 function! s:IsInputCommand() abort
     return getcmdtype() == '@'
 endfunction
@@ -110,14 +102,10 @@ function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#CCword()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#CCword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#ctrlsf#CCword()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#CCword()
     elseif s:IsInputCommand()
         return zero#shell#CCword()
     else
@@ -129,14 +117,10 @@ function! zero#InsertCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Cword()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#ctrlsf#Cword()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Cword()
     elseif s:IsInputCommand()
         return zero#shell#Cword()
     else
@@ -148,14 +132,10 @@ function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Word()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Word()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Word()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#Word()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Word()
     elseif s:IsInputCommand()
         return zero#shell#Word()
     else
@@ -167,14 +147,10 @@ function! zero#InsertVword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Vword()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Vword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Vword()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#ctrlsf#Vword()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Vword()
     elseif s:IsInputCommand()
         return zero#shell#Vword()
     else
@@ -186,14 +162,10 @@ function! zero#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Pword()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Pword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Pword()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#ctrlsf#Pword()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Pword()
     elseif s:IsInputCommand()
         return zero#shell#Pword()
     else
@@ -209,14 +181,10 @@ function! zero#InsertInput() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Input()
-    elseif s:IsFerretSubstituteCommand(l:cmd)
-        return zero#substitute#Input()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Input()
     elseif s:IsCtrlSFCommand(l:cmd)
         return zero#ctrlsf#Input()
-    elseif s:IsFerretCommand(l:cmd)
-        return zero#ferret#Input()
     elseif s:IsInputCommand()
         return zero#shell#Input()
     else
