@@ -14,11 +14,11 @@ function! zero#leaderf#Input(...) abort
 endfunction
 
 function! zero#leaderf#CCword() abort
-    return s:Escape(zero#CCword())
+    return shellescape(zero#CCword())
 endfunction
 
 function! zero#leaderf#Cword() abort
-    return zero#Cword()
+    return shellescape(zero#Cword())
 endfunction
 
 function! zero#leaderf#Word() abort
