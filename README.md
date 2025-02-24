@@ -30,7 +30,7 @@
 * zero#substitute#Pword()
 * zero#InsertCCword()
 * zero#InsertWord()
-* zero#InsertPWord()
+* zero#InsertPword()
 
 ### This plugin defines the following commands:
 
