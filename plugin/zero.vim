@@ -59,6 +59,19 @@ if get(g:, 'zero_vim_highlight_commands', 0)
 endif
 " }}}
 
+" CircleCI
+command! -bang OpenCircleCIDashboard   call zero#circleci#OpenDashboard(<bang>0)
+command! -bang OpenCircleCIProject     call zero#circleci#OpenProject(<bang>0)
+command! -bang OpenCircleCIBranch      call zero#circleci#OpenBranch(<bang>0)
+command! -bang OpenCircleCIMyPipelines call zero#circleci#OpenMyPipelines(<bang>0)
+
+" GitHub
+command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
+command! -nargs=?                                             OpenGitHubRepo   call zero#github#OpenRepo(<f-args>)
+command! -nargs=*                                             OpenGitHubPRs    call zero#github#OpenPRs(<f-args>)
+command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
+command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
+
 " Insert mappings {{{
 if get(g:, 'zero_vim_insert_mappings', 1)
     cnoremap <C-r><C-w> <C-r>=zero#InsertCword()<CR>
@@ -72,6 +85,8 @@ if get(g:, 'zero_vim_insert_mappings', 1)
     " <C-r><C-h>: Innsert buffer project dir
     inoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
     cnoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
+    " Insert GitHub PR url
+    inoremap <C-x>g <C-r>=zero#github#InsertPR()<CR>
 endif
 " }}}
 
@@ -116,21 +131,6 @@ if executable('tig')
     command! -bang -nargs=? -complete=file               TigFile  call zero#tig#TigFile(<q-args>, <bang>0)
     command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
 endif
-
-" CircleCI
-command! -bang OpenCircleCIDashboard   call zero#circleci#OpenDashboard(<bang>0)
-command! -bang OpenCircleCIProject     call zero#circleci#OpenProject(<bang>0)
-command! -bang OpenCircleCIBranch      call zero#circleci#OpenBranch(<bang>0)
-command! -bang OpenCircleCIMyPipelines call zero#circleci#OpenMyPipelines(<bang>0)
-
-" GitHub
-command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
-command! -nargs=?                                             OpenGitHubRepo   call zero#github#OpenRepo(<f-args>)
-command! -nargs=*                                             OpenGitHubPRs    call zero#github#OpenPRs(<f-args>)
-command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
-command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
-
-inoremap <C-x>g <C-r>=zero#github#InsertPR()<CR>
 
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
