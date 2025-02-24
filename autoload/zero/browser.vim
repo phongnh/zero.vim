@@ -16,12 +16,16 @@ function! zero#browser#Open(opts) abort
     if !exists('g:loaded_netrw')
         runtime! autoload/netrw.vim
     endif
-    if exists('*netrw#Open')
+    if exists('*netrw#os#Open')
+        call netrw#os#Open(l:url)
+    elseif exists('*netrw#Open')
         call netrw#Open(l:url)
     elseif exists('*netrw#BrowseX')
         call netrw#BrowseX(l:url, 0)
     elseif exists('*netrw#NetrwBrowseX')
         call netrw#NetrwBrowseX(l:url, 0)
+    elseif has('nvim-0.10')
+        call luaeval('vim.ui.open(_A[1]) and nil', [l:url])
     else
         call s:CopyUrl(l:url)
     endif
