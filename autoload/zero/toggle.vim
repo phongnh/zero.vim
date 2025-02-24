@@ -65,3 +65,63 @@ if has('conceal')
     endfunction
 endif
 " }
+
+" Toggle background {
+function! zero#toggle#ToggleBackground() abort
+    if &background == 'dark'
+        set background=light background?
+    else
+        set background=dark background?
+    endif
+endfunction
+" }
+
+" Toggle diff {
+function! zero#toggle#ToggleDiff() abort
+    if &diff
+        diffoff
+        echo 'diffoff'
+    else
+        diffthis
+        echo 'diffthis'
+    endif
+endfunction
+" }
+
+" Toggle virtualedit {
+function! zero#toggle#ToggleVirtualEditAll() abort
+    if &virtualedit =~# 'all'
+        set virtualedit-=all
+        echo 'set virtualedit-=all'
+    else
+        set virtualedit+=all
+        echo 'set virtualedit+=all'
+    endif
+endfunction
+" }
+
+" Toggle cursorline and cursorcolumn {
+function! zero#toggle#ToggleCursorOptions() abort
+    if &cursorline && &cursorcolumn
+        set nocursorline nocursorcolumn
+        echo 'set nocursorline nocursorcolumn'
+    else
+        set cursorline cursorcolumn
+        echo 'set cursorline cursorcolumn'
+    endif
+endfunction
+" }
+
+" Toggle colorcolumn {
+function! zero#toggle#ToggleColorColumn() abort
+    if !empty(&colorcolumn)
+        let s:colorcolumn = &colorcolumn
+    endif
+    if !empty(&colorcolumn)
+        set colorcolumn=
+    else
+        execute printf('set colorcolumn=%s', get(s:, 'colorcolumn', '+1'))
+    endif
+    set colorcolumn?
+endfunction
+" }
