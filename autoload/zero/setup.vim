@@ -21,13 +21,6 @@ function! zero#setup#ToggleMappings() abort
     " Toggle "keep current line in the center of the screen" mode
     nnoremap <silent> yoz :<C-u>let &scrolloff = 1000 - &scrolloff<CR>:set scrolloff?<CR>
 
-    if get(g:, 'zero_vim_cycle_buffers_with_tab_mappings', 0)
-        silent! call zero#toggle#CycleBuffersWithTabMappings()
-    endif
-
-    " Enable/disable gt/gT to cycle buffers when VIM has only one tabpage
-    nnoremap <silent> yot :<C-u>call zero#toggle#CycleBuffersWithTabMappings()<CR>
-
     " Exchange gj and gk to j and k
     nnoremap <silent> yom :<C-u>call zero#toggle#ToggleGJK()<CR>
 
@@ -63,7 +56,7 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yo_     :<C-u>setlocal cursorline! cursorline?<CR>
         nnoremap <silent> you     :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
         nnoremap <silent> yo<Bar> :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
-        nnoremap <silent> yod     :<C-u>call <SID>ToggleDiff()<CR>
+        nnoremap <silent> yod     :<C-u>call zero#toggle#ToggleDiff()<CR>
         nnoremap <silent> yoh     :<C-u>set hlsearch! hlsearch?<CR>
         nnoremap <silent> yoi     :<C-u>set ignorecase! ignorecase?<CR>
         nnoremap <silent> yol     :<C-u>setlocal list! list?<CR>

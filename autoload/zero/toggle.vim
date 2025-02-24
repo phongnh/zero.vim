@@ -1,17 +1,3 @@
-" Enable/disable gt/gT to cycle buffers when VIM has only one tabpage {
-function! zero#toggle#CycleBuffersWithTabMappings() abort
-    if empty(mapcheck('gt', 'n')) || empty(mapcheck('gT', 'n'))
-        nnoremap <silent> <expr> gt printf(":\<C-u>%s%s\<CR>", v:count > 0 ? v:count : '', tabpagenr('$') == 1 ? 'bnext' : 'tabnext')
-        nnoremap <silent> <expr> gT printf(":\<C-u>%s%s\<CR>", v:count > 0 ? v:count : '', tabpagenr('$') == 1 ? 'bprevious' : 'tabprevious')
-        echo 'Enabled cycling buffers with gt/gT for VIM with only one tabpage!'
-    else
-        silent! nunmap gt
-        silent! nunmap gT
-        echo 'Disabled cycling buffers with gt/gT for VIM with only one tabpage!'
-    endif
-endfunction
-" }
-
 " Exchange gj and gk to j and k {
 function! zero#toggle#ToggleGJK() abort
     if empty(mapcheck('j', 'n')) || empty(mapcheck('k', 'n'))
