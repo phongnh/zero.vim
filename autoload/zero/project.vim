@@ -1,5 +1,13 @@
 " Find project dir from buffer based on root markers
-let g:zero_vim_file_root_markers = get(g:, 'zero_vim_file_root_markers', [
+let s:vcs_root_markers = get(g:, 'zero_vim_vcs_root_markers', [
+            \ '.git',
+            \ '.hg',
+            \ '.svn',
+            \ '.bzr',
+            \ '_darcs',
+            \ ])
+
+let s:file_root_markers = get(g:, 'zero_vim_file_root_markers', [
             \ 'Gemfile',
             \ 'rebar.config',
             \ 'mix.exs',
@@ -9,17 +17,9 @@ let g:zero_vim_file_root_markers = get(g:, 'zero_vim_file_root_markers', [
             \ '.root',
             \ ])
 
-let g:zero_vim_vcs_root_markers = get(g:, 'zero_vim_vcs_root_markers', [
-            \ '.git',
-            \ '.hg',
-            \ '.svn',
-            \ '.bzr',
-            \ '_darcs',
-            \ ])
+let s:root_markers = s:vcs_root_markers + s:file_root_markers
 
-let g:zero_vim_root_markers = g:zero_vim_vcs_root_markers + g:zero_vim_file_root_markers
-
-let g:zero_vim_ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
+let s:ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
             \ '/',
             \ '/root',
             \ '/Users',
@@ -49,8 +49,8 @@ function! zero#project#find(...) abort
 
     let l:root_dir = ''
 
-    for l:root_marker in g:zero_vim_root_markers
-        if index(g:zero_vim_file_root_markers, l:root_marker) > -1
+    for l:root_marker in s:root_markers
+        if index(s:file_root_markers, l:root_marker) > -1
             let l:root_dir = findfile(l:root_marker, l:starting_dir . ';')
         else
             let l:root_dir = finddir(l:root_marker, l:starting_dir . ';')
@@ -68,9 +68,9 @@ function! zero#project#find(...) abort
         endif
     endfor
 
-    if empty(l:root_dir) || index(g:zero_vim_ignored_root_dirs, l:root_dir) > -1
+    if empty(l:root_dir) || index(s:ignored_root_dirs, l:root_dir) > -1
         let l:cwd = getcwd()
-        if index(g:zero_vim_ignored_root_dirs, cwd) > -1
+        if index(s:ignored_root_dirs, cwd) > -1
             let l:root_dir = l:starting_dir
         elseif stridx(l:starting_dir, cwd) == 0
             let l:root_dir = cwd
