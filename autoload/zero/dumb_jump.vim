@@ -180,9 +180,10 @@ function! zero#dumb_jump#Cword() abort
     call add(patterns, '(' . substitute(regex, s:placeholder, keyword, 'g') . ')')
   endfor
   if len(patterns)
-    " "call add(patterns, '(\b' . keyword . '\b)')
+    " call add(patterns, '(\b' . keyword . '\b)')
     call add(opts, '-i')
-    call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+    " call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+    call add(opts, "\"(" . join(patterns, '|') . ")\"")
   else
     call add(opts, shellescape('\b' . keyword . '\b'))
   endif
