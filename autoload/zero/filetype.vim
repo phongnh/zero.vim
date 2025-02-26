@@ -221,7 +221,7 @@ let s:rg_filetype_mappings = {
       \ 'typescriptreact': 'ts',
       \ }
 
-function! s:RgFileTypeOpts(...) abort
+function! zero#filetype#RgFileTypeOpts(...) abort
   let opts = []
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   let ft = get(s:rg_filetype_mappings, ft, ft)
@@ -237,7 +237,7 @@ function! s:RgFileTypeOpts(...) abort
 endfunction
 
 function! s:RgOpts(keyword) abort
-  let opts = s:RgFileTypeOpts()
+  let opts = zero#filetype#RgFileTypeOpts()
   call add(opts, shellescape(a:keyword))
   return join(opts, ' ')
 endfunction
@@ -258,7 +258,7 @@ function! zero#filetype#RgVword() abort
   return s:RgOpts(zero#Vword())
 endfunction
 
-function! s:GitFileTypeOpts(...) abort
+function! zero#filetype#GitFileTypeOpts(...) abort
   let opts = []
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   let ft = get(s:rg_filetype_mappings, ft, ft)
@@ -279,7 +279,7 @@ endfunction
 
 function! s:GitOpts(keyword) abort
   let opts = [shellescape(a:keyword)]
-  call extend(opts, s:GitFileTypeOpts())
+  call extend(opts, zero#filetype#GitFileTypeOpts())
   return join(opts, ' ')
 endfunction
 

@@ -407,7 +407,7 @@ function! zero#dumb_jump#Cword() abort
     call add(patterns, '(' . substitute(regex, s:placeholder, keyword, 'g') . ')')
   endfor
   if len(patterns)
-    call add(patterns, '(\b' . keyword . '\b)')
+    " "call add(patterns, '(\b' . keyword . '\b)')
     call add(opts, '-i')
     call add(opts, shellescape('(' . join(patterns, '|') . ')'))
   else
@@ -426,9 +426,25 @@ function! zero#dumb_jump#CwordRegex() abort
   if len(patterns)
     call add(opts, '-i')
     call extend(opts, patterns)
-    call add(opts, '-e ' . printf('''\b%s\b''', keyword))
+    " "call add(opts, '-e ' . printf('''\b%s\b''', keyword))
   else
     call add(opts, printf('''\b%s\b''', keyword))
   endif
   return join(opts, ' ')
+endfunction
+
+function! zero#dumb_jump#RgCword() abort
+  return join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#Cword()
+endfunction
+
+function! zero#dumb_jump#RgCwordRegex() abort
+  return join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#CwordRegex()
+endfunction
+
+function! zero#dumb_jump#GitCword() abort
+  return zero#dumb_jump#Cword() . ' ' . join(zero#filetype#GitFileTypeOpts(), ' ')
+endfunction
+
+function! zero#dumb_jump#GitCwordRegex() abort
+  return zero#dumb_jump#CwordRegex() . ' ' . join(zero#filetype#GitFileTypeOpts(), ' ')
 endfunction
