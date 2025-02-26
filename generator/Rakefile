@@ -4,8 +4,7 @@ require "bundler/setup"
 require_relative "lib/download"
 require_relative "lib/extract"
 require_relative "lib/generate"
-
-NAMESPACE = ENV.fetch("NAMESPACE", "zero#dumb_jump")
+require_relative "lib/rg"
 
 task default: [:update]
 
@@ -22,22 +21,10 @@ end
 task :generate do
   input = "dumb-jump-find-rules.el"
   Rake::Task["extract"].invoke unless File.exist?(input)
-  Generate.call(input: input, output: "dumb_jump.vim", namespace: NAMESPACE)
+  Generate.call(input: input, namespace: "zero#dumb_jump")
+  Rg.call(namespace: "zero#rg")
 end
 
-task :install do
-  input = "dumb_jump.vim"
-  Rake::Task["generate"].invoke unless File.exist?(input)
-
-  require "fileutils"
-
-  FileUtils.chdir(File.expand_path("..", __dir__), verbose: true) do
-    filename = "autoload/#{NAMESPACE.gsub("#", "/")}.vim"
-    FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
-    FileUtils.cp("generator/#{input}", filename, verbose: true)
-  end
-end
-
-task build: [:download, :extract, :generate, :install]
+task build: [:download, :extract, :generate]
 
 task update: [:build]

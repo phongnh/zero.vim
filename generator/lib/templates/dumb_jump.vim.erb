@@ -18,7 +18,11 @@ let s:definitions = {
 function! <%= namespace %>#get(...) abort
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   if has_key(s:definitions, ft)
-    return s:definitions[ft]
+    let result = []
+    for [type, regexes] in items(s:definitions[ft])
+      call extend(result, regexes)
+    endfor
+    return result
   endif
   return []
 endfunction

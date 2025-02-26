@@ -1,0 +1,17 @@
+" rg --type-list
+let s:rg_filetypes = [
+<% rg_filetypes.each do |filetype| -%>
+      \ '<%= filetype %>',
+<% end -%>
+      \ ]
+
+" Map vim filetype to rg filetype
+" - key: vim filetype 
+" - value: rg filetype
+let s:rg_filetype_mappings = {
+      \ 'python':          'py',
+      \ 'javascript':      'js',
+      \ 'javascriptreact': 'js',
+      \ 'typescript':      'ts',
+      \ 'typescriptreact': 'ts',
+      \ }

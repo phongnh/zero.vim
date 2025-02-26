@@ -1,3 +1,4 @@
+require "fileutils"
 require "json"
 require "erb"
 require "sxp"
@@ -13,9 +14,10 @@ class Generate
     "typescriptreact" => "typescript",
   }
 
-  def initialize(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim", namespace: "zero#dumb_jump")
+  def initialize(input: "dumb-jump-find-rules.el", namespace: "zero#dumb_jump")
+    @filename = "#{namespace.gsub("#", "/")}.vim"
     @input = input
-    @output = output
+    @output = File.basename(filename)
     @namespace = namespace
   end
 
@@ -52,6 +54,11 @@ class Generate
     File.open(output, "w") { |file| file.puts(vimscript) }
     puts "Saved: #{output}"
 
+    FileUtils.chdir(File.expand_path("../..", __dir__), verbose: true) do
+      FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
+      FileUtils.mv("generator/#{output}", "autoload/#{filename}", verbose: true)
+    end
+
     vimscript
   end
 
@@ -61,5 +68,5 @@ class Generate
 
   private
 
-  attr_reader :input, :output, :namespace
+  attr_reader :input, :filename, :output, :namespace
 end

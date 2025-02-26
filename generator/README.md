@@ -24,16 +24,10 @@ bundle exec rake download
 bundle exec rake extract
 ```
 
-### Step 3: Generate language definitions in VimL from `dumb-jump-find-rules.el`
+### Step 3: Generate and install VimL language definitions from `dumb-jump-find-rules.el`
 
 ```shell
 bundle exec rake generate
-```
-
-### Step 4: Install language definitions to `autoload/zero/dumb_jump.vim`
-
-```
-bundle exec rake install
 ```
 
 ### Run all steps
