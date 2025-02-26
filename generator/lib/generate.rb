@@ -13,13 +13,13 @@ class Generate
   end
 
   def call
-    puts "Reading #{input}"
+    puts "Reading: #{input}"
     source = File.read(input)
 
     puts "Parsing S-expressions from #{input}"
     s_expressions = SXP.read(source)
     # s_expressions = SXP::Reader::Basic.read(source)
-    puts "Found #{s_expressions.count} rules"
+    puts "Found #{s_expressions.count} rules from #{input}"
 
     definitions = s_expressions.map do |s_expression|
       ParseDefinition.call(s_expression)
@@ -37,8 +37,8 @@ class Generate
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)
 
-    puts "Saved #{output}"
     File.open(output, "w") { |file| file.puts(vimscript) }
+    puts "Saved: #{output}"
 
     vimscript
   end

@@ -10,7 +10,7 @@ class Extract
   end
 
   def call
-    puts "Reading #{input}"
+    puts "Reading: #{input}"
     source = File.read(input)
 
     puts "Extracting find-rules from #{input}"

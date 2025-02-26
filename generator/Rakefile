@@ -5,6 +5,8 @@ require_relative "lib/download"
 require_relative "lib/extract"
 require_relative "lib/generate"
 
+NAMESPACE = ENV.fetch("NAMESPACE", "zero#dumb_jump")
+
 task default: [:update]
 
 task :download do
@@ -16,16 +18,19 @@ task :extract do
 end
 
 task :generate do
-  Generate.call(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim")
+  Generate.call(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim", namespace: NAMESPACE)
 end
 
 task :install do
   require "fileutils"
 
-  FileUtils.chdir File.expand_path("..", __dir__) do
-    FileUtils.cp("generator/dumb_jump.vim", "autoload/dumb_jump.vim", verbose: true)
+  FileUtils.chdir(File.expand_path("..", __dir__), verbose: true) do
+    filename = "autoload/#{NAMESPACE.gsub("#", "/")}.vim"
+    FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
+    FileUtils.cp("generator/dumb_jump.vim", filename, verbose: true)
   end
 end
 
-task update: [:download, :extract, :generate, :install] do
-end
+task build: [:download, :extract, :generate, :install]
+
+task update: [:build]
