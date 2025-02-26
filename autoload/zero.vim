@@ -84,6 +84,14 @@ function! s:IsSubstituteCommand(cmd) abort
                 \ a:cmd =~# '^\(silent!\?\s\+\)\?\(c\|l\)\(fdo\|do\)\s\+\(s\|substitute\|S\|Subvert\)/'
 endfunction
 
+function! s:IsGrepperGitCommand(cmd) abort
+    return a:cmd =~# '^\(GrepperGit\)\s'
+endfunction
+
+function! s:IsGrepperCommand(cmd) abort
+    return a:cmd =~# '^\(Grepper\|SGrepper\|LGrepper\|PGrepper\|TGrepper\|GrepperRg\)\s'
+endfunction
+
 function! s:IsGrepCommand(cmd) abort
     return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|grep\|lgrep\)\s' ||
                 \ a:cmd =~# '^\(Ggrep!\?\|Gcgrep!\?\|Glgrep!\?\)\s' ||
@@ -102,6 +110,10 @@ function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#CCword()
+    elseif s:IsGrepperGitCommand(l:cmd)
+        return zero#dumb_jump#GitCword()
+    elseif s:IsGrepperCommand(l:cmd)
+        return zero#dumb_jump#RgCword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
     elseif s:IsCtrlSFCommand(l:cmd)
@@ -117,6 +129,10 @@ function! zero#InsertCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Cword()
+    elseif s:IsGrepperGitCommand(l:cmd)
+        return zero#dumb_jump#Cword()
+    elseif s:IsGrepperCommand(l:cmd)
+        return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
     elseif s:IsCtrlSFCommand(l:cmd)
@@ -132,6 +148,10 @@ function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Word()
+    elseif s:IsGrepperGitCommand(l:cmd)
+        return zero#dumb_jump#Cword()
+    elseif s:IsGrepperCommand(l:cmd)
+        return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Word()
     elseif s:IsCtrlSFCommand(l:cmd)

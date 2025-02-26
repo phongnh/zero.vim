@@ -1,0 +1,33 @@
+require "rubygems"
+require "bundler/setup"
+
+require_relative "lib/download"
+require_relative "lib/extract"
+require_relative "lib/generate"
+require_relative "lib/generate_filetype"
+
+task default: [:update]
+
+task :download do
+  Download.call(output: "dumb-jump.el")
+end
+
+task :extract do
+  input = "dumb-jump.el"
+  Rake::Task["download"].invoke unless File.exist?(input)
+  Extract.call(input: input, output: "dumb-jump-find-rules.el")
+end
+
+task :generate do
+  input = "dumb-jump-find-rules.el"
+  Rake::Task["extract"].invoke unless File.exist?(input)
+  Generate.call(input: input, namespace: "zero#dumb_jump")
+end
+
+task :filetype do
+  GenerateFiletype.call(namespace: "zero#filetype")
+end
+
+task build: [:download, :extract, :generate]
+
+task update: [:build]
