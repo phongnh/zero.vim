@@ -6,6 +6,13 @@ require_relative "parse_definition"
 class Generate
   TEMPLATE  = File.join(__dir__, "templates/dumb_jump.vim.erb")
 
+  LANGUAGE_MAPPINGS = {
+    "c" => "c++",
+    "cpp" => "c++",
+    "javascriptreact" => "javascript",
+    "typescriptreact" => "typescript",
+  }
+
   def initialize(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim", namespace: "zero#dumb_jump")
     @input = input
     @output = output
@@ -30,10 +37,11 @@ class Generate
       group[definition[:language]] ||= []
       group[definition[:language]] << definition
     end
-    definitions["c"] = definitions["c++"]
-    definitions["cpp"] = definitions["c++"]
-    definitions["javascriptreact"] = definitions["javascript"]
-    definitions["typescriptreact"] = definitions["typescript"]
+
+    LANGUAGE_MAPPINGS.each do |key, value|
+      puts "Mapping definitions for #{key.inspect} from #{value.inspect}"
+      definitions[key] = definitions[value]
+    end
 
     puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
