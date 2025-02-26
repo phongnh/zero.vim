@@ -32,6 +32,17 @@ class Generate
       ParseDefinition.call(s_expression)
     end
 
+    puts "Extracting support tools"
+    tools = definitions.each_with_object({}) do |definition, group|
+      language, supports = definition.values_at(:language, :supports)
+      group[language] ||= []
+      group[language].concat(supports).uniq!
+    end
+    LANGUAGE_MAPPINGS.each do |key, value|
+      puts "Mapping tools for #{key.inspect} from #{value.inspect}"
+      tools[key] = tools[value]
+    end
+    
     puts "Formatting #{definitions.count} definitions"
     definitions = definitions.each_with_object({}) do |definition, group|
       group[definition[:language]] ||= []
