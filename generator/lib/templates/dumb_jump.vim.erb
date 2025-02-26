@@ -30,7 +30,7 @@ function! s:Regexes(...) abort
 endfunction
 
 function! <%= namespace %>#Cword() abort
-  let opts = ['i']
+  let opts = ['-i']
   let keyword = expand('<cword>')
   let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
   call add(patterns, '(\b' . keyword . '\b)')
@@ -39,7 +39,7 @@ function! <%= namespace %>#Cword() abort
 endfunction
 
 function! <%= namespace %>#CwordRegex() abort
-  let opts = ['i']
+  let opts = ['-i']
   let keyword = expand('<cword>')
   for regex in s:Regexes()
     let pattern = substitute(regex, s:placeholder, keyword, 'g')

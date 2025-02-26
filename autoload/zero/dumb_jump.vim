@@ -718,7 +718,7 @@ function! s:Regexes(...) abort
 endfunction
 
 function! zero#dumb_jump#Cword() abort
-  let opts = ['i']
+  let opts = ['-i']
   let keyword = expand('<cword>')
   let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
   call add(patterns, '(\b' . keyword . '\b)')
@@ -727,7 +727,7 @@ function! zero#dumb_jump#Cword() abort
 endfunction
 
 function! zero#dumb_jump#CwordRegex() abort
-  let opts = ['i']
+  let opts = ['-i']
   let keyword = expand('<cword>')
   for regex in s:Regexes()
     let pattern = substitute(regex, s:placeholder, keyword, 'g')
