@@ -14,20 +14,27 @@ task :download do
 end
 
 task :extract do
-  Extract.call(input: "dumb-jump.el", output: "dumb-jump-find-rules.el")
+  input = "dumb-jump.el"
+  Rake::Task["download"].invoke unless File.exist?(input)
+  Extract.call(input: input, output: "dumb-jump-find-rules.el")
 end
 
 task :generate do
-  Generate.call(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim", namespace: NAMESPACE)
+  input = "dumb-jump-find-rules.el"
+  Rake::Task["extract"].invoke unless File.exist?(input)
+  Generate.call(input: input, output: "dumb_jump.vim", namespace: NAMESPACE)
 end
 
 task :install do
+  input = "dumb_jump.vim"
+  Rake::Task["generate"].invoke unless File.exist?(input)
+
   require "fileutils"
 
   FileUtils.chdir(File.expand_path("..", __dir__), verbose: true) do
     filename = "autoload/#{NAMESPACE.gsub("#", "/")}.vim"
     FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
-    FileUtils.cp("generator/dumb_jump.vim", filename, verbose: true)
+    FileUtils.cp("generator/#{input}", filename, verbose: true)
   end
 end
 
