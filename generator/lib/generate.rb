@@ -6,9 +6,10 @@ require_relative "parse_definition"
 class Generate
   TEMPLATE  = File.join(__dir__, "templates/dumb_jump.vim.erb")
 
-  def initialize(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim")
+  def initialize(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim", namespace: "zero#dumb_jump")
     @input = input
     @output = output
+    @namespace = namespace
   end
 
   def call
@@ -48,5 +49,5 @@ class Generate
 
   private
 
-  attr_reader :input, :output
+  attr_reader :input, :output, :namespace
 end

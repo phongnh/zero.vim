@@ -1714,22 +1714,10 @@ let s:definitions = {
       \ ],
       \ }
 
-function! lang_map#find_definitions(language) abort
-  if !lang_map#lang_exists(a:language)
-    return []
+function! zero#dumb_jump#get(...) abort
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  if has_key(s:definitions, ft)
+    return s:definitions[ft]
   endif
-
-  return s:definitions[a:language]
-endfunction
-
-function! lang_map#definitions() abort
-  return s:definitions
-endfunction
-
-function! lang_map#lang_exists(language) abort
-  return has_key(s:definitions, a:language)
-endfunction
-
-function! lang_map#get_language_from_filetype(ft) abort
-  return lang_map#lang_exists(a:ft)
+  return []
 endfunction
