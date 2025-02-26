@@ -2,7 +2,7 @@
 
 Code is copied from https://github.com/pechorin/any-jump.vim/tree/master/generator and modified for my usecase.
 
-All credits go to https://github.com/pechorin.
+All credits go to https://github.com/pechorin/any-jump.vim and https://github.com/jacktasia/dumb-jump.
 
 ## Source
 
