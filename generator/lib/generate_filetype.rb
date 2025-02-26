@@ -1,17 +1,29 @@
 require "fileutils"
 require "erb"
 
-class Rg
-  TEMPLATE  = File.join(__dir__, "templates/rg.vim.erb")
+class GenerateFiletype
+  TEMPLATE  = File.join(__dir__, "templates/filetype.vim.erb")
 
-  def initialize(namespace: "zero#rg")
+  def initialize(namespace: "zero#filetype")
     @filename = "#{namespace.gsub("#", "/")}.vim"
     @output = File.basename(filename)
     @namespace = namespace
   end
 
   def call
-    rg_filetypes = `rg --type-list | cut -d ':' -f 1`.split
+    rg_filetypes = `rg --type-list`.each_line.reduce({}) do |hash, line|
+      filetype, extensions = line.chomp.split(": ", 2)
+      extensions = extensions.split(", ").map do |ext|
+        md = ext.match(/^*\.\{(.*)\}$/)
+        if md
+          md[1].split(",").map { |ext| "*.#{ext}" }
+        else
+          ext
+        end
+      end
+      hash[filetype] = extensions.flatten
+      hash
+    end
 
     puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")

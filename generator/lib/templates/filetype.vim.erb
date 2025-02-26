@@ -1,0 +1,87 @@
+" rg --type-list
+let s:rg_filetypes = {
+<% rg_filetypes.each do |filetype, extensions| -%>
+      \ '<%= filetype %>': [<%= extensions.map { |ext| "'#{ext}'" }.join(", ") %>],
+<% end -%>
+      \ }
+
+" Map vim filetype to rg filetype
+" - key: vim filetype 
+" - value: rg filetype
+let s:rg_filetype_mappings = {
+      \ 'python':          'py',
+      \ 'javascript':      'js',
+      \ 'javascriptreact': 'js',
+      \ 'typescript':      'ts',
+      \ 'typescriptreact': 'ts',
+      \ }
+
+function! s:RgFileTypeOpts(...) abort
+  let opts = []
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && has_key(s:rg_filetypes, ft)
+    call add(opts, '-t ' . ft)
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
+
+function! s:RgOpts(keyword) abort
+  let opts = s:RgFileTypeOpts()
+  call add(opts, shellescape(a:keyword))
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#RgCCword() abort
+  return s:RgOpts(zero#CCword())
+endfunction
+
+function! <%= namespace %>#RgCword() abort
+  return s:RgOpts(zero#Cword())
+endfunction
+
+function! <%= namespace %>#RgCword() abort
+  return s:RgOpts(zero#Vword())
+endfunction
+
+function! s:GitFileTypeOpts(...) abort
+  let opts = []
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && has_key(s:rg_filetypes, ft)
+    call add(opts, '--')
+    for ext in s:rg_filetypes[ft]
+      call add(opts, shellescape(ext))
+    endfor
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '--')
+      call add(opts, shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
+
+function! s:GitOpts(keyword) abort
+  let opts = [shellescape(a:keyword)]
+  call extend(opts, s:GitFileTypeOpts())
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#GitCCword() abort
+  return s:GitOpts(zero#CCword())
+endfunction
+
+function! <%= namespace %>#GitCword() abort
+  return s:GitOpts(zero#Cword())
+endfunction
+
+function! <%= namespace %>#GitVword() abort
+  return s:GitOpts(zero#Vword())
+endfunction

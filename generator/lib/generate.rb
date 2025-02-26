@@ -48,19 +48,6 @@ class Generate
     end
 
     placeholder = ParseDefinition::PLACEHOLDER
-    rg_filetypes = `rg --type-list`.each_line.reduce({}) do |hash, line|
-      filetype, extensions = line.chomp.split(": ", 2)
-      extensions = extensions.split(", ").map do |ext|
-        md = ext.match(/^*\.\{(.*)\}$/)
-        if md
-          md[1].split(",").map { |ext| "*.#{ext}" }
-        else
-          ext
-        end
-      end
-      hash[filetype] = extensions.flatten
-      hash
-    end
 
     puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
