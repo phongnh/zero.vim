@@ -1,12 +1,6 @@
 " NOTES:
 " - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
-let s:tools = {
-<% tools.each do |language, supports| -%>
-      \ '<%= language %>': [<%= supports.map { |engine| "'#{engine}'" }.join(", ") %>],
-<% end -%>
-      \ }
-
 let s:rules = {
 <% rules.each do |language, details| -%>
       \ '<%= language %>': {
