@@ -394,11 +394,7 @@ let s:definitions = {
 function! s:Regexes(...) abort
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   if has_key(s:definitions, ft)
-    let result = []
-    for [type, regexes] in items(s:definitions[ft])
-      call extend(result, regexes)
-    endfor
-    return result
+    return s:definitions[ft]
   endif
   return []
 endfunction
