@@ -4,6 +4,7 @@ require "bundler/setup"
 require_relative "lib/download"
 require_relative "lib/extract"
 require_relative "lib/generate"
+require_relative "lib/rg"
 
 task default: [:update]
 
@@ -21,6 +22,7 @@ task :generate do
   input = "dumb-jump-find-rules.el"
   Rake::Task["extract"].invoke unless File.exist?(input)
   Generate.call(input: input, namespace: "zero#dumb_jump")
+  Rg.call(namespace: "zero#rg")
 end
 
 task build: [:download, :extract, :generate]
