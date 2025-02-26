@@ -72,24 +72,6 @@ command! -nargs=*                                             OpenGitHubPRs    c
 command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
 command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
 
-" Insert mappings {{{
-if get(g:, 'zero_vim_insert_mappings', 1)
-    cnoremap <C-r><C-w> <C-r>=zero#InsertCword()<CR>
-    cnoremap <C-r><C-b> <C-r>=zero#InsertCCword()<CR>
-    cnoremap <C-r><C-t> <C-r>=zero#InsertWord()<CR>
-    cnoremap <C-r><C-v> <C-r>=zero#InsertVword()<CR>
-    cnoremap <C-r><C-_> <C-r>=zero#InsertPword()<CR>
-    cnoremap <C-r>?     <C-r>=zero#InsertGrepPword()<CR>
-    cnoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
-    inoremap <C-r><C-d> <C-r>=expand("%:p:h")<CR>
-    " <C-r><C-h>: Innsert buffer project dir
-    inoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
-    cnoremap <C-r><C-h> <C-r>=zero#project#find()<CR>
-    " Insert GitHub PR url
-    inoremap <C-x>g <C-r>=zero#github#InsertPR()<CR>
-endif
-" }}}
-
 " Toggle mappings {{{
 call zero#setup#ToggleMappings()
 
