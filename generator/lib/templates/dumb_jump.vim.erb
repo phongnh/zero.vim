@@ -1,0 +1,60 @@
+" NOTES:
+" - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
+
+let s:definitions = {
+<% definitions.each do |language, rules| -%>
+      \ '<%= language %>': [
+<% rules.each do |rule| -%>
+      \   {
+      \     'type': '<%= rule[:type] %>',
+      \     'pcre_regex': '<%= rule[:pcre_regex_vim] %>',
+      \     'regex': '<%= rule[:regex_vim] %>',
+      \   },
+<% end -%>
+      \ ],
+<% end -%>
+      \ }
+
+" map any-language to concrete internal s:definitions[language]
+let s:filetypes_proxy = {
+      \ 'javascriptreact': 'javascript',
+      \ 'c': 'cpp',
+      \ }
+
+function! s:add_definition(lang, definition) abort
+  if !has_key(s:definitions, a:lang)
+    let s:definitions[a:lang] = []
+  endif
+
+  call add(s:definitions[a:lang], a:definition)
+endfunction
+
+function! lang_map#find_definitions(language) abort
+  if !lang_map#lang_exists(a:language)
+    return
+  endif
+
+  return s:definitions[a:language]
+endfunction
+
+function! lang_map#definitions() abort
+  return s:definitions
+endfunction
+
+function! lang_map#lang_exists(language) abort
+  return has_key(s:definitions, a:language)
+endfunction
+
+function! lang_map#get_language_from_filetype(ft) abort
+  if has_key(s:filetypes_proxy, a:ft)
+    let maybe_lan = s:filetypes_proxy[a:ft]
+  else
+    let maybe_lan = a:ft
+  endif
+
+  if lang_map#lang_exists(maybe_lan)
+    return maybe_lan
+  else
+    return 0
+  endif
+endfunction

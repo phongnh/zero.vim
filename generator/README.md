@@ -6,19 +6,25 @@ https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
 ## Build process
 
-### Step 1: Download source and extract definitions
+### Step 1: Download `dump-jump.el`
 
 ```shell
 bundle exec rake download
 ```
 
-### Step 2: Generate language definitions in VimL
+### Step 2: Extract definitions
+
+```shell
+bundle exec rake extract
+```
+
+### Step 3: Generate language definitions in VimL
 
 ```shell
 bundle exec rake generate
 ```
 
-### Step 3: Install language definitions to `autoload`
+### Step 4: Install language definitions to `autoload`
 
 ```
 bundle exec rake install

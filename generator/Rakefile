@@ -1,40 +1,31 @@
-require 'rubygems'
-require 'bundler/setup'
+require "rubygems"
+require "bundler/setup"
 
-require './lib/download.rb'
-require './lib/generate.rb'
+require_relative "lib/download"
+require_relative "lib/extract"
+require_relative "lib/generate"
 
 task default: [:update]
 
 task :download do
-  result = Download.new.call
-  file   = File.new('./lang_map_downloaded.el', 'w')
-  bytes  = file.write(result)
-  file.close
+  Download.call(output: "dumb-jump.el")
+end
 
-  puts "Downloading and extracting lisp language map completed: #{bytes} bytes"
+task :extract do
+  Extract.call(input: "dumb-jump.el", output: "dumb-jump-find-rules.el")
 end
 
 task :generate do
-  in_file_path  = './lang_map_downloaded.el' || ENV['IN']
-  out_file_path = './lang_map_generated.vim' || ENV['OUT']
-
-  Generate.new(in_file_path, out_file_path).call
-
-  puts "lang map generated at #{out_file_path}"
+  Generate.call(input: "dumb-jump-find-rules.el", output: "dumb_jump.vim")
 end
 
 task :install do
-  require 'fileutils'
+  require "fileutils"
 
-  in_file_path  = './lang_map_generated.vim' || ENV['IN']
-  out_file_path = '../autoload/lang_map.vim' || ENV['OUT']
-
-  FileUtils.cp(in_file_path, out_file_path)
-
-  puts "lang map installed at #{out_file_path}"
+  FileUtils.chdir File.expand_path("..", __dir__) do
+    FileUtils.cp("generator/dumb_jump.vim", "autoload/dumb_jump.vim", verbose: true)
+  end
 end
 
-task :update => [ :download, :generate, :install ] do
-  puts "update finished"
+task update: [:download, :extract, :generate, :install] do
 end
