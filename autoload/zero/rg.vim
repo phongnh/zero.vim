@@ -220,3 +220,18 @@ let s:rg_filetype_mappings = {
       \ 'typescript':      'ts',
       \ 'typescriptreact': 'ts',
       \ }
+
+function! zero#rg#get(...) abort
+  let opts = []
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && index(s:rg_filetypes, ft) > -1
+    call add(opts, '-t ' . ft)
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
