@@ -18,11 +18,11 @@ let s:definitions = {
       \ }
 
 " rg --type-list
-let s:rg_filetypes = [
-<% rg_filetypes.each do |filetype| -%>
-      \ '<%= filetype %>',
+let s:rg_filetypes = {
+<% rg_filetypes.each do |filetype, extensions| -%>
+      \ '<%= filetype %>': [<%= extensions.map { |ext| "'#{ext}'" }.join(", ") %>],
 <% end -%>
-      \ ]
+      \ }
 
 " Map vim filetype to rg filetype
 " - key: vim filetype 
@@ -35,16 +35,35 @@ let s:rg_filetype_mappings = {
       \ 'typescriptreact': 'ts',
       \ }
 
-function! s:TypeOpts(...) abort
-  let opts = ['-i']
+function! s:RgFileTypeOpts(...) abort
+  let opts = []
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   let ft = get(s:rg_filetype_mappings, ft, ft)
-  if strlen(ft) && index(s:rg_filetypes, ft) > -1
+  if strlen(ft) && has_key(s:rg_filetypes, ft)
     call add(opts, '-t ' . ft)
   else
     let ext = expand('%:e')
     if strlen(ext)
       call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
+
+function! s:GitFileTypeOpts(...) abort
+  let opts = []
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && has_key(s:rg_filetypes, ft)
+    call add(opts, '--')
+    for ext in s:rg_filetypes[ft]
+      call add(opts, shellescape(ext))
+    endfor
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '--')
+      call add(opts, shellescape(printf('*.{%s}', ext)))
     endif
   endif
   return opts
@@ -62,8 +81,17 @@ function! s:Regexes(...) abort
   return []
 endfunction
 
+function! <%= namespace %>#Cword(...) abort
+  let opts = ['i']
+  let keyword = expand('<cword>')
+  let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
+  call add(patterns, '(\b' . keyword . '\b)')
+  call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+  return join(opts, ' ')
+endfunction
+
 function! <%= namespace %>#CwordRegex() abort
-  let opts = s:TypeOpts()
+  let opts = ['i']
   let keyword = expand('<cword>')
   for regex in s:Regexes()
     let pattern = substitute(regex, s:placeholder, keyword, 'g')
@@ -73,12 +101,8 @@ function! <%= namespace %>#CwordRegex() abort
   return join(opts, ' ')
 endfunction
 
-function! <%= namespace %>#CCwordRegex() abort
-  return <%= namespace %>#CwordRegex()
-endfunction
-
-function! <%= namespace %>#Cword() abort
-  let opts = s:TypeOpts()
+function! <%= namespace %>#RgCword() abort
+  let opts = s:RgFileTypeOpts()
   let keyword = expand('<cword>')
   let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
   call add(patterns, '(\b' . keyword . '\b)')
@@ -86,6 +110,35 @@ function! <%= namespace %>#Cword() abort
   return join(opts, ' ')
 endfunction
 
-function! <%= namespace %>#CCword() abort
-  return <%= namespace %>#Cword()
+function! <%= namespace %>#RgCwordRegex() abort
+  let opts = s:RgFileTypeOpts()
+  let keyword = expand('<cword>')
+  for regex in s:Regexes()
+    let pattern = substitute(regex, s:placeholder, keyword, 'g')
+    call add(opts, '-e ' . shellescape(pattern))
+  endfor
+  call add(opts, '-e ' . printf('''\b%s\b''', keyword))
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#GitCword() abort
+  let opts = ['-i']
+  let keyword = expand('<cword>')
+  let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
+  call add(patterns, '(\b' . keyword . '\b)')
+  call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+  call extend(opts, s:GitFileTypeOpts())
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#GitCwordRegex() abort
+  let opts = ['-i']
+  let keyword = expand('<cword>')
+  for regex in s:Regexes()
+    let pattern = substitute(regex, s:placeholder, keyword, 'g')
+    call add(opts, '-e ' . shellescape(pattern))
+  endfor
+  call add(opts, '-e ' . printf('''\b%s\b''', keyword))
+  call extend(opts, s:GitFileTypeOpts())
+  return join(opts, ' ')
 endfunction
