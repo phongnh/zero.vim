@@ -33,7 +33,7 @@ class Extract
     puts "Saved: #{raw_output}"
 
     # Remove comments
-    source = source.select { |line| !line.start_with?(/\s{2,};;?/) }
+    source = source.select { |line| !line.start_with?(/\s{2,};;?\s/) }
     File.open(output, "w") { |file| file.puts(source) }
     puts "Saved: #{output}"
 

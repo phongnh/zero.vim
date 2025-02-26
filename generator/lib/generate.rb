@@ -19,12 +19,13 @@ class Generate
     puts "Parsing S-expressions from #{input}"
     s_expressions = SXP.read(source)
     # s_expressions = SXP::Reader::Basic.read(source)
-    puts "Found #{s_expressions.count} rules from #{input}"
 
+    puts "Parsing #{s_expressions.count} found definition rules from #{input}"
     definitions = s_expressions.map do |s_expression|
       ParseDefinition.call(s_expression)
     end
 
+    puts "Formatting #{definitions.count} definitions"
     definitions = definitions.each_with_object({}) do |definition, group|
       group[definition[:language]] ||= []
       group[definition[:language]] << definition
@@ -34,6 +35,7 @@ class Generate
     definitions["javascriptreact"] = definitions["javascript"]
     definitions["typescriptreact"] = definitions["typescript"]
 
+    puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)
 
