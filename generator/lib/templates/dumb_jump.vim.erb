@@ -7,6 +7,20 @@ let s:tools = {
 <% end -%>
       \ }
 
+let s:rules = {
+<% rules.each do |language, details| -%>
+      \ '<%= language %>': {
+<% details.each do |key, value| -%>
+      \   '<%= key %>': [
+<% value.each do |regex| -%>
+      \     <%= "'#{regex}'" %>,
+<% end -%>
+      \   ],
+<% end -%>
+      \ },
+<% end -%>
+      \ }
+
 let s:definitions = {
 <% definitions.each do |language, rules| -%>
       \ '<%= language %>': [
