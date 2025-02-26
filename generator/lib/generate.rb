@@ -47,6 +47,9 @@ class Generate
       definitions[key] = definitions[value]
     end
 
+    placeholder = ParseDefinition::PLACEHOLDER
+    rg_filetypes = `rg --type-list | cut -d ':' -f 1`.split
+
     puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)

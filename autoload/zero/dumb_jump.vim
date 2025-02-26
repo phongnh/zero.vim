@@ -1,6 +1,8 @@
 " NOTES:
 " - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
+let s:placeholder = 'KEYWORD'
+
 let s:definitions = {
       \ 'elisp': {
       \   'function': [
@@ -703,7 +705,245 @@ let s:definitions = {
       \ },
       \ }
 
-function! zero#dumb_jump#get(...) abort
+" rg --type-list
+let s:rg_filetypes = [
+      \ 'ada',
+      \ 'agda',
+      \ 'aidl',
+      \ 'alire',
+      \ 'amake',
+      \ 'asciidoc',
+      \ 'asm',
+      \ 'asp',
+      \ 'ats',
+      \ 'avro',
+      \ 'awk',
+      \ 'bat',
+      \ 'batch',
+      \ 'bazel',
+      \ 'bitbake',
+      \ 'brotli',
+      \ 'buildstream',
+      \ 'bzip2',
+      \ 'c',
+      \ 'cabal',
+      \ 'candid',
+      \ 'carp',
+      \ 'cbor',
+      \ 'ceylon',
+      \ 'clojure',
+      \ 'cmake',
+      \ 'cmd',
+      \ 'cml',
+      \ 'coffeescript',
+      \ 'config',
+      \ 'coq',
+      \ 'cpp',
+      \ 'creole',
+      \ 'crystal',
+      \ 'cs',
+      \ 'csharp',
+      \ 'cshtml',
+      \ 'csproj',
+      \ 'css',
+      \ 'csv',
+      \ 'cuda',
+      \ 'cython',
+      \ 'd',
+      \ 'dart',
+      \ 'devicetree',
+      \ 'dhall',
+      \ 'diff',
+      \ 'dita',
+      \ 'docker',
+      \ 'dockercompose',
+      \ 'dts',
+      \ 'dvc',
+      \ 'ebuild',
+      \ 'edn',
+      \ 'elisp',
+      \ 'elixir',
+      \ 'elm',
+      \ 'erb',
+      \ 'erlang',
+      \ 'fennel',
+      \ 'fidl',
+      \ 'fish',
+      \ 'flatbuffers',
+      \ 'fortran',
+      \ 'fsharp',
+      \ 'fut',
+      \ 'gap',
+      \ 'gn',
+      \ 'go',
+      \ 'gprbuild',
+      \ 'gradle',
+      \ 'graphql',
+      \ 'groovy',
+      \ 'gzip',
+      \ 'h',
+      \ 'haml',
+      \ 'hare',
+      \ 'haskell',
+      \ 'hbs',
+      \ 'hs',
+      \ 'html',
+      \ 'hy',
+      \ 'idris',
+      \ 'images',
+      \ 'janet',
+      \ 'java',
+      \ 'jinja',
+      \ 'jl',
+      \ 'js',
+      \ 'json',
+      \ 'jsonl',
+      \ 'julia',
+      \ 'jupyter',
+      \ 'k',
+      \ 'kotlin',
+      \ 'lean',
+      \ 'less',
+      \ 'license',
+      \ 'lilypond',
+      \ 'lisp',
+      \ 'lock',
+      \ 'log',
+      \ 'lua',
+      \ 'lz4',
+      \ 'lzma',
+      \ 'm4',
+      \ 'make',
+      \ 'mako',
+      \ 'man',
+      \ 'markdown',
+      \ 'matlab',
+      \ 'md',
+      \ 'meson',
+      \ 'minified',
+      \ 'mint',
+      \ 'mk',
+      \ 'ml',
+      \ 'motoko',
+      \ 'msbuild',
+      \ 'nim',
+      \ 'nix',
+      \ 'objc',
+      \ 'objcpp',
+      \ 'ocaml',
+      \ 'org',
+      \ 'pants',
+      \ 'pascal',
+      \ 'pdf',
+      \ 'perl',
+      \ 'php',
+      \ 'po',
+      \ 'pod',
+      \ 'postscript',
+      \ 'prolog',
+      \ 'protobuf',
+      \ 'ps',
+      \ 'puppet',
+      \ 'purs',
+      \ 'py',
+      \ 'python',
+      \ 'qmake',
+      \ 'qml',
+      \ 'r',
+      \ 'racket',
+      \ 'rails',
+      \ 'raku',
+      \ 'rdoc',
+      \ 'readme',
+      \ 'reasonml',
+      \ 'red',
+      \ 'rescript',
+      \ 'robot',
+      \ 'rst',
+      \ 'ruby',
+      \ 'rust',
+      \ 'sass',
+      \ 'scala',
+      \ 'sh',
+      \ 'slim',
+      \ 'smarty',
+      \ 'sml',
+      \ 'solidity',
+      \ 'soy',
+      \ 'spark',
+      \ 'spec',
+      \ 'sql',
+      \ 'stylus',
+      \ 'sv',
+      \ 'svelte',
+      \ 'svg',
+      \ 'swift',
+      \ 'swig',
+      \ 'systemd',
+      \ 'taskpaper',
+      \ 'tcl',
+      \ 'tex',
+      \ 'texinfo',
+      \ 'textile',
+      \ 'tf',
+      \ 'thrift',
+      \ 'toml',
+      \ 'ts',
+      \ 'twig',
+      \ 'txt',
+      \ 'typescript',
+      \ 'typoscript',
+      \ 'usd',
+      \ 'v',
+      \ 'vala',
+      \ 'vb',
+      \ 'vcl',
+      \ 'verilog',
+      \ 'vhdl',
+      \ 'vim',
+      \ 'vimscript',
+      \ 'vue',
+      \ 'webidl',
+      \ 'wgsl',
+      \ 'wiki',
+      \ 'xml',
+      \ 'xz',
+      \ 'yacc',
+      \ 'yaml',
+      \ 'yang',
+      \ 'z',
+      \ 'zig',
+      \ 'zsh',
+      \ 'zstd',
+      \ ]
+
+" Map vim filetype to rg filetype
+" - key: vim filetype 
+" - value: rg filetype
+let s:rg_filetype_mappings = {
+      \ 'python':          'py',
+      \ 'javascript':      'js',
+      \ 'javascriptreact': 'js',
+      \ 'typescript':      'ts',
+      \ 'typescriptreact': 'ts',
+      \ }
+
+function! s:TypeOpts(...) abort
+  let opts = ['-i']
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && index(s:rg_filetypes, ft) > -1
+    call add(opts, '-t ' . ft)
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
+
+function! s:Regexes(...) abort
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   if has_key(s:definitions, ft)
     let result = []
@@ -713,4 +953,32 @@ function! zero#dumb_jump#get(...) abort
     return result
   endif
   return []
+endfunction
+
+function! zero#dumb_jump#CwordRegex() abort
+  let opts = s:TypeOpts()
+  let keyword = expand('<cword>')
+  for regex in s:Regexes()
+    let pattern = substitute(regex, s:placeholder, keyword, 'g')
+    call add(opts, '-e ' . shellescape(pattern))
+  endfor
+  call add(opts, '-e ' . printf('''\b%s\b''', keyword))
+  return join(opts, ' ')
+endfunction
+
+function! zero#dumb_jump#CCwordRegex() abort
+  return zero#dumb_jump#CwordRegex()
+endfunction
+
+function! zero#dumb_jump#Cword() abort
+  let opts = s:TypeOpts()
+  let keyword = expand('<cword>')
+  let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
+  call add(patterns, '(\b' . keyword . '\b)')
+  call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+  return join(opts, ' ')
+endfunction
+
+function! zero#dumb_jump#CCword() abort
+  return zero#dumb_jump#Cword()
 endfunction

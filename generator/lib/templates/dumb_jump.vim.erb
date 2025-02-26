@@ -1,6 +1,8 @@
 " NOTES:
 " - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
+let s:placeholder = '<%= placeholder %>'
+
 let s:definitions = {
 <% definitions.each do |language, rules| -%>
       \ '<%= language %>': {
@@ -15,7 +17,40 @@ let s:definitions = {
 <% end -%>
       \ }
 
-function! <%= namespace %>#get(...) abort
+" rg --type-list
+let s:rg_filetypes = [
+<% rg_filetypes.each do |filetype| -%>
+      \ '<%= filetype %>',
+<% end -%>
+      \ ]
+
+" Map vim filetype to rg filetype
+" - key: vim filetype 
+" - value: rg filetype
+let s:rg_filetype_mappings = {
+      \ 'python':          'py',
+      \ 'javascript':      'js',
+      \ 'javascriptreact': 'js',
+      \ 'typescript':      'ts',
+      \ 'typescriptreact': 'ts',
+      \ }
+
+function! s:TypeOpts(...) abort
+  let opts = ['-i']
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  let ft = get(s:rg_filetype_mappings, ft, ft)
+  if strlen(ft) && index(s:rg_filetypes, ft) > -1
+    call add(opts, '-t ' . ft)
+  else
+    let ext = expand('%:e')
+    if strlen(ext)
+      call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
+    endif
+  endif
+  return opts
+endfunction
+
+function! s:Regexes(...) abort
   let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
   if has_key(s:definitions, ft)
     let result = []
@@ -25,4 +60,32 @@ function! <%= namespace %>#get(...) abort
     return result
   endif
   return []
+endfunction
+
+function! <%= namespace %>#CwordRegex() abort
+  let opts = s:TypeOpts()
+  let keyword = expand('<cword>')
+  for regex in s:Regexes()
+    let pattern = substitute(regex, s:placeholder, keyword, 'g')
+    call add(opts, '-e ' . shellescape(pattern))
+  endfor
+  call add(opts, '-e ' . printf('''\b%s\b''', keyword))
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#CCwordRegex() abort
+  return <%= namespace %>#CwordRegex()
+endfunction
+
+function! <%= namespace %>#Cword() abort
+  let opts = s:TypeOpts()
+  let keyword = expand('<cword>')
+  let patterns = map(s:Regexes(), { _, regex -> '(' . substitute(regex, s:placeholder, keyword, 'g') . ')' })
+  call add(patterns, '(\b' . keyword . '\b)')
+  call add(opts, shellescape('(' . join(patterns, '|') . ')'))
+  return join(opts, ' ')
+endfunction
+
+function! <%= namespace %>#CCword() abort
+  return <%= namespace %>#Cword()
 endfunction
