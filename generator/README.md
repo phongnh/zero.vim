@@ -1,4 +1,8 @@
-# Modified version of https://github.com/pechorin/any-jump.vim/tree/master/generator
+# dumb-jump-generator
+
+Code is copied from https://github.com/pechorin/any-jump.vim/tree/master/generator and modified for my usecase.
+
+All credits go to https://github.com/pechorin.
 
 ## Source
 
