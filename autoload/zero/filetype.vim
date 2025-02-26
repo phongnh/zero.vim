@@ -250,7 +250,11 @@ function! zero#filetype#RgCword() abort
   return s:RgOpts(zero#Cword())
 endfunction
 
-function! zero#filetype#RgCword() abort
+function! zero#filetype#RgWord() abort
+  return s:RgOpts(zero#Word())
+endfunction
+
+function! zero#filetype#RgVword() abort
   return s:RgOpts(zero#Vword())
 endfunction
 
@@ -285,6 +289,10 @@ endfunction
 
 function! zero#filetype#GitCword() abort
   return s:GitOpts(zero#Cword())
+endfunction
+
+function! zero#filetype#GitWord() abort
+  return s:GitOpts(zero#Word())
 endfunction
 
 function! zero#filetype#GitVword() abort

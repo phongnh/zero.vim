@@ -45,7 +45,11 @@ function! <%= namespace %>#RgCword() abort
   return s:RgOpts(zero#Cword())
 endfunction
 
-function! <%= namespace %>#RgCword() abort
+function! <%= namespace %>#RgWord() abort
+  return s:RgOpts(zero#Word())
+endfunction
+
+function! <%= namespace %>#RgVword() abort
   return s:RgOpts(zero#Vword())
 endfunction
 
@@ -80,6 +84,10 @@ endfunction
 
 function! <%= namespace %>#GitCword() abort
   return s:GitOpts(zero#Cword())
+endfunction
+
+function! <%= namespace %>#GitWord() abort
+  return s:GitOpts(zero#Word())
 endfunction
 
 function! <%= namespace %>#GitVword() abort
