@@ -14,6 +14,27 @@ class Generate
     "typescriptreact" => "typescript",
   }
 
+  ENABLED_LANGUAGES = [
+    "c++",
+    "python",
+    "ruby",
+    "crystal",
+    "shell",
+    "dart",
+    "fennel",
+    "go",
+    "javascript",
+    "hcl",
+    "typescript",
+    "lua",
+    "rust",
+    "elixir",
+    "erlang",
+    "sql",
+    "zig",
+    "protobuf",
+  ]
+
   def initialize(input: "dumb-jump-find-rules.el", namespace: "zero#dumb_jump")
     @filename = "#{namespace.gsub("#", "/")}.vim"
     @input = input
@@ -37,6 +58,7 @@ class Generate
     puts "Formatting #{definitions.count} definitions"
     definitions = definitions.each_with_object({}) do |definition, group|
       language = definition[:language]
+      next unless ENABLED_LANGUAGES.include?(language)
       group[language] ||= []
       group[language] << definition[:pcre_regex_vim]
     end
