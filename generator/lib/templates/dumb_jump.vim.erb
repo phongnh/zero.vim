@@ -1,32 +1,17 @@
 " NOTES:
 " - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
-let s:rules = {
-<% rules.each do |language, details| -%>
+let s:definitions = {
+<% definitions.each do |language, rules| -%>
       \ '<%= language %>': {
-<% details.each do |key, value| -%>
+<% rules.each do |key, regexes| -%>
       \   '<%= key %>': [
-<% value.each do |regex| -%>
+<% regexes.each do |regex| -%>
       \     <%= "'#{regex}'" %>,
 <% end -%>
       \   ],
 <% end -%>
       \ },
-<% end -%>
-      \ }
-
-let s:definitions = {
-<% definitions.each do |language, rules| -%>
-      \ '<%= language %>': [
-<% rules.each do |rule| -%>
-      \   {
-      \     'type': '<%= rule[:type] %>',
-      \     'pcre_regex': '<%= rule[:pcre_regex_vim] %>',
-      \     'regex': '<%= rule[:regex_vim] %>',
-      \     'supports': [<%= rule[:supports].map { |engine| "'#{engine}'" }.join(", ") %>],
-      \   },
-<% end -%>
-      \ ],
 <% end -%>
       \ }
 

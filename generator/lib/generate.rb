@@ -33,16 +33,11 @@ class Generate
     end
 
     puts "Formatting #{definitions.count} definitions"
-    rules = definitions.each_with_object({}) do |definition, group|
+    definitions = definitions.each_with_object({}) do |definition, group|
       language, type = definition.values_at(:language, :type)
       group[language] ||= {}
-      group[language][type.to_sym] ||= []
-      group[language][type.to_sym] << definition[:pcre_regex_vim]
-    end
-
-    definitions = definitions.each_with_object({}) do |definition, group|
-      group[definition[:language]] ||= []
-      group[definition[:language]] << definition
+      group[language][type] ||= []
+      group[language][type] << definition[:pcre_regex_vim]
     end
 
     LANGUAGE_MAPPINGS.each do |key, value|
