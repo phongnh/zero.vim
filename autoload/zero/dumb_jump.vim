@@ -173,7 +173,6 @@ function! s:Regexes(...) abort
 endfunction
 
 function! zero#dumb_jump#Cword() abort
-  let opts = []
   let keyword = expand('<cword>')
   let patterns = []
   for regex in s:Regexes()
@@ -181,38 +180,31 @@ function! zero#dumb_jump#Cword() abort
   endfor
   if len(patterns)
     " call add(patterns, '(\b' . keyword . '\b)')
-    call add(opts, '-i')
-    " call add(opts, shellescape('(' . join(patterns, '|') . ')'))
-    call add(opts, "\"(" . join(patterns, '|') . ")\"")
-  else
-    call add(opts, shellescape('\b' . keyword . '\b'))
+    " return shellescape('(' . join(patterns, '|') . ')')
+    return "\"(" . join(patterns, '|') . ")\""
   endif
-  return join(opts, ' ')
+  return shellescape('\b' . keyword . '\b')
 endfunction
 
 function! zero#dumb_jump#CwordRegex() abort
-  let opts = []
   let keyword = expand('<cword>')
   let patterns = []
   for regex in s:Regexes()
     call add(patterns, '-e ' . shellescape(substitute(regex, s:placeholder, keyword, 'g')))
   endfor
   if len(patterns)
-    call add(opts, '-i')
-    call extend(opts, patterns)
-    " "call add(opts, '-e ' . printf('''\b%s\b''', keyword))
-  else
-    call add(opts, printf('''\b%s\b''', keyword))
+    " call add(patterns, '-e ' . printf('''\b%s\b''', keyword))
+    return join(patterns, ' ')
   endif
-  return join(opts, ' ')
+  return printf('''\b%s\b''', keyword)
 endfunction
 
 function! zero#dumb_jump#RgCword() abort
-  return join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#Cword()
+  return '-s ' . join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#Cword()
 endfunction
 
 function! zero#dumb_jump#RgCwordRegex() abort
-  return join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#CwordRegex()
+  return '-s ' . join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . zero#dumb_jump#CwordRegex()
 endfunction
 
 function! zero#dumb_jump#GitCword() abort
