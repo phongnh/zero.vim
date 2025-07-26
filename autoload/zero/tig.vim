@@ -33,7 +33,6 @@ function! s:TigEnvDict(cwd) abort
     return {
                 \ 'TIGRC_USER':          shellescape(s:tigrc_user_path),
                 \ 'TIG_VIM_ACTION_FILE': shellescape(s:GetTigVimActionFile()),
-                \ 'TIG_VIM_CWD':         shellescape(a:cwd),
                 \ }
 endfunction
 
