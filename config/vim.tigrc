@@ -1,3 +1,7 @@
+# Source User configurations
+source -q ~/.config/tig/config
+source -q ~/.tigrc
+
 ############
 # Settings #
 ############
@@ -18,15 +22,15 @@ bind generic <Ctrl-b> scroll-page-up
 # Diff View #
 #############
 # Move in diff view with arrow keys
-bind diff <Up> move-up
+bind diff <Up>   move-up
 bind diff <Down> move-down
 
 ################
 # VIM Mappings #
 ################
-bind generic e        <sh -c 'echo "edit    +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
-bind generic <Ctrl-x> <sh -c 'echo "split   +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
-bind generic <Ctrl-v> <sh -c 'echo "vsplit  +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic e        <sh -c 'echo    "edit +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic <Ctrl-x> <sh -c 'echo   "split +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
+bind generic <Ctrl-v> <sh -c 'echo  "vsplit +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
 bind generic <Ctrl-t> <sh -c 'echo "tabedit +%(lineno) %(repo:git-dir)/../%(file)" > "$TIG_VIM_ACTION_FILE"'
 
 ###############
