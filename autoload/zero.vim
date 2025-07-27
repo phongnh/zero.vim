@@ -19,7 +19,7 @@ function! zero#LogCommand(cmd, ...) abort
         if strlen(l:tag)
             let l:tag = '[' . l:tag . '] '
         endif
-        call s:Print('Running: ' . l:tag . a:cmd)
+        call s:Print('Running: ' . l:tag . string(a:cmd))
     endif
 endfunction
 

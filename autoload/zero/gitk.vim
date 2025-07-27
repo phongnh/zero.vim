@@ -1,20 +1,13 @@
 " Gitk
-let s:gitk_cmd = 'gitk %s'
-let s:gitk_log_cmd = 'git log --name-only --format= --follow -- %s'
-
-function! s:RunGitk(options) abort
+function! s:RunGitk(...) abort
     let cwd = zero#git#WorkTree()
-    let cmd = zero#Trim(printf(s:gitk_cmd, a:options))
+    let cmd = extend(['gitk'], a:000)
     call zero#term#Launch(cmd, { 'cwd': cwd })
 endfunction
 
-function! s:GitkShellEscape(path) abort
-    return '"' . a:path . '"'
-endfunction
-
 function! s:GitOldPaths(path) abort
-    let cmd = printf(s:gitk_log_cmd, a:path)
-    return map(uniq(split(system(cmd))), 's:GitkShellEscape(v:val)')
+    let cmd = printf('git log --name-only --format= --follow -- %s', shellescape(a:path))
+    return uniq(split(system(cmd)))
 endfunction
 
 function! zero#gitk#Gitk(options) abort
@@ -29,16 +22,10 @@ endfunction
 function! zero#gitk#GitkFile(path, bang) abort
     try
         call zero#git#FindRepo()
-
         let path = zero#git#BuildPath(a:path)
-
-        if a:bang
-            let path = join(s:GitOldPaths(path), ' ')
-        else
-            let path = s:GitkShellEscape(path)
-        endif
-
-        call s:RunGitk('-- ' . path)
+        let path = a:bang ? s:GitOldPaths(path) : [path]
+        let path = map(path, 'escape(v:val, " ")')
+        call call('s:RunGitk', ['--'] + path)
     catch
         call zero#Error('GitkFile: ' . v:exception)
     endtry
