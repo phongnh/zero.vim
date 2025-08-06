@@ -15,13 +15,18 @@ function! zero#browser#Open(opts) abort
     endif
     if !exists('g:loaded_netrw')
         runtime! autoload/netrw.vim
+        runtime! autoload/netrw/os.vim
     endif
     if exists('*netrw#os#Open')
         call netrw#os#Open(l:url)
     elseif exists('*netrw#Open')
         call netrw#Open(l:url)
     elseif exists('*netrw#BrowseX')
-        call netrw#BrowseX(l:url, 0)
+        try
+            call netrw#BrowseX(l:url)
+        catch
+            call netrw#BrowseX(l:url, 0)
+        endtry
     elseif exists('*netrw#NetrwBrowseX')
         call netrw#NetrwBrowseX(l:url, 0)
     elseif has('nvim-0.10')
