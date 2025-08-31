@@ -33,15 +33,59 @@
          :not ("(defun blah (test-1)" "(defun blah (test-2 blah)" "(defun (blah test-3)"))
 
   (:type "function" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
-         :regex "\\\(defun\\s+JJJ\\j"
-         :tests ("(defun test (blah)" "(defun test\n")
+         :regex "\\\(def(un|macro|generic|method|setf)\\s+JJJ\\j"
+         :tests ("(defun test (blah)" "(defun test\n"
+                 "(defmacro test (blah)" "(defmacro test\n"
+                 "(defgeneric test (blah)" "(defgeneric test\n"
+                 "(defmethod test (blah)" "(defmethod test\n"
+                 "(defsetf test (blah)" "(defsetf test\n")
          :not ("(defun test-asdf (blah)" "(defun test-blah\n"
-               "(defun tester (blah)" "(defun test? (blah)" "(defun test- (blah)"))
+               "(defun tester (blah)" "(defun test? (blah)" "(defun test- (blah)"
+               "(defmacro test-asdf (blah)" "(defmacro test-blah\n"
+               "(defmacro tester (blah)" "(defmacro test? (blah)" "(defmacro test- (blah)"
+               "(defgeneric test-asdf (blah)" "(defgeneric test-blah\n"
+               "(defgeneric tester (blah)" "(defgeneric test? (blah)" "(defun test- (blah)"
+               "(defmethod test-asdf (blah)" "(defmethod test-blah\n"
+               "(defmethod tester (blah)" "(defmethod test? (blah)" "(defun test- (blah)"
+               "(defsetf test-asdf (blah)" "(defsetf test-blah\n"
+               "(defsetf tester (blah)" "(defsetf test? (blah)" "(defun test- (blah)"))
+
+  (:type "function" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
+         :regex "\\\(define-(modify-macro|compiler-macro|setf-expander)\\s+JJJ\\j"
+         :tests ("(define-modify-macro test (blah)" "(define-modify-macro test\n"
+                 "(define-compiler-macro test (blah)" "(define-compiler-macro test\n")
+         :not ("(define-modify-macro test-asdf (blah)" "(define-modify-macro test-blah\n"
+               "(define-modify-macro tester (blah)" "(define-modify-macro test? (blah)" "(define-modify-macro test- (blah)"
+               "(define-compiler-macro test-asdf (blah)" "(define-compiler-macro test-blah\n"
+               "(define-compiler-macro tester (blah)" "(define-compiler-macro test? (blah)" "(define-compiler-macro test- (blah)"))
 
   (:type "variable" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
-         :regex "\\\(defparameter\\b\\s*JJJ\\j"
-         :tests ("(defparameter test " "(defparameter test\n")
-         :not ("(defparameter tester" "(defparameter test?" "(defparameter test-"))
+         :regex "\\\(def(var|parameter|constant)\\b\\s*JJJ\\j"
+         :tests ("(defvar test " "(defvar test\n"
+                 "(defparameter test " "(defparameter test\n"
+                 "(defconstant test " "(defconstant test\n")
+         :not ("(defvar tester" "(defvar test?" "(defvar test-"
+               "(defparameter tester" "(defparameter test?" "(defparameter test-"
+               "(defconstant tester" "(defconstant test?" "(defconstant test-"))
+
+  (:type "variable" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
+         :regex "\\\(define-symbol-macro\\b\\s*JJJ\\j"
+         :tests ("(define-symbol-macro test " "(define-symbol-macro test\n")
+         :not ("(define-symbol-macro tester" "(define-symbol-macro test?" "(define-symbol-macro test-"))
+
+  (:type "type" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
+         :regex "\\\(def(class|struct|type)\\b\\s*JJJ\\j"
+         :tests ("(defclass test " "(defclass test\n"
+                 "(defstruct test " "(defstruct test\n"
+                 "(deftype test " "(deftype test\n")
+         :not ("(defclass tester" "(defclass test?" "(defclass test-"
+               "(defstruct tester" "(defstruct test?" "(defstruct test-"
+               "(deftype tester" "(deftype test?" "(deftype test-"))
+
+  (:type "type" :supports ("ag" "grep" "rg" "git-grep") :language "commonlisp"
+         :regex "\\\(define-condition\\b\\s*JJJ\\j"
+         :tests ("(define-condition test " "(define-condition test\n")
+         :not ("(define-condition tester" "(define-condition test?" "(define-condition test-"))
 
   (:type "function" :supports ("ag" "grep" "rg" "git-grep") :language "racket"
          :regex "\\\(define\\s+\\(\\s*JJJ\\j"
@@ -1204,4 +1248,34 @@
   (:type "type" :supports ("ag" "grep" "rg" "git-grep") :language "apex"
          :regex "(class|interface)\\s*JJJ\\b"
          :tests ("class test:" "public class test implements Something")
-         :not ("class testnot:" "public class testnot implements Something")))
+         :not ("class testnot:" "public class testnot implements Something"))
+
+  (:type "function" :supports ("ag" "grep" "rg" "git-grep") :language "jai"
+         :regex "\\bJJJ\\s*::"
+         :tests ("test ::"))
+  (:type "variable" :supports ("ag" "grep" "rg" "git-grep") :language "jai"
+         :regex "\\bJJJ\\s*(:|:\\s*=|::)"
+         :tests ("test: Type" "test : Type = Val" "test :: Val"))
+  (:type "type" :supports ("ag" "grep" "rg" "git-grep") :language "jai"
+         :regex "\\bJJJ\\s*::"
+         :tests ("test ::"))
+  
+  (:type "variable" :supports ("ag" "grep" "rg" "git-grep") :language "odin"
+         :regex "\\s*\\bJJJ\\s*:\\s*([^=\\n]+\\s*:|:|[^=\\n]+\\s*=|=)"
+         :tests ("test :: struct"
+                 "test ::enum"
+                 "test:: union"
+                 "test: : custom_type"
+                 "test :: [2]f32"
+                 "test : f32 : 20"
+                 "test: i32 : 10"
+                 "test := 20"
+                 "test : f32 = 20"
+                 "test: i32 = 10"
+                 "test: i32= 10"
+                 "test :i32= 10"
+                 "test :: proc()"
+                 "test ::proc() {"
+                 "test:: proc(a: i32) -> i32 {"
+                 "test::proc{}"
+                 "test: :proc \"contextless\" {}")))

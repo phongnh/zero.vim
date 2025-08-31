@@ -24,6 +24,7 @@ class GenerateFiletype
     "fish",
     "go",
     "graphql",
+    "groovy",
     "h",
     "haml",
     "html",
