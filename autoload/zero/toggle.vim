@@ -74,6 +74,21 @@ function! zero#toggle#ToggleDiff() abort
 endfunction
 " }
 
+" Cycle Diff Option {
+function! zero#toggle#CycleDiffOption() abort
+    if &diffopt =~# 'algorithm'
+        if &diffopt =~# 'algorithm:patience'
+            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
+        else
+            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:histogram diffopt+=algorithm:patience
+        endif
+    else
+        set diffopt+=algorithm:patience
+    endif
+    set diffopt?
+endfunction
+" }
+
 " Toggle virtualedit {
 function! zero#toggle#ToggleVirtualEditAll() abort
     if &virtualedit =~# 'all'
