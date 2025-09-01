@@ -63,30 +63,30 @@ endfunction
 " }
 
 " Toggle diff {
-function! zero#toggle#ToggleDiff() abort
-    if &diff
-        diffoff
-        echo 'diffoff'
-    else
-        diffthis
-        echo 'diffthis'
-    endif
-endfunction
+if has('diff')
+    function! zero#toggle#ToggleDiff() abort
+        if &diff
+            diffoff
+            echo 'diffoff'
+        else
+            diffthis
+            echo 'diffthis'
+        endif
+    endfunction
+endif
 " }
 
 " Cycle Diff Option {
-function! zero#toggle#CycleDiffOption() abort
-    if &diffopt =~# 'algorithm'
-        if &diffopt =~# 'algorithm:patience'
-            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
-        else
+if has('diff')
+    function! zero#toggle#CycleDiffOption() abort
+        if &diffopt =~# 'algorithm:histogram'
             set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:histogram diffopt+=algorithm:patience
+        else
+            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
         endif
-    else
-        set diffopt+=algorithm:patience
-    endif
-    set diffopt?
-endfunction
+        set diffopt?
+    endfunction
+endif
 " }
 
 " Toggle virtualedit {

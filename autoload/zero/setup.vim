@@ -57,7 +57,6 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yo_     :<C-u>setlocal cursorline! cursorline?<CR>
         nnoremap <silent> you     :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
         nnoremap <silent> yo<Bar> :<C-u>setlocal cursorcolumn! cursorcolumn?<CR>
-        nnoremap <silent> yod     :<C-u>call zero#toggle#ToggleDiff()<CR>
         nnoremap <silent> yoh     :<C-u>set hlsearch! hlsearch?<CR>
         nnoremap <silent> yoi     :<C-u>set ignorecase! ignorecase?<CR>
         nnoremap <silent> yol     :<C-u>setlocal list! list?<CR>
@@ -69,6 +68,10 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yox     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
         nnoremap <silent> yo+     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
         nnoremap <silent> yot     :<C-u>call zero#toggle#ToggleColorColumn()<CR>
+
+        if has('diff')
+            nnoremap <silent> yod :<C-u>call zero#toggle#ToggleDiff()<CR>
+        endif
 
         " Move lines up or down
         nnoremap <silent> <M-j> <Cmd>move .+1<Bar>normal! ==<CR>
