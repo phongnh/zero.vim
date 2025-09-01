@@ -73,13 +73,19 @@ let s:rg_filetype_mappings = {
       \ 'typescriptreact': 'ts',
       \ }
 
+function! s:GetFileType() abort
+  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+  return get(s:rg_filetype_mappings, ft, ft)
+endfunction
+
 function! zero#filetype#RgFileTypeOpts(...) abort
   let opts = []
-  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
-  let ft = get(s:rg_filetype_mappings, ft, ft)
-  if strlen(ft) && has_key(s:rg_filetypes, ft)
-    call add(opts, '-t ' . ft)
-  else
+  for ft in split(s:GetFileType(), '\.')
+    if has_key(s:rg_filetypes, ft)
+      call add(opts, '-t ' . ft)
+    endif
+  endfor
+  if empty(opts)
     let ext = expand('%:e')
     if strlen(ext)
       call add(opts, '-g ' . shellescape(printf('*.{%s}', ext)))
@@ -112,18 +118,17 @@ endfunction
 
 function! zero#filetype#GitFileTypeOpts(...) abort
   let opts = []
-  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
-  let ft = get(s:rg_filetype_mappings, ft, ft)
-  if strlen(ft) && has_key(s:rg_filetypes, ft)
-    call add(opts, '--')
-    for ext in s:rg_filetypes[ft]
-      call add(opts, shellescape(ext))
-    endfor
-  else
+  for ft in split(s:GetFileType(), '\.')
+    if has_key(s:rg_filetypes, ft)
+      call add(opts, '--')
+      call extend(opts, mapnew(s:rg_filetypes[ft], 'shellescape(v:val)'))
+    endif
+  endfor
+  if empty(opts)
     let ext = expand('%:e')
     if strlen(ext)
       call add(opts, '--')
-      call add(opts, shellescape(printf('*.{%s}', ext)))
+      call add(opts, shellescape(printf('*.%s', ext)))
     endif
   endif
   return opts
