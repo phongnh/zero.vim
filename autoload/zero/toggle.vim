@@ -79,11 +79,14 @@ endif
 " Cycle Diff Option {
 if has('diff')
     function! zero#toggle#CycleDiffOption() abort
-        if &diffopt =~# 'algorithm:histogram'
-            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:histogram diffopt+=algorithm:patience
-        else
-            set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
-        endif
+        try
+            if &diffopt =~# 'algorithm:histogram'
+                set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:histogram diffopt+=algorithm:patience
+            else
+                set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
+            endif
+        catch
+        endtry
         set diffopt?
     endfunction
 endif
