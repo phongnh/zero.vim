@@ -72,15 +72,6 @@ command! -nargs=*                                             OpenGitHubPRs    c
 command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
 command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
 
-" Toggle mappings {{{
-call zero#setup#ToggleMappings()
-
-augroup ZeroVimToggleMappings
-    autocmd!
-    autocmd VimEnter * call zero#setup#UnimpairedMappings()
-augroup END
-" }}}
-
 " Grep Settings
 if executable('rg')
     " https://github.com/BurntSushi/ripgrep
