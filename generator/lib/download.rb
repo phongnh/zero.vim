@@ -1,7 +1,7 @@
 require "http"
 
 class Download
-  URL = "https://raw.githubusercontent.com/jacktasia/dumb-jump/master/dumb-jump.el"
+  URL = "https://raw.githubusercontent.com/jacktasia/dumb-jump/refs/heads/master/dumb-jump.el"
 
   def initialize(output: "dumb-jump.el")
     @output = output
