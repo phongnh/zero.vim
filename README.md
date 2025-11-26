@@ -51,6 +51,5 @@
 * LGrep
 * BGrep
 * Gitk, GitkFile
-* Tig, TigFile, TigBlame
 * SW
 * Cls
