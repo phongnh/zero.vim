@@ -98,13 +98,6 @@ if s:is_windows
     finish
 endif
 
-" Tig
-if executable('tig')
-    command! -nargs=? -complete=custom,zero#git#Branches Tig      call zero#tig#Tig(<q-args>)
-    command! -bang -nargs=? -complete=file               TigFile  call zero#tig#TigFile(<q-args>, <bang>0)
-    command! -nargs=? -complete=file                     TigBlame call zero#tig#TigBlame(<q-args>)
-endif
-
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
 

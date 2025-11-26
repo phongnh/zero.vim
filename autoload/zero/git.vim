@@ -128,8 +128,6 @@ function! zero#git#ViewCommit(command)
         execute a:command hash
     elseif a:command ==# 'gitk'
         call zero#gitk#Gitk(hash)
-    elseif a:command ==# 'tig'
-        call zero#tig#Tig('show ' . hash)
     endif
 endfunction
 
@@ -137,11 +135,6 @@ function! zero#git#SetupViewCommit()
     if executable('gitk')
         command! -buffer ViewCommitWithGitk call zero#git#ViewCommit('gitk')
         nnoremap <buffer> <silent> K :<C-u>ViewCommitWithGitk<CR>
-    endif
-
-    if executable('tig')
-        command! -buffer ViewCommitWithTig call zero#git#ViewCommit('tig')
-        nnoremap <buffer> <silent> T :<C-u>ViewCommitWithTig<CR>
     endif
 
     if exists(':GBrowse') == 2
