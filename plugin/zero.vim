@@ -59,12 +59,6 @@ if get(g:, 'zero_vim_highlight_commands', 0)
 endif
 " }}}
 
-" CircleCI
-command! -bang OpenCircleCIDashboard   call zero#circleci#OpenDashboard(<bang>0)
-command! -bang OpenCircleCIProject     call zero#circleci#OpenProject(<bang>0)
-command! -bang OpenCircleCIBranch      call zero#circleci#OpenBranch(<bang>0)
-command! -bang OpenCircleCIMyPipelines call zero#circleci#OpenMyPipelines(<bang>0)
-
 " GitHub
 command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
 command! -nargs=?                                             OpenGitHubRepo   call zero#github#OpenRepo(<f-args>)
