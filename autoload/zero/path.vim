@@ -39,10 +39,14 @@ function! s:CopyDirPath(path) abort
     call s:Copy(l:path)
 endfunction
 
-function! zero#path#CopyDirPath(bang) abort
-    call s:CopyDirPath(a:bang ? '%:p:~:h' : '%:p:.:h')
+function! zero#path#CopyDirPath() abort
+    call s:CopyDirPath('%:p:~:h')
 endfunction
 
-function! zero#path#CopyAbsoluteDirPath(bang) abort
+function! zero#path#CopyFullDirPath() abort
+    call s:CopyDirPath('%:p:.:h')
+endfunction
+
+function! zero#path#CopyAbsoluteDirPath() abort
     call s:CopyDirPath('%:p:h')
 endfunction

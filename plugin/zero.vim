@@ -28,18 +28,20 @@ endif
 command! -bang CopyPath            call zero#path#CopyPath(<bang>0)
 command! -bang CopyFullPath        call zero#path#CopyFullPath(<bang>0)
 command! -bang CopyAbsolutePath    call zero#path#CopyAbsolutePath(<bang>0)
-command! -bang CopyDirPath         call zero#path#CopyDirPath(<bang>0)
-command! -bang CopyAbsoluteDirPath call zero#path#CopyAbsoluteDirPath(<bang>0)
+command!       CopyDirPath         call zero#path#CopyDirPath()
+command!       CopyFullDirPath     call zero#path#CopyFullDirPath()
+command!       CopyAbsoluteDirPath call zero#path#CopyAbsoluteDirPath()
 
 if get(g:, 'zero_vim_path_mappings', 1)
-    nnoremap <silent> yp :CopyPath<CR>
-    nnoremap <silent> yP :CopyPath!<CR>
-    nnoremap <silent> yc :CopyFullPath<CR>
-    nnoremap <silent> yC :CopyFullPath!<CR>
+    nnoremap <silent> yc :CopyPath<CR>
+    nnoremap <silent> yc :CopyPath!<CR>
+    nnoremap <silent> yp :CopyFullPath<CR>
+    nnoremap <silent> yP :CopyFullPath!<CR>
     nnoremap <silent> yu :CopyAbsolutePath<CR>
     nnoremap <silent> yU :CopyAbsolutePath!<CR>
-    nnoremap <silent> yd :CopyDirPath<CR>
-    nnoremap <silent> yD :CopyDirPath!<CR>
+    nnoremap <silent> y. :CopyDirPath<CR>
+    nnoremap <silent> yd :CopyFullDirPath<CR>
+    nnoremap <silent> yD :CopyAbsoluteDirPath<CR>
 endif
 " }}}
 

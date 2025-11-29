@@ -42,6 +42,7 @@
 * CopyFullPath
 * CopyAbsolutePath
 * CopyDirPath
+* CopyFullDirPath
 * CopyAbsoluteDirPath
 * HighlightLine
 * HighlightWord
