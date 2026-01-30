@@ -34,7 +34,7 @@ command!       CopyAbsoluteDirPath call zero#path#CopyAbsoluteDirPath()
 
 if get(g:, 'zero_vim_path_mappings', 1)
     nnoremap <silent> yc :CopyPath<CR>
-    nnoremap <silent> yc :CopyPath!<CR>
+    nnoremap <silent> yC :CopyPath!<CR>
     nnoremap <silent> yp :CopyFullPath<CR>
     nnoremap <silent> yP :CopyFullPath!<CR>
     nnoremap <silent> yu :CopyAbsolutePath<CR>
