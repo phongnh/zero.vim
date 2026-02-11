@@ -1,12 +1,12 @@
 function! zero#setup#ToggleMappings() abort
     " Change tab width
-    nnoremap <silent> yo2 :<C-u>setlocal softtabstop=2 shiftwidth=2 shiftwidth?<CR>
-    nnoremap <silent> yo4 :<C-u>setlocal softtabstop=4 shiftwidth=4 shiftwidth?<CR>
-    nnoremap <silent> yo8 :<C-u>setlocal softtabstop=8 shiftwidth=8 shiftwidth?<CR>
+    nnoremap <silent> yo2 :<C-u>execute printf('setlocal softtabstop=%s shiftwidth=2 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 2)<CR>
+    nnoremap <silent> yo4 :<C-u>execute printf('setlocal softtabstop=%s shiftwidth=4 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 4)<CR>
+    nnoremap <silent> yo8 :<C-u>execute printf('setlocal softtabstop=%s shiftwidth=8 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 8)<CR>
 
-    nnoremap <silent> yo@ :<C-u>setlocal tabstop=2 softtabstop=2 shiftwidth=2 shiftwidth?<CR>
-    nnoremap <silent> yo$ :<C-u>setlocal tabstop=4 softtabstop=4 shiftwidth=4 shiftwidth?<CR>
-    nnoremap <silent> yo* :<C-u>setlocal tabstop=8 softtabstop=8 shiftwidth=8 shiftwidth?<CR>
+    nnoremap <silent> yo@ :<C-u>execute printf('setlocal softtabstop=%s tabstop=2 shiftwidth=2 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 2)<CR>
+    nnoremap <silent> yo$ :<C-u>execute printf('setlocal softtabstop=%s tabstop=4 shiftwidth=4 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 4)<CR>
+    nnoremap <silent> yo* :<C-u>execute printf('setlocal softtabstop=%s tabstop=8 shiftwidth=8 shiftwidth?', &softtabstop <= 0 ? &softtabstop : 8)<CR>
 
     " Toggle incsearch
     nnoremap <silent> yoS :<C-u>set incsearch! incsearch?<CR>
