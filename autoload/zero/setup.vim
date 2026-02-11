@@ -46,6 +46,19 @@ function! zero#setup#ToggleMappings() abort
     nnoremap <silent> zi zi:<C-u>setlocal foldenable?<CR>
     nnoremap <silent> z] :<C-u>let &foldcolumn = &foldcolumn + 1<CR>:<C-u>setlocal foldcolumn?<CR>
     nnoremap <silent> z[ :<C-u>let &foldcolumn = &foldcolumn - 1<CR>:<C-u>setlocal foldcolumn?<CR>
+
+    " Toggle EOL
+    nnoremap <silent> yoE :<C-u>call zero#toggle#ToggleEOL()<CR>
+
+    " Toggle Indent Guides
+    if has('patch-8.2.5066')
+        nnoremap <silent> yoI :<C-u>call zero#toggle#ToggleLeadmultispace()<CR>
+
+        augroup ZeroVimShiftwidthOption
+            autocmd!
+            autocmd OptionSet shiftwidth call zero#toggle#AdjustLeadmultispace(v:option_old, v:option_new)
+        augroup END
+    endif
 endfunction
 
 function! zero#setup#UnimpairedMappings() abort
