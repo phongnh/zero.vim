@@ -69,10 +69,10 @@ command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch c
 command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
 
 " Grep Settings
+" https://github.com/BurntSushi/ripgrep
 if executable('rg')
-    " https://github.com/BurntSushi/ripgrep
     let &grepprg = 'rg --line-buffered -H --no-heading -n -S --hidden'
-    let &grepprg .= get(g:, 'zero_vim_grep_follow_links', get(g:, 'zero_vim_follow_links', 0)) ? ' --follow' : ''
+    let &grepprg .= get(g:, 'zero_vim_grep_follow_links', get(g:, 'zero_vim_follow_links', 0)) ? ' -L' : ''
     let &grepprg .= get(g:, 'zero_vim_grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
 endif
 
