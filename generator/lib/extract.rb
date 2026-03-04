@@ -1,7 +1,7 @@
 class Extract
   PARSE_PATTERNS = {
     head: "(defcustom dumb-jump-find-rules",
-    tail: '  "List of regex patttern templates organized by language and type to use for generating the grep command."',
+    tail: '  "List of search regex pattern templates organized by language and type.',
   }
 
   def initialize(input: "dumb-jump.el", output: "dumb-jump-find-rules.el")
@@ -34,6 +34,7 @@ class Extract
 
     # Remove comments
     source = source.select { |line| !line.start_with?(/\s{2,};;?\s/) }
+    source = source.select { |line| !line.start_with?(';;', '  ;;--') }
     File.open(output, "w") { |file| file.puts(source) }
     puts "Saved: #{output}"
 
