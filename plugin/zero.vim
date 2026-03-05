@@ -97,7 +97,4 @@ endif
 " Sudo write
 command! -bang SW w<bang> !sudo tee >/dev/null %
 
-" Clear terminal console
-command! -bar Cls execute 'silent! !clear' | redraw!
-
 let g:loaded_zero_vim = 1
