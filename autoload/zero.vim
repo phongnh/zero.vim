@@ -98,10 +98,6 @@ function! s:IsGrepCommand(cmd) abort
                 \ a:cmd =~# '^\(Git!\?\s\+grep\)\s'
 endfunction
 
-function! s:IsCtrlSFCommand(cmd) abort
-    return a:cmd =~# '^\(CtrlSF\|PCtrlSF\)'
-endfunction
-
 function! s:IsInputCommand() abort
     return getcmdtype() == '@'
 endfunction
@@ -116,8 +112,6 @@ function! zero#InsertCCword() abort
         return zero#dumb_jump#RgCword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#ctrlsf#CCword()
     elseif s:IsInputCommand()
         return zero#shell#CCword()
     else
@@ -135,8 +129,6 @@ function! zero#InsertCword() abort
         return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#ctrlsf#Cword()
     elseif s:IsInputCommand()
         return zero#shell#Cword()
     else
@@ -154,8 +146,6 @@ function! zero#InsertWord() abort
         return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Word()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#Word()
     elseif s:IsInputCommand()
         return zero#shell#Word()
     else
@@ -169,8 +159,6 @@ function! zero#InsertVword() abort
         return zero#substitute#Vword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Vword()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#ctrlsf#Vword()
     elseif s:IsInputCommand()
         return zero#shell#Vword()
     else
@@ -184,8 +172,6 @@ function! zero#InsertPword() abort
         return zero#substitute#Pword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Pword()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#ctrlsf#Pword()
     elseif s:IsInputCommand()
         return zero#shell#Pword()
     else
@@ -203,8 +189,6 @@ function! zero#InsertInput() abort
         return zero#substitute#Input()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Input()
-    elseif s:IsCtrlSFCommand(l:cmd)
-        return zero#ctrlsf#Input()
     elseif s:IsInputCommand()
         return zero#shell#Input()
     else
