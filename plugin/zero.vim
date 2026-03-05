@@ -10,11 +10,6 @@ let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win1
 
 let g:zero_vim_debug = get(g:, 'zero_vim_debug', 0)
 
-" Remove zero-width spaces (<200b>) {{{
-command! -bar Remove200b silent! %s/\%u200b//g | update | redraw
-command! -bar RemoveZeroWidthSpaces Remove200b
-" }}}
-
 " Replace typographic characters {{{
 command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacters()
 " }}}

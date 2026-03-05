@@ -29,8 +29,6 @@
 
 ### This plugin defines the following commands:
 
-* Remove200b
-* RemoveZeroWidthSpaces
 * ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
 * CopyYankedText
 * CopyPath
@@ -47,5 +45,3 @@
 * LGrep
 * BGrep
 * Gitk, GitkFile
-* SW
-* Cls
