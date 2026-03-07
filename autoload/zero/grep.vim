@@ -16,27 +16,6 @@ function! zero#grep#Input(...) abort
     return s:Escape(input(l:prompt)) . ' '
 endfunction
 
-" Grep Helpers
-function! s:BuildGrepCommand(...) abort
-    let l:opts = map(copy(a:000), 'escape(v:val, " ")')
-    let l:cmd = join([expandcmd(&grepprg)] + l:opts, ' ')
-    return l:cmd
-endfunction
-
-function! zero#grep#Grep(...) abort
-    let l:cmd = call('s:BuildGrepCommand', a:000)
-    cgetexpr system(l:cmd)
-    botright cwindow
-    call setqflist([], 'a', { 'title': l:cmd })
-endfunction
-
-function! zero#grep#LGrep(...) abort
-    let l:cmd = call('s:BuildGrepCommand', a:000)
-    lgetexpr system(l:cmd)
-    lwindow
-    call setloclist(0, [], 'a', { 'title': l:cmd })
-endfunction
-
 function! zero#grep#CCword() abort
     return s:Escape(zero#CCword())
 endfunction

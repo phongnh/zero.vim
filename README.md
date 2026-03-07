@@ -41,7 +41,4 @@
 * HighlightWord
 * HighlightColumns
 * ClearHightlights
-* Grep
-* LGrep
-* BGrep
 * Gitk, GitkFile

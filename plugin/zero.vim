@@ -63,22 +63,6 @@ command! -nargs=*                                             OpenGitHubPRs    c
 command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
 command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
 
-" Grep Settings
-" https://github.com/BurntSushi/ripgrep
-if executable('rg')
-    let &grepprg = 'rg --line-buffered -H --no-heading -n -S --hidden'
-    let &grepprg .= get(g:, 'zero_vim_grep_follow_links', get(g:, 'zero_vim_follow_links', 0)) ? ' -L' : ''
-    let &grepprg .= get(g:, 'zero_vim_grep_ignore_vcs', 0) ? ' --no-ignore-vcs' : ''
-endif
-
-" Grep
-command! -nargs=+ -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
-command! -nargs=+ -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
-command! -nargs=+                        BGrep call zero#grep#LGrep(<f-args>, shellescape(expand('%:p')))
-
-cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
-cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
-
 " Gitk
 if executable('gitk')
     command! -nargs=? -complete=custom,zero#git#Branches Gitk     call zero#gitk#Gitk(expand(<q-args>))
