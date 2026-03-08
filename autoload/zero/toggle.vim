@@ -39,19 +39,6 @@ if has('clipboard')
 endif
 " }
 
-" Toggle conceallevel {
-if has('conceal')
-    function! zero#toggle#ToggleConceallevel() abort
-        if &conceallevel > 0
-            set conceallevel=0
-        else
-            set conceallevel=2
-        endif
-        set conceallevel?
-    endfunction
-endif
-" }
-
 " Cycle Diff Option {
 if has('diff')
     function! zero#toggle#CycleDiffOption() abort

@@ -30,7 +30,7 @@ function! zero#setup#ToggleMappings() abort
 
     " Toggle conceallevel
     if has('conceal')
-        nnoremap <silent> yoC :<C-u>call zero#toggle#ToggleConceallevel()<CR>
+        nnoremap <silent> <expr> yoC &conceallevel > 0 ? ":\<C-u>set conceallevel=0 conceallevel?\<CR>" : ":\<C-u>set conceallevel=2 conceallevel?\<CR>"
     endif
 
     " Cycle diff option
