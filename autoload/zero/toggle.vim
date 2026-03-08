@@ -40,18 +40,6 @@ if has('diff')
 endif
 " }
 
-" Toggle cursorline and cursorcolumn {
-function! zero#toggle#ToggleCursorOptions() abort
-    if &cursorline && &cursorcolumn
-        set nocursorline nocursorcolumn
-        echo 'set nocursorline nocursorcolumn'
-    else
-        set cursorline cursorcolumn
-        echo 'set cursorline cursorcolumn'
-    endif
-endfunction
-" }
-
 " Toggle colorcolumn {
 function! zero#toggle#ToggleColorColumn() abort
     if !empty(&colorcolumn)

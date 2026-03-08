@@ -81,8 +81,8 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yos     :<C-u>setlocal spell! spell?<CR>
         nnoremap <silent> yow     :<C-u>setlocal wrap! wrap?<CR>
         nnoremap <expr>   yov     &virtualedit =~# 'all' ? ":\<C-u>set virtualedit-=all\<CR>" : ":\<C-u>set virtualedit+=all\<CR>"
-        nnoremap <silent> yox     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
-        nnoremap <silent> yo+     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
+        nnoremap <expr>   yox     &cursorline && &cursorcolumn ? ":\<C-u>set nocursorline nocursorcolumn\<CR>" : ":\<C-u>set cursorline cursorcolumn\<CR>"
+        nnoremap <expr>   yo+     &cursorline && &cursorcolumn ? ":\<C-u>set nocursorline nocursorcolumn\<CR>" : ":\<C-u>set cursorline cursorcolumn\<CR>"
         nnoremap <silent> yot     :<C-u>call zero#toggle#ToggleColorColumn()<CR>
 
         if has('diff')
