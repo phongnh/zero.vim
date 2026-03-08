@@ -56,11 +56,15 @@ function! zero#setup#ToggleMappings() abort
 
     " Toggle Indent Guides
     if has('patch-8.2.5066')
-        nnoremap <silent> yoI :<C-u>call zero#toggle#ToggleLeadmultispace()<CR>
+        nnoremap <expr> yoI printf(":\<C-u>" .. (&listchars =~# '\V\<leadmultispace\>' ? 'set listchars-=leadmultispace:┊%s' : 'set listchars+=leadmultispace:┊%s') .. "\<CR>", escape(repeat(' ', &shiftwidth - 1), ' '))
 
         augroup ZeroVimShiftwidthOption
             autocmd!
-            autocmd OptionSet shiftwidth call zero#toggle#AdjustLeadmultispace(v:option_old, v:option_new)
+            autocmd OptionSet shiftwidth
+                        \   if &listchars =~# '\V\<leadmultispace\>'
+                        \ |     execute printf('set listchars-=leadmultispace:┊%s', escape(repeat(' ', v:option_old - 1), ' '))
+                        \ |     execute printf('set listchars+=leadmultispace:┊%s', escape(repeat(' ', v:option_new - 1), ' '))
+                        \ | endif
         augroup END
     endif
 endfunction

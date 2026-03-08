@@ -23,20 +23,3 @@ function! zero#toggle#ToggleGJK() abort
     endif
 endfunction
 " }
-
-" Toggle Indent Guides {
-function! zero#toggle#ToggleLeadmultispace() abort
-    if &listchars =~# '\V\<leadmultispace\>'
-        execute printf('set listchars-=leadmultispace:┊%s listchars?', escape(repeat(' ', &shiftwidth - 1), ' '))
-    else
-        execute printf('set listchars+=leadmultispace:┊%s listchars?', escape(repeat(' ', &shiftwidth - 1), ' '))
-    endif
-endfunction
-
-function! zero#toggle#AdjustLeadmultispace(shiftwidth_old, shiftwidth_new) abort
-    if &listchars =~# '\V\<leadmultispace\>'
-        execute printf('set listchars-=leadmultispace:┊%s', escape(repeat(' ', a:shiftwidth_old - 1), ' '))
-        execute printf('set listchars+=leadmultispace:┊%s', escape(repeat(' ', a:shiftwidth_new - 1), ' '))
-    endif
-endfunction
-" }
