@@ -13,11 +13,6 @@ command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacter
 " }}}
 
 " Copy Commands {{{
-if has('clipboard')
-    " Copy yanked text to clipboard
-    command! CopyYankedText let [@+, @*] = [@", @"]
-endif
-
 command! -bang CopyPath            call zero#path#CopyPath(<bang>0)
 command! -bang CopyFullPath        call zero#path#CopyFullPath(<bang>0)
 command! -bang CopyAbsolutePath    call zero#path#CopyAbsolutePath(<bang>0)

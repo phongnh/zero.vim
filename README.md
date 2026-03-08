@@ -30,7 +30,6 @@
 ### This plugin defines the following commands:
 
 * ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
-* CopyYankedText
 * CopyPath
 * CopyFullPath
 * CopyAbsolutePath
