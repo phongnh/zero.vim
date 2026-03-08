@@ -24,21 +24,6 @@ function! zero#toggle#ToggleGJK() abort
 endfunction
 " }
 
-" Toggle clipboard {
-if has('clipboard')
-    function! zero#toggle#ToggleClipboard() abort
-        let l:clipboard = has('unnamedplus') ? 'unnamedplus' : 'unnamed'
-        if match(&clipboard, l:clipboard) > -1
-            execute printf('set clipboard-=%s', l:clipboard)
-            echo printf('Disabled "%s" clipboard!', l:clipboard)
-        else
-            execute printf('set clipboard^=%s', l:clipboard)
-            echo printf('Enabled "%s" clipboard!', l:clipboard)
-        endif
-    endfunction
-endif
-" }
-
 " Cycle Diff Option {
 if has('diff')
     function! zero#toggle#CycleDiffOption() abort

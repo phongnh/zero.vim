@@ -25,7 +25,11 @@ function! zero#setup#ToggleMappings() abort
 
     " Toggle clipboard
     if has('clipboard')
-        nnoremap <silent> yoy :<C-u>call zero#toggle#ToggleClipboard()<CR>
+        if has('unnamedplus')
+            nnoremap <expr> yoy match(&clipboard, 'unnamedplus') > -1 ? ":\<C-u>set clipboard-=unnamedplus\<CR>" : ":\<C-u>set clipboard^=unnamedplus\<CR>"
+        else
+            nnoremap <expr> yoy match(&clipboard, 'unnamed') > -1 ? ":\<C-u>set clipboard-=unnamed\<CR>" : ":\<C-u>set clipboard^=unnamed\<CR>"
+        endif
     endif
 
     " Toggle conceallevel
