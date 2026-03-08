@@ -63,7 +63,7 @@ endfunction
 
 function! zero#setup#UnimpairedMappings() abort
     if empty(globpath(&rtp, 'plugin/unimpaired.vim'))
-        nnoremap <silent> yob     :<C-u>call zero#toggle#ToggleBackground()<CR>
+        nnoremap <silent> yob     :<C-u>set background=<C-r>=&background == 'dark' ? 'light' : 'dark'<CR><CR><Cmd>set background?<CR>
         nnoremap <silent> yoc     :<C-u>setlocal cursorline! cursorline?<CR>
         nnoremap <silent> yo-     :<C-u>setlocal cursorline! cursorline?<CR>
         nnoremap <silent> yo_     :<C-u>setlocal cursorline! cursorline?<CR>

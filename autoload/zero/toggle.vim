@@ -52,16 +52,6 @@ if has('conceal')
 endif
 " }
 
-" Toggle background {
-function! zero#toggle#ToggleBackground() abort
-    if &background == 'dark'
-        set background=light background?
-    else
-        set background=dark background?
-    endif
-endfunction
-" }
-
 " Toggle diff {
 if has('diff')
     function! zero#toggle#ToggleDiff() abort
