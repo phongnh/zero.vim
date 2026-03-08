@@ -24,20 +24,6 @@ function! zero#toggle#ToggleGJK() abort
 endfunction
 " }
 
-" Toggle colorcolumn {
-function! zero#toggle#ToggleColorColumn() abort
-    if !empty(&colorcolumn)
-        let s:colorcolumn = &colorcolumn
-    endif
-    if !empty(&colorcolumn)
-        set colorcolumn=
-    else
-        execute printf('set colorcolumn=%s', get(s:, 'colorcolumn', '+1'))
-    endif
-    set colorcolumn?
-endfunction
-" }
-
 " Toggle Indent Guides {
 function! zero#toggle#ToggleLeadmultispace() abort
     if &listchars =~# '\V\<leadmultispace\>'
