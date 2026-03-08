@@ -6,8 +6,6 @@ if get(g:, 'loaded_zero_vim', 0)
     finish
 endif
 
-let s:is_windows = has('win64') || has('win32') || has('win32unix') || has('win16')
-
 let g:zero_vim_debug = get(g:, 'zero_vim_debug', 0)
 
 " Replace typographic characters {{{
@@ -68,12 +66,5 @@ if executable('gitk')
     command! -nargs=? -complete=custom,zero#git#Branches Gitk     call zero#gitk#Gitk(expand(<q-args>))
     command! -bang -nargs=? -complete=file               GitkFile call zero#gitk#GitkFile(expand(<q-args>), <bang>0)
 endif
-
-if s:is_windows
-    finish
-endif
-
-" Sudo write
-command! -bang SW w<bang> !sudo tee >/dev/null %
 
 let g:loaded_zero_vim = 1
