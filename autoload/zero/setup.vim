@@ -39,7 +39,7 @@ function! zero#setup#ToggleMappings() abort
 
     " Cycle diff option
     if has('diff')
-        nnoremap <silent> yoD :<C-u>call zero#toggle#CycleDiffOption()<CR>
+        nnoremap yoD :<C-u>set diffopt-=algorithm:myers diffopt-=algorithm:minimal<CR>:<C-r>=&diffopt =~# 'algorithm:histogram' ? 'set diffopt-=algorithm:histogram diffopt+=algorithm:patience' : 'set diffopt-=algorithm:patience diffopt+=algorithm:histogram'<CR><CR>
     endif
 
     " Improve folding mappings

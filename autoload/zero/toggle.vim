@@ -24,22 +24,6 @@ function! zero#toggle#ToggleGJK() abort
 endfunction
 " }
 
-" Cycle Diff Option {
-if has('diff')
-    function! zero#toggle#CycleDiffOption() abort
-        try
-            if &diffopt =~# 'algorithm:histogram'
-                set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:histogram diffopt+=algorithm:patience
-            else
-                set diffopt-=algorithm:myers diffopt-=algorithm:minimal diffopt-=algorithm:patience diffopt+=algorithm:histogram
-            endif
-        catch
-        endtry
-        set diffopt?
-    endfunction
-endif
-" }
-
 " Toggle colorcolumn {
 function! zero#toggle#ToggleColorColumn() abort
     if !empty(&colorcolumn)
