@@ -52,20 +52,6 @@ if has('conceal')
 endif
 " }
 
-" Toggle diff {
-if has('diff')
-    function! zero#toggle#ToggleDiff() abort
-        if &diff
-            diffoff
-            echo 'diffoff'
-        else
-            diffthis
-            echo 'diffthis'
-        endif
-    endfunction
-endif
-" }
-
 " Cycle Diff Option {
 if has('diff')
     function! zero#toggle#CycleDiffOption() abort

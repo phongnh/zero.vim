@@ -82,7 +82,7 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yot     :<C-u>call zero#toggle#ToggleColorColumn()<CR>
 
         if has('diff')
-            nnoremap <silent> yod :<C-u>call zero#toggle#ToggleDiff()<CR>
+            nnoremap <expr> yod &diff ? ":\<C-u>diffoff\<CR>" : ":\<C-u>diffthis\<CR>"
         endif
 
         " Move lines up or down
