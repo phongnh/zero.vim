@@ -76,7 +76,7 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yor     :<C-u>setlocal relativenumber! relativenumber?<CR>
         nnoremap <silent> yos     :<C-u>setlocal spell! spell?<CR>
         nnoremap <silent> yow     :<C-u>setlocal wrap! wrap?<CR>
-        nnoremap <silent> yov     :<C-u>call zero#toggle#ToggleVirtualEditAll()<CR>
+        nnoremap <expr>   yov     &virtualedit =~# 'all' ? ":\<C-u>set virtualedit-=all\<CR>" : ":\<C-u>set virtualedit+=all\<CR>"
         nnoremap <silent> yox     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
         nnoremap <silent> yo+     :<C-u>call zero#toggle#ToggleCursorOptions()<CR>
         nnoremap <silent> yot     :<C-u>call zero#toggle#ToggleColorColumn()<CR>

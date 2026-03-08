@@ -92,18 +92,6 @@ if has('diff')
 endif
 " }
 
-" Toggle virtualedit {
-function! zero#toggle#ToggleVirtualEditAll() abort
-    if &virtualedit =~# 'all'
-        set virtualedit-=all
-        echo 'set virtualedit-=all'
-    else
-        set virtualedit+=all
-        echo 'set virtualedit+=all'
-    endif
-endfunction
-" }
-
 " Toggle cursorline and cursorcolumn {
 function! zero#toggle#ToggleCursorOptions() abort
     if &cursorline && &cursorcolumn
