@@ -52,7 +52,7 @@ function! zero#setup#ToggleMappings() abort
     nnoremap <silent> z[ :<C-u>let &foldcolumn = &foldcolumn - 1<CR>:<C-u>setlocal foldcolumn?<CR>
 
     " Toggle EOL
-    nnoremap <silent> yoE :<C-u>call zero#toggle#ToggleEOL()<CR>
+    nnoremap <expr> yoE &listchars =~# '\V\<eol\>' ? ":\<C-u>set listchars-=eol:§\<CR>" : ":\<C-u>set listchars+=eol:§\<CR>"
 
     " Toggle Indent Guides
     if has('patch-8.2.5066')

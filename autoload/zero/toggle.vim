@@ -66,17 +66,6 @@ function! zero#toggle#ToggleColorColumn() abort
 endfunction
 " }
 
-" Toggle EOL {
-function! zero#toggle#ToggleEOL() abort
-    if &listchars =~# '\V\<eol\>'
-        set listchars-=eol:§
-    else
-        set listchars+=eol:§
-    endif
-    set listchars?
-endfunction
-" }
-
 " Toggle Indent Guides {
 function! zero#toggle#ToggleLeadmultispace() abort
     if &listchars =~# '\V\<leadmultispace\>'
