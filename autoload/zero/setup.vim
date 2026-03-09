@@ -14,11 +14,8 @@ function! zero#setup#ToggleMappings() abort
     " Toggle expandtab
     nnoremap <silent> yoe :<C-u>setlocal expandtab! expandtab?<CR>
 
-    " Toggle showcmd
-    nnoremap <silent> yo; :<C-u>set showcmd! showcmd?<CR>
-
     " Toggle "keep current line in the center of the screen" mode
-    nnoremap <silent> yoz :<C-u>let &scrolloff = 1000 - &scrolloff<CR>:set scrolloff?<CR>
+    nnoremap <silent> yoz :<C-u>let &scrolloff = 1000 - &scrolloff<Bar>set scrolloff?<CR>
 
     " Exchange gj and gk to j and k
     nnoremap <silent> yom :<C-u>call zero#toggle#ToggleGJK()<CR>
@@ -26,37 +23,28 @@ function! zero#setup#ToggleMappings() abort
     " Toggle clipboard
     if has('clipboard')
         if has('unnamedplus')
-            nnoremap <expr> yoy match(&clipboard, 'unnamedplus') > -1 ? ":\<C-u>set clipboard-=unnamedplus\<CR>" : ":\<C-u>set clipboard^=unnamedplus\<CR>"
+            nnoremap <expr> yoy printf("\<C-u>set clipboard%s=unnamedplus\<CR>", match(&clipboard, 'unnamedplus') > -1 ? '-' : '^')
         else
-            nnoremap <expr> yoy match(&clipboard, 'unnamed') > -1 ? ":\<C-u>set clipboard-=unnamed\<CR>" : ":\<C-u>set clipboard^=unnamed\<CR>"
+            nnoremap <expr> yoy printf("\<C-u>set clipboard%s=unnamed\<CR>", match(&clipboard, 'unnamed') > -1 ? '-' : '^')
         endif
     endif
 
     " Toggle conceallevel
     if has('conceal')
-        nnoremap <silent> <expr> yoC &conceallevel > 0 ? ":\<C-u>set conceallevel=0 conceallevel?\<CR>" : ":\<C-u>set conceallevel=2 conceallevel?\<CR>"
+        nnoremap <expr> yoC printf(":\<C-u>set conceallevel=%s\<CR>", &conceallevel > 0 ? 0 : 2)
     endif
 
     " Cycle diff option
     if has('diff')
-        nnoremap yoD :<C-u>set diffopt-=algorithm:myers diffopt-=algorithm:minimal<CR>:<C-r>=&diffopt =~# 'algorithm:histogram' ? 'set diffopt-=algorithm:histogram diffopt+=algorithm:patience' : 'set diffopt-=algorithm:patience diffopt+=algorithm:histogram'<CR><CR>
+        nnoremap yoD :<C-u>set diffopt-=algorithm:myers diffopt-=algorithm:minimal<CR>:<C-u>set <C-r>=&diffopt =~# 'algorithm:histogram' ? 'diffopt-=algorithm:histogram diffopt+=algorithm:patience' : 'diffopt-=algorithm:patience diffopt+=algorithm:histogram'<CR><CR>
     endif
 
-    " Improve folding mappings
-    nnoremap <silent> zr zr:<C-u>setlocal foldlevel?<CR>
-    nnoremap <silent> zm zm:<C-u>setlocal foldlevel?<CR>
-    nnoremap <silent> zR zR:<C-u>setlocal foldlevel?<CR>
-    nnoremap <silent> zM zM:<C-u>setlocal foldlevel?<CR>
-    nnoremap <silent> zi zi:<C-u>setlocal foldenable?<CR>
-    nnoremap <silent> z] :<C-u>let &foldcolumn = &foldcolumn + 1<CR>:<C-u>setlocal foldcolumn?<CR>
-    nnoremap <silent> z[ :<C-u>let &foldcolumn = &foldcolumn - 1<CR>:<C-u>setlocal foldcolumn?<CR>
-
     " Toggle EOL
-    nnoremap <expr> yoE &listchars =~# '\V\<eol\>' ? ":\<C-u>set listchars-=eol:§\<CR>" : ":\<C-u>set listchars+=eol:§\<CR>"
+    nnoremap <expr> yoE printf(":\<C-u>set listchars%s=eol:§\<CR>", &listchars =~# '\V\<eol\>' ? '-' : '+')
 
     " Toggle Indent Guides
     if has('patch-8.2.5066')
-        nnoremap <expr> yoI printf(":\<C-u>" .. (&listchars =~# '\V\<leadmultispace\>' ? 'set listchars-=leadmultispace:┊%s' : 'set listchars+=leadmultispace:┊%s') .. "\<CR>", escape(repeat(' ', &shiftwidth - 1), ' '))
+        nnoremap <expr> yoI printf(":\<C-u>set listchars%s=leadmultispace:┊%s\<CR>", &listchars =~# '\V\<leadmultispace\>' ? '-' : '+', escape(repeat(' ', (exists('*shiftwidth') ? shiftwidth() : &shiftwidth)  - 1), ' '))
 
         augroup ZeroVimShiftwidthOption
             autocmd!
@@ -67,6 +55,15 @@ function! zero#setup#ToggleMappings() abort
                         \ | endif
         augroup END
     endif
+
+    " Improve folding mappings
+    nnoremap <silent> zr zr:<C-u>setlocal foldlevel?<CR>
+    nnoremap <silent> zm zm:<C-u>setlocal foldlevel?<CR>
+    nnoremap <silent> zR zR:<C-u>setlocal foldlevel?<CR>
+    nnoremap <silent> zM zM:<C-u>setlocal foldlevel?<CR>
+    nnoremap <silent> zi zi:<C-u>setlocal foldenable?<CR>
+    nnoremap <silent> z] :<C-u>let &foldcolumn = &foldcolumn + 1<Bar>setlocal foldcolumn?<CR>
+    nnoremap <silent> z[ :<C-u>let &foldcolumn = &foldcolumn - 1<Bar>setlocal foldcolumn?<CR>
 endfunction
 
 function! zero#setup#UnimpairedMappings() abort
@@ -84,13 +81,13 @@ function! zero#setup#UnimpairedMappings() abort
         nnoremap <silent> yor     :<C-u>setlocal relativenumber! relativenumber?<CR>
         nnoremap <silent> yos     :<C-u>setlocal spell! spell?<CR>
         nnoremap <silent> yow     :<C-u>setlocal wrap! wrap?<CR>
-        nnoremap <expr>   yov     &virtualedit =~# 'all' ? ":\<C-u>set virtualedit-=all\<CR>" : ":\<C-u>set virtualedit+=all\<CR>"
-        nnoremap <expr>   yox     &cursorline && &cursorcolumn ? ":\<C-u>set nocursorline nocursorcolumn\<CR>" : ":\<C-u>set cursorline cursorcolumn\<CR>"
-        nnoremap <expr>   yo+     &cursorline && &cursorcolumn ? ":\<C-u>set nocursorline nocursorcolumn\<CR>" : ":\<C-u>set cursorline cursorcolumn\<CR>"
-        nnoremap <expr>   yot     empty(&colorcolumn) ? ":\<C-u>set colorcolumn=+1\<CR>" : ":\<C-u>set colorcolumn=\<CR>"
+        nnoremap <expr>   yov     printf(":\<C-u>set virtualedit%s=all\<CR>", &virtualedit =~# 'all' ? '-' : '+')
+        nnoremap <expr>   yox     printf(":\<C-u>set %s\<CR>", &cursorline && &cursorcolumn ? 'nocursorline nocursorcolumn' : 'cursorline cursorcolumn')
+        nnoremap <expr>   yo+     printf(":\<C-u>set %s\<CR>", &cursorline && &cursorcolumn ? 'nocursorline nocursorcolumn' : 'cursorline cursorcolumn')
+        nnoremap <expr>   yot     printf(":\<C-u>set colorcolumn=%s\<CR>", empty(&colorcolumn) ? '+1' : '')
 
         if has('diff')
-            nnoremap <expr> yod &diff ? ":\<C-u>diffoff\<CR>" : ":\<C-u>diffthis\<CR>"
+            nnoremap <expr> yod printf(":\<C-u>%s\<CR>", &diff ? 'diffoff' : 'diffthis')
         endif
 
         " Move lines up or down
