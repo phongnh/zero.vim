@@ -126,17 +126,17 @@ function! zero#github#OpenMyPRs() abort
 endfunction
 
 function! s:SystemRun(cmd, ...) abort
-    let cwd = get(a:, 1, '')
+    let l:cwd = get(a:, 1, '')
 
-    if strlen(cwd)
-        let cmd = printf('cd %s && %s', fnameescape(cwd), a:cmd)
+    if strlen(l:cwd)
+        let l:cmd = printf('cd %s && %s', fnameescape(l:cwd), a:cmd)
     else
-        let cmd = a:cmd
+        let l:cmd = a:cmd
     endif
 
     try
-        call zero#LogCommand(cmd)
-        return system(cmd)
+        call zero#LogCommand(l:cmd)
+        return system(l:cmd)
     catch /E684/
     endtry
 
@@ -145,9 +145,9 @@ endfunction
 
 function! zero#github#RemoteBranches(A, L, P) abort
     try
-        let repo_dir = zero#git#FindRepo()
-        let output = s:SystemRun('git branch -r | cut -f2- -d "/"', repo_dir)
-        return output
+        let l:repo_dir = zero#git#FindRepo()
+        let l:output = s:SystemRun('git branch -r | cut -f2- -d "/"', l:repo_dir)
+        return l:output
     catch
         return ''
     endtry

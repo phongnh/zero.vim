@@ -2,9 +2,9 @@ let s:escape_characters = '^$.*+?()[]{}|-'
 
 function! s:Escape(text) abort
     " Escape alternative file
-    let text = substitute(a:text, '#', '\\\\#', 'g')
-    let text = escape(text, s:escape_characters)
-    return shellescape(text)
+    let l:text = substitute(a:text, '#', '\\\\#', 'g')
+    let l:text = escape(l:text, s:escape_characters)
+    return shellescape(l:text)
 endfunction
 
 function! zero#grep#Escape(text) abort

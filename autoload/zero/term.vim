@@ -6,42 +6,42 @@ function! s:resolve(opts) abort
 endfunction
 
 function! zero#term#Launch(cmd, ...) abort
-    let opts = s:resolve(get(a:, 1, {}))
+    let l:opts = s:resolve(get(a:, 1, {}))
     if exists('*jobstart')
         call zero#LogCommand(a:cmd, 'nvim')
-        return jobstart(a:cmd, opts)
+        return jobstart(a:cmd, l:opts)
     elseif exists('*job_start')
         call zero#LogCommand(a:cmd, 'terminal')
-        return job_start(a:cmd, opts)
+        return job_start(a:cmd, l:opts)
     else
-        opts.background = v:true
-        return zero#term#Run(a:cmd, opts)
+        let l:opts.background = v:true
+        return zero#term#Run(a:cmd, l:opts)
     endif
 endfunction
 
 function! zero#term#Run(cmd, ...) abort
-    let cmd = type(a:cmd) == v:t_list ? join(a:cmd, ' ') : a:cmd
-    let opts = get(a:, 1, {})
-    let opts = type(opts) == v:t_dict ? opts : {}
-    if has_key(opts, 'env') && !empty(opts.env)
-        let env = 'env '
-        for [l:name, l:value] in items(opts.env)
+    let l:cmd = type(a:cmd) == v:t_list ? join(a:cmd, ' ') : a:cmd
+    let l:opts = get(a:, 1, {})
+    let l:opts = type(l:opts) == v:t_dict ? l:opts : {}
+    if has_key(l:opts, 'env') && !empty(l:opts.env)
+        let l:env = 'env '
+        for [l:name, l:value] in items(l:opts.env)
             if !empty(l:value)
-                let env ..= printf(' %s=%s', l:name, shellescape(l:value))
+                let l:env ..= printf(' %s=%s', l:name, shellescape(l:value))
             endif
         endfor
-        if env !=# 'env '
-            let cmd = env .. ' ' .. cmd
+        if l:env !=# 'env '
+            let l:cmd = l:env .. ' ' .. l:cmd
         endif
     endif
-    if has_key(opts, 'cwd') && !empty(opts.cwd) && opts.cwd !=# getcwd()
-        let cmd = printf('cd %s && %s', shellescape(opts.cwd), cmd)
+    if has_key(l:opts, 'cwd') && !empty(l:opts.cwd) && l:opts.cwd !=# getcwd()
+        let l:cmd = printf('cd %s && %s', shellescape(l:opts.cwd), l:cmd)
     endif
-    if has_key(opts, 'background') && opts.background && !s:is_windows
-        let cmd ..= ' >/dev/null 2>&1 &'
+    if has_key(l:opts, 'background') && l:opts.background && !s:is_windows
+        let l:cmd ..= ' >/dev/null 2>&1 &'
     endif
-    call zero#LogCommand(cmd, 'shell')
-    execute 'silent' ('!' .. cmd)
+    call zero#LogCommand(l:cmd, 'shell')
+    execute 'silent' ('!' .. l:cmd)
     redraw!
     return v:null
 endfunction

@@ -4,62 +4,62 @@
 let s:placeholder = '<%= placeholder %>'
 
 let s:definitions = {
-<% definitions.each do |language, regexes| -%>
-      \ '<%= language %>': [
-<% regexes.each do |regex| -%>
-      \   <%= "'#{regex}'" %>,
-<% end -%>
-      \ ],
-<% end -%>
-      \ }
+  <% definitions.each do |language, regexes| -%>
+          \ '<%= language %>': [
+  <% regexes.each do |regex| -%>
+          \   <%= "'#{regex}'" %>,
+  <% end -%>
+          \ ],
+  <% end -%>
+          \ }
 
 function! s:Regexes(...) abort
-  let ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
-  if has_key(s:definitions, ft)
-    return s:definitions[ft]
-  endif
-  return []
+    let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+    if has_key(s:definitions, l:ft)
+        return s:definitions[l:ft]
+    endif
+    return []
 endfunction
 
 function! <%= namespace %>#Cword() abort
-  let keyword = expand('<cword>')
-  let patterns = []
-  for regex in s:Regexes()
-    call add(patterns, '(' . substitute(regex, s:placeholder, keyword, 'g') . ')')
-  endfor
-  if len(patterns)
-    " call add(patterns, '(\b' . keyword . '\b)')
-    " return shellescape('(' . join(patterns, '|') . ')')
-    return "\"(" . join(patterns, '|') . ")\""
-  endif
-  return shellescape('\b' . keyword . '\b')
+    let l:keyword = expand('<cword>')
+    let l:patterns = []
+    for l:regex in s:Regexes()
+        call add(l:patterns, '(' .. substitute(l:regex, s:placeholder, l:keyword, 'g') .. ')')
+    endfor
+    if len(l:patterns)
+        " call add(l:patterns, '(\b' .. l:keyword .. '\b)')
+        " return shellescape('(' .. join(l:patterns, '|') .. ')')
+        return "\"(" .. join(l:patterns, '|') .. ")\""
+    endif
+    return shellescape('\b' .. l:keyword .. '\b')
 endfunction
 
 function! <%= namespace %>#CwordRegex() abort
-  let keyword = expand('<cword>')
-  let patterns = []
-  for regex in s:Regexes()
-    call add(patterns, '-e ' . shellescape(substitute(regex, s:placeholder, keyword, 'g')))
-  endfor
-  if len(patterns)
-    " call add(patterns, '-e ' . printf('''\b%s\b''', keyword))
-    return join(patterns, ' ')
-  endif
-  return printf('''\b%s\b''', keyword)
+    let l:keyword = expand('<cword>')
+    let l:patterns = []
+    for l:regex in s:Regexes()
+        call add(patterns, '-e ' .. shellescape(substitute(l:regex, s:placeholder, l:keyword, 'g')))
+    endfor
+    if len(l:patterns)
+        " call add(l:patterns, '-e ' .. printf('''\b%s\b''', l:keyword))
+        return join(l:patterns, ' ')
+    endif
+    return printf('''\b%s\b''', l:keyword)
 endfunction
 
 function! <%= namespace %>#RgCword() abort
-  return '-s ' . join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . <%= namespace %>#Cword()
+    return '-s ' .. join(zero#filetype#RgFileTypeOpts(), ' ') .. ' ' .. <%= namespace %>#Cword()
 endfunction
 
 function! <%= namespace %>#RgCwordRegex() abort
-  return '-s ' . join(zero#filetype#RgFileTypeOpts(), ' ') . ' ' . <%= namespace %>#CwordRegex()
+    return '-s ' .. join(zero#filetype#RgFileTypeOpts(), ' ') .. ' ' .. <%= namespace %>#CwordRegex()
 endfunction
 
 function! <%= namespace %>#GitCword() abort
-  return <%= namespace %>#Cword() . ' ' . join(zero#filetype#GitFileTypeOpts(), ' ')
+    return <%= namespace %>#Cword() .. ' ' .. join(zero#filetype#GitFileTypeOpts(), ' ')
 endfunction
 
 function! <%= namespace %>#GitCwordRegex() abort
-  return <%= namespace %>#CwordRegex() . ' ' . join(zero#filetype#GitFileTypeOpts(), ' ')
+    return <%= namespace %>#CwordRegex() .. ' ' .. join(zero#filetype#GitFileTypeOpts(), ' ')
 endfunction

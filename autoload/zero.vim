@@ -48,35 +48,35 @@ endfunction
 
 function! zero#Vword() range abort
     " Save the current register and clipboard
-    let reg_save     = getreg('"')
-    let regtype_save = getregtype('"')
-    let cb_save      = &clipboard
+    let l:reg_save     = getreg('"')
+    let l:regtype_save = getregtype('"')
+    let l:cb_save      = &clipboard
     set clipboard&
 
     " Put the current visual selection in the " register
     normal! ""gvy
 
-    let selection = getreg('"')
+    let l:selection = getreg('"')
 
     " Put the saved registers and clipboards back
-    call setreg('"', reg_save, regtype_save)
-    let &clipboard = cb_save
+    call setreg('"', l:reg_save, l:regtype_save)
+    let &clipboard = l:cb_save
 
-    if selection ==# "\n"
+    if l:selection ==# "\n"
         return ''
     else
-        return selection
+        return l:selection
     endif
 endfunction
 
 function! zero#Pword() abort
-    let search = @/
+    let l:search = @/
 
-    if search ==# "\n" || empty(search)
+    if l:search ==# "\n" || empty(l:search)
         return ''
     endif
 
-    return substitute(search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    return substitute(l:search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort

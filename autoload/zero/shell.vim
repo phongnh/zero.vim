@@ -26,11 +26,11 @@ function! zero#shell#Word() abort
 endfunction
 
 function! zero#shell#Vword() range abort
-    let text = zero#Trim(zero#Vword())
-    return s:Escape(text)
+    let l:text = zero#Trim(zero#Vword())
+    return s:Escape(l:text)
 endfunction
 
 function! zero#shell#Pword() abort
-    let text = zero#Trim(zero#Pword())
-    return s:Escape(text)
+    let l:text = zero#Trim(zero#Pword())
+    return s:Escape(l:text)
 endfunction

@@ -70,10 +70,10 @@ function! zero#project#find(...) abort
 
     if empty(l:root_dir) || index(s:ignored_root_dirs, l:root_dir) > -1
         let l:cwd = getcwd()
-        if index(s:ignored_root_dirs, cwd) > -1
+        if index(s:ignored_root_dirs, l:cwd) > -1
             let l:root_dir = l:starting_dir
-        elseif stridx(l:starting_dir, cwd) == 0
-            let l:root_dir = cwd
+        elseif stridx(l:starting_dir, l:cwd) == 0
+            let l:root_dir = l:cwd
         else
             let l:root_dir = l:starting_dir
         endif

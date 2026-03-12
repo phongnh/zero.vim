@@ -2,9 +2,9 @@
 let s:escape_characters = '^$.*\/~[]'
 
 function! s:Escape(text) abort
-    let text = escape(a:text, s:escape_characters)
+    let l:text = escape(a:text, s:escape_characters)
     " Escape the line endings
-    return substitute(text, '\n', '\\n', 'g')
+    return substitute(l:text, '\n', '\\n', 'g')
 endfunction
 
 function! zero#substitute#Escape(text) abort
