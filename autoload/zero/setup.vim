@@ -42,6 +42,9 @@ function! zero#setup#ToggleMappings() abort
     " Toggle EOL
     nnoremap <expr> yoE printf(":\<C-u>set listchars%s=eol:§\<CR>", &listchars =~# '\V\<eol\>' ? '-' : '+')
 
+    " Toggle trailing space
+    nnoremap <expr> yo<Space> printf(":\<C-u>set listchars%s=trail:·\<CR>", &listchars =~# '\V\<trail\>' ? '-' : '+')
+
     " Toggle Indent Guides
     if has('patch-8.2.5066')
         nnoremap <expr> yoI printf(":\<C-u>set listchars%s=leadmultispace:┊%s\<CR>", &listchars =~# '\V\<leadmultispace\>' ? '-' : '+', escape(repeat(' ', (exists('*shiftwidth') ? shiftwidth() : &shiftwidth)  - 1), ' '))

@@ -16,10 +16,10 @@ endfunction
 function! zero#LogCommand(cmd, ...) abort
     if g:zero_vim_debug
         let l:tag = get(a:, 1, '')
-        if strlen(l:tag)
-            let l:tag = '[' . l:tag . '] '
+        if !empty(l:tag)
+            let l:tag = '[' .. l:tag .. '] '
         endif
-        call s:Print('Running: ' . l:tag . string(a:cmd))
+        call s:Print('Running: ' .. l:tag .. string(a:cmd))
     endif
 endfunction
 
@@ -35,7 +35,7 @@ endif
 
 " Search Helpers
 function! zero#CCword() abort
-    return '\b' . expand('<cword>') . '\b'
+    return '\b' .. expand('<cword>') .. '\b'
 endfunction
 
 function! zero#Cword() abort
@@ -47,36 +47,23 @@ function! zero#Word() abort
 endfunction
 
 function! zero#Vword() range abort
-    " Save the current register and clipboard
-    let l:reg_save     = getreg('"')
+    let l:reg_save = @@
     let l:regtype_save = getregtype('"')
-    let l:cb_save      = &clipboard
-    set clipboard&
 
-    " Put the current visual selection in the " register
-    normal! ""gvy
+    normal! gvy
+    let l:selection = @@
 
-    let l:selection = getreg('"')
-
-    " Put the saved registers and clipboards back
     call setreg('"', l:reg_save, l:regtype_save)
-    let &clipboard = l:cb_save
 
-    if l:selection ==# "\n"
-        return ''
-    else
-        return l:selection
-    endif
+    return l:selection ==# "\n" ? '' : l:selection
 endfunction
 
 function! zero#Pword() abort
     let l:search = @/
 
-    if l:search ==# "\n" || empty(l:search)
-        return ''
-    endif
-
-    return substitute(l:search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    return empty(l:search) || l:search ==# "\n"
+                \ ? ''
+                \ : substitute(l:search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
@@ -112,8 +99,6 @@ function! zero#InsertCCword() abort
         return zero#dumb_jump#RgCword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#CCword()
-    elseif s:IsInputCommand()
-        return zero#shell#CCword()
     else
         return zero#shell#CCword()
     endif
@@ -146,8 +131,6 @@ function! zero#InsertWord() abort
         return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Word()
-    elseif s:IsInputCommand()
-        return zero#shell#Word()
     else
         return zero#shell#Word()
     endif
@@ -172,8 +155,6 @@ function! zero#InsertPword() abort
         return zero#substitute#Pword()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Pword()
-    elseif s:IsInputCommand()
-        return zero#shell#Pword()
     else
         return zero#shell#Pword()
     endif
@@ -189,26 +170,25 @@ function! zero#InsertInput() abort
         return zero#substitute#Input()
     elseif s:IsGrepCommand(l:cmd)
         return zero#grep#Input()
-    elseif s:IsInputCommand()
-        return zero#shell#Input()
     else
         return zero#shell#Input()
     endif
 endfunction
 
 " Replace typographic characters
-" Copied from https://github.com/srstevenson/dotfiles {{{
+" Copied from https://github.com/srstevenson/dotfiles
 function! zero#ReplaceTypographicCharacters() abort
-    let l:map = {}
-    let l:map['–'] = '--'
-    let l:map['—'] = '---'
-    let l:map['‘'] = "'"
-    let l:map['’'] = "'"
-    let l:map['“'] = '"'
-    let l:map['”'] = '"'
-    let l:map['•'] = '*'
-    let l:map['…'] = '...'
-    execute ':keeppatterns :%substitute/'.join(keys(l:map), '\|').'/\=l:map[submatch(0)]/ge'
+    let l:map = {
+                \ '–': '--',
+                \ '—': '---',
+                \ "‘": "'",
+                \ "’": "'",
+                \ '“': '"',
+                \ '”': '"',
+                \ '•': '*',
+                \ '…': '...',
+                \ }
+    execute ':keeppatterns :%substitute/' .. join(keys(l:map), '\|') .. '/\=l:map[submatch(0)]/ge'
 endfunction
 
 let &cpoptions = s:save_cpo
