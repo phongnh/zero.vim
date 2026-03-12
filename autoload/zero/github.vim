@@ -62,7 +62,7 @@ function! zero#github#OpenRepo(...) abort
     else
         let l:path = printf('%s/%s', l:remote.owner, l:remote.repo)
     endif
-    if l:remote.host =~# 'github.com'
+    if stridx(l:remote.host, 'github.com') > -1
         let l:url = printf('https://github.com/%s', l:path)
         call zero#browser#Open(l:url)
     endif
@@ -115,7 +115,7 @@ function! zero#github#OpenPRs(...) abort
             let l:path = printf('%s/%s/pulls', l:owner, l:repo)
         endif
     endif
-    if l:host =~# 'github.com'
+    if stridx(l:host, 'github.com') > -1
         let l:url = printf('https://github.com/%s', l:path)
         call zero#browser#Open(l:url)
     endif
@@ -128,7 +128,7 @@ endfunction
 function! s:SystemRun(cmd, ...) abort
     let l:cwd = get(a:, 1, '')
 
-    if strlen(l:cwd)
+    if !empty(l:cwd)
         let l:cmd = printf('cd %s && %s', fnameescape(l:cwd), a:cmd)
     else
         let l:cmd = a:cmd
@@ -155,10 +155,10 @@ endfunction
 
 function! zero#github#OpenBranch(...) abort
     let l:branch = a:0 > 0 ? a:1 : s:GitBranch()
-    if strlen(l:branch)
+    if !empty(l:branch)
         let l:remote = s:ParseRemote()
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
-        if l:host =~# 'github.com'
+        if stridx(l:host, 'github.com') > -1
             let l:url = printf('https://github.com/%s/%s/tree/%s', l:owner, l:repo, l:branch)
             call zero#browser#Open(l:url)
         endif
@@ -171,10 +171,10 @@ function! zero#github#OpenFile(...) abort
     let l:branch = s:GitBranch()
     let l:file = a:0 > 0 ? expand(a:1) : expand('%')
     let l:file = fnamemodify(l:file, ':p:.')
-    if strlen(l:branch) && strlen(l:file)
+    if !empty(l:branch) && !empty(l:file)
         let l:remote = s:ParseRemote()
         let [l:host, l:owner, l:repo] = [l:remote.host, l:remote.owner, l:remote.repo]
-        if l:host =~# 'github.com'
+        if stridx(l:host, 'github.com') > -1
             let l:url = printf('https://github.com/%s/%s/blob/%s/%s', l:owner, l:repo, l:branch, l:file)
             call zero#browser#Open(l:url)
         endif

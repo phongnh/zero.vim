@@ -62,7 +62,7 @@ function! zero#project#find(...) abort
             let l:root_dir = substitute(l:root_dir, l:root_marker .. '$', '', '')
         endif
 
-        if strlen(l:root_dir)
+        if !empty(l:root_dir)
             let l:root_dir = fnamemodify(l:root_dir, ':p:h')
             break
         endif

@@ -78,11 +78,11 @@ function! zero#filetype#RgFileTypeOpts(...) abort
     let l:opts = []
     let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
     let l:ft = get(s:rg_filetype_mappings, l:ft, l:ft)
-    if strlen(l:ft) && has_key(s:rg_filetypes, l:ft)
+    if !empty(l:ft) && has_key(s:rg_filetypes, l:ft)
         call add(l:opts, '-t ' .. l:ft)
     else
         let l:ext = expand('%:e')
-        if strlen(l:ext)
+        if !empty(l:ext)
             call add(l:opts, '-g ' .. shellescape(printf('*.{%s}', l:ext)))
         endif
     endif
@@ -115,14 +115,14 @@ function! zero#filetype#GitFileTypeOpts(...) abort
     let l:opts = []
     let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
     let l:ft = get(s:rg_filetype_mappings, l:ft, l:ft)
-    if strlen(l:ft) && has_key(s:rg_filetypes, l:ft)
+    if !empty(l:ft) && has_key(s:rg_filetypes, l:ft)
         call add(l:opts, '--')
         for l:ext in s:rg_filetypes[l:ft]
             call add(l:opts, shellescape(l:ext))
         endfor
     else
         let l:ext = expand('%:e')
-        if strlen(l:ext)
+        if !empty(l:ext)
             call add(l:opts, '--')
             call add(l:opts, shellescape(printf('*.{%s}', l:ext)))
         endif

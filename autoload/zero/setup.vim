@@ -23,9 +23,9 @@ function! zero#setup#ToggleMappings() abort
     " Toggle clipboard
     if has('clipboard')
         if has('unnamedplus')
-            nnoremap <expr> yoy printf(":\<C-U>set clipboard%s=unnamedplus\<CR>", match(&clipboard, 'unnamedplus') > -1 ? '-' : '^')
+            nnoremap <expr> yoy printf(":\<C-U>set clipboard%s=unnamedplus\<CR>", stridx(&clipboard, 'unnamedplus') > -1 ? '-' : '^')
         else
-            nnoremap <expr> yoy printf(":\<C-U>set clipboard%s=unnamed\<CR>", match(&clipboard, 'unnamed') > -1 ? '-' : '^')
+            nnoremap <expr> yoy printf(":\<C-U>set clipboard%s=unnamed\<CR>", stridx(&clipboard, 'unnamed') > -1 ? '-' : '^')
         endif
     endif
 

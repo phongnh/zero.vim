@@ -12,7 +12,7 @@ function! zero#git#BuildPath(path) abort
 endfunction
 
 function! zero#git#FindRepo() abort
-    if exists('b:git_dir') && strlen(b:git_dir)
+    if exists('b:git_dir') && !empty(b:git_dir)
         return fnamemodify(b:git_dir, ':h')
     endif
 
@@ -42,7 +42,7 @@ endfunction
 function! s:SystemRun(cmd, ...) abort
     let l:cwd = get(a:, 1, '')
 
-    if strlen(l:cwd)
+    if !empty(l:cwd)
         let l:cmd = printf('cd %s && %s', fnameescape(l:cwd), a:cmd)
     else
         let l:cmd = a:cmd
