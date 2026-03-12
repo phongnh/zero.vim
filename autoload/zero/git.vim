@@ -134,12 +134,12 @@ endfunction
 function! zero#git#SetupViewCommit()
     if executable('gitk')
         command! -buffer ViewCommitWithGitk call zero#git#ViewCommit('gitk')
-        nnoremap <buffer> <silent> K :<C-u>ViewCommitWithGitk<CR>
+        nnoremap <buffer> <silent> K :<C-U>ViewCommitWithGitk<CR>
     endif
 
     if exists(':GBrowse') == 2
         command! -buffer ViewCommitWithGBrowse call zero#git#ViewCommit(':GBrowse')
-        nnoremap <buffer> <silent> gb :<C-u>ViewCommitWithGBrowse<CR>
+        nnoremap <buffer> <silent> gb :<C-U>ViewCommitWithGBrowse<CR>
     endif
 
     if exists(':OpenGithubCommit') == 2
