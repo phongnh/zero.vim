@@ -7,7 +7,7 @@ function! zero#git#BuildPath(path) abort
     endif
 
     let l:path = fnamemodify(l:path, ':p')
-    let l:path = substitute(l:path, zero#git#WorkTree() . '/', '', 'g')
+    let l:path = substitute(l:path, zero#git#WorkTree() .. '/', '', 'g')
     return l:path
 endfunction
 
@@ -21,7 +21,7 @@ function! zero#git#FindRepo() abort
         let l:path = getcwd()
     endif
 
-    let l:git_dir = finddir('.git', l:path . ';')
+    let l:git_dir = finddir('.git', l:path .. ';')
     if empty(l:git_dir)
         throw 'Not in git repo!'
     endif
@@ -99,8 +99,8 @@ function! s:ParseFugitiveBlameLine() abort
     let [l:hash; l:_text] = split(l:line)
     if l:hash !~# '^0\{7,\}$' && l:hash =~# '^\^\?[a-z0-9]\{7,\}$'
         if l:hash[0] == '^'
-            let l:new_hash = system('git show -s --format=format:%h ' . l:hash)
-            return strlen(l:new_hash) ? l:new_hash : l:hash[1:]
+            let l:new_hash = system('git show -s --format=format:%h ' .. l:hash)
+            return !empty(l:new_hash) ? l:new_hash : l:hash[1:]
         else
             return l:hash
         endif

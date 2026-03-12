@@ -4,13 +4,13 @@ function! s:Copy(path) abort
     if has('clipboard')
         let [@*, @+] = [@", @"]
     endif
-    echo 'Copied: ' . @"
+    echo 'Copied:' @"
 endfunction
 
 function! s:ExpandPath(path, line_number) abort
     let l:path = expand(a:path)
     if a:line_number
-        let l:path .= ':' . line('.')
+        let l:path ..= ':' .. line('.')
     endif
     return l:path
 endfunction

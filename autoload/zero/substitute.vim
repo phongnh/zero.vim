@@ -13,11 +13,11 @@ endfunction
 
 function! zero#substitute#Input(...) abort
     let l:prompt = get(a:, 1, 'Substitute: ')
-    return s:Escape(input(l:prompt)) . ' '
+    return s:Escape(input(l:prompt)) .. ' '
 endfunction
 
 function! zero#substitute#CCword() abort
-    return '\<' . zero#Cword() . '\>'
+    return '\<' .. zero#Cword() .. '\>'
 endfunction
 
 function! zero#substitute#Cword() abort
@@ -30,7 +30,7 @@ endfunction
 
 function! zero#substitute#Vword(...) range abort
     if get(a:, 1, 0)
-        return '\<' . s:Escape(zero#Vword()) . '\>'
+        return '\<' .. s:Escape(zero#Vword()) .. '\>'
     else
         return s:Escape(zero#Vword())
     endif

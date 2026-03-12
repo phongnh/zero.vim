@@ -51,15 +51,15 @@ function! zero#project#find(...) abort
 
     for l:root_marker in s:root_markers
         if index(s:file_root_markers, l:root_marker) > -1
-            let l:root_dir = findfile(l:root_marker, l:starting_dir . ';')
+            let l:root_dir = findfile(l:root_marker, l:starting_dir .. ';')
         else
-            let l:root_dir = finddir(l:root_marker, l:starting_dir . ';')
+            let l:root_dir = finddir(l:root_marker, l:starting_dir .. ';')
         endif
 
         if l:root_dir == l:root_marker
             let l:root_dir = '.'
         else
-            let l:root_dir = substitute(l:root_dir, l:root_marker . '$', '', '')
+            let l:root_dir = substitute(l:root_dir, l:root_marker .. '$', '', '')
         endif
 
         if strlen(l:root_dir)

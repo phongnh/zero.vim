@@ -13,7 +13,7 @@ endfunction
 
 function! zero#grep#Input(...) abort
     let l:prompt = get(a:, 1, 'Grep: ')
-    return s:Escape(input(l:prompt)) . ' '
+    return s:Escape(input(l:prompt)) .. ' '
 endfunction
 
 function! zero#grep#CCword() abort

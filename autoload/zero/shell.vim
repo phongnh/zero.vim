@@ -10,7 +10,7 @@ endfunction
 
 function! zero#shell#Input(...) abort
     let l:prompt = get(a:, 1, 'Shell: ')
-    return s:Escape(input(l:prompt)) . ' '
+    return s:Escape(input(l:prompt)) .. ' '
 endfunction
 
 function! zero#shell#CCword() abort

@@ -6,8 +6,8 @@ function! zero#browser#Open(opts) abort
         let l:path = get(a:opts, 'path', '/')
         let l:query = get(a:opts, 'query', '')
         let l:url = printf('https://%s', l:host)
-        let l:url .= l:path
-        let l:url .= strlen(l:query) ? '?' . query : ''
+        let l:url ..= l:path
+        let l:url ..= !empty(l:query) ? '?' .. query : ''
     endif
     if exists(':OpenBrowser') == 2
         execute 'OpenBrowser' l:url
@@ -41,5 +41,5 @@ function! s:CopyUrl(url) abort
     if has('clipboard')
         let [@*, @+] = [@", @"]
     endif
-    echo 'Copied: ' . @"
+    echo 'Copied:' @"
 endfunction

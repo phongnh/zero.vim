@@ -15,7 +15,7 @@ function! zero#gitk#Gitk(options) abort
         call zero#git#FindRepo()
         call s:RunGitk(a:options)
     catch
-        call zero#Error('Gitk: ' . v:exception)
+        call zero#Error('Gitk: ' .. v:exception)
     endtry
 endfunction
 
@@ -27,6 +27,6 @@ function! zero#gitk#GitkFile(path, bang) abort
         let l:path = map(l:path, 'escape(v:val, " ")')
         call call('s:RunGitk', ['--'] + l:path)
     catch
-        call zero#Error('GitkFile: ' . v:exception)
+        call zero#Error('GitkFile: ' .. v:exception)
     endtry
 endfunction
