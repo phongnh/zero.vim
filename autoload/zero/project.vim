@@ -17,8 +17,6 @@ let s:file_root_markers = get(g:, 'zero_vim_file_root_markers', [
             \ '.root',
             \ ])
 
-let s:root_markers = s:vcs_root_markers + s:file_root_markers
-
 let s:ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
             \ '/',
             \ '/root',
