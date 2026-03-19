@@ -33,51 +33,38 @@ let s:ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
             \ ])
 
 function! zero#project#find(...) abort
-    let l:starting_dir = get(a:, 1, "")
-
-    if type(l:starting_dir) != v:t_string
-        let l:starting_dir = ""
-    endif
-
-    if empty(l:starting_dir)
-        let l:starting_dir = expand('%:p:h')
-    endif
+    let l:starting_dir = a:0 > 0 && type(a:1) == v:t_string && !empty(a:1)
+                \ ? a:1
+                \ : expand('%:p:h')
 
     if empty(l:starting_dir) || !isdirectory(l:starting_dir)
         return ''
     endif
 
-    let l:root_dir = ''
-
-    for l:root_marker in s:root_markers
-        if index(s:file_root_markers, l:root_marker) > -1
-            let l:root_dir = findfile(l:root_marker, l:starting_dir .. ';')
-        else
-            let l:root_dir = finddir(l:root_marker, l:starting_dir .. ';')
-        endif
-
-        if l:root_dir == l:root_marker
-            let l:root_dir = '.'
-        else
-            let l:root_dir = substitute(l:root_dir, l:root_marker .. '$', '', '')
-        endif
-
-        if !empty(l:root_dir)
-            let l:root_dir = fnamemodify(l:root_dir, ':p:h')
-            break
+    " Search for VCS markers first (prioritize them as they're more reliable)
+    for l:marker in s:vcs_root_markers
+        let l:found = finddir(l:marker, l:starting_dir .. ';')
+        if !empty(l:found)
+            return fnamemodify(l:found, ':p:h:h:~')
         endif
     endfor
 
-    if empty(l:root_dir) || index(s:ignored_root_dirs, l:root_dir) > -1
-        let l:cwd = getcwd()
-        if index(s:ignored_root_dirs, l:cwd) > -1
-            let l:root_dir = l:starting_dir
-        elseif stridx(l:starting_dir, l:cwd) == 0
-            let l:root_dir = l:cwd
-        else
-            let l:root_dir = l:starting_dir
+    " Search for file markers
+    for l:marker in s:file_root_markers
+        let l:found = findfile(l:marker, l:starting_dir .. ';')
+        if !empty(l:found)
+            return fnamemodify(l:found, ':p:h:~')
         endif
-    endif
+    endfor
 
-    return fnamemodify(l:root_dir, ':p:h:~')
+    " No marker found, determine fallback directory
+    let l:cwd = getcwd()
+
+    if index(s:ignored_root_dirs, l:cwd) == -1 && stridx(l:starting_dir, fnamemodify(l:cwd, ':p')) == 0
+        " Use cwd if it's valid and starting_dir is under it
+        return fnamemodify(l:cwd, ':~')
+    else
+        " Fall back to starting directory
+        return fnamemodify(l:starting_dir, ':~')
+    endif
 endfunction
