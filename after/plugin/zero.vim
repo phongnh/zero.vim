@@ -1,3 +1,2 @@
-" Toggle Mappings
-call zero#setup#ToggleMappings()
-call zero#setup#UnimpairedMappings()
+" Setup Toggle Mappings
+call zero#toggle#Setup()
