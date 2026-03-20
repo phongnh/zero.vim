@@ -12,27 +12,6 @@ let g:zero_vim_debug = get(g:, 'zero_vim_debug', 0)
 command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacters()
 " }}}
 
-" Copy Commands {{{
-command! -bang CopyPath            call zero#path#CopyPath(<bang>0)
-command! -bang CopyFullPath        call zero#path#CopyFullPath(<bang>0)
-command! -bang CopyAbsolutePath    call zero#path#CopyAbsolutePath(<bang>0)
-command!       CopyDirPath         call zero#path#CopyDirPath()
-command!       CopyFullDirPath     call zero#path#CopyFullDirPath()
-command!       CopyAbsoluteDirPath call zero#path#CopyAbsoluteDirPath()
-
-if get(g:, 'zero_vim_path_mappings', 1)
-    nnoremap <silent> yc :CopyPath<CR>
-    nnoremap <silent> yC :CopyPath!<CR>
-    nnoremap <silent> yp :CopyFullPath<CR>
-    nnoremap <silent> yP :CopyFullPath!<CR>
-    nnoremap <silent> yu :CopyAbsolutePath<CR>
-    nnoremap <silent> yU :CopyAbsolutePath!<CR>
-    nnoremap <silent> y. :CopyDirPath<CR>
-    nnoremap <silent> yd :CopyFullDirPath<CR>
-    nnoremap <silent> yD :CopyAbsoluteDirPath<CR>
-endif
-" }}}
-
 " Highlight commands {{{
 if get(g:, 'zero_vim_highlight_commands', 0)
     " Highlight current line

@@ -30,12 +30,6 @@
 ### This plugin defines the following commands:
 
 * ReplaceTypographicCharacters (copied from https://github.com/srstevenson/dotfiles)
-* CopyPath
-* CopyFullPath
-* CopyAbsolutePath
-* CopyDirPath
-* CopyFullDirPath
-* CopyAbsoluteDirPath
 * HighlightLine
 * HighlightWord
 * HighlightColumns
