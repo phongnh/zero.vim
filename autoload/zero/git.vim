@@ -141,9 +141,5 @@ function! zero#git#SetupViewCommit()
         command! -buffer ViewCommitWithGBrowse call zero#git#ViewCommit(':GBrowse')
         nnoremap <buffer> <silent> gb :<C-U>ViewCommitWithGBrowse<CR>
     endif
-
-    if exists(':OpenGithubCommit') == 2
-        command! -buffer ViewCommitWithGithub call zero#git#ViewCommit(':OpenGithubCommit')
-    endif
 endfunction
 

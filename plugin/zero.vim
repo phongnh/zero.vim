@@ -28,13 +28,6 @@ if get(g:, 'zero_vim_highlight_commands', 0)
 endif
 " }}}
 
-" GitHub
-command!                                                      OpenGitHubMyPRs  call zero#github#OpenMyPRs()
-command! -nargs=?                                             OpenGitHubRepo   call zero#github#OpenRepo(<f-args>)
-command! -nargs=*                                             OpenGitHubPRs    call zero#github#OpenPRs(<f-args>)
-command! -nargs=? -complete=custom,zero#github#RemoteBranches OpenGitHubBranch call zero#github#OpenBranch(<f-args>)
-command! -nargs=? -complete=file                              OpenGitHubFile   call zero#github#OpenFile(<f-args>)
-
 " Gitk
 if executable('gitk')
     command! -nargs=? -complete=custom,zero#git#Branches Gitk     call zero#gitk#Gitk(expand(<q-args>))
