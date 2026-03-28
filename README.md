@@ -34,4 +34,3 @@
 * HighlightWord
 * HighlightColumns
 * ClearHightlights
-* Gitk, GitkFile

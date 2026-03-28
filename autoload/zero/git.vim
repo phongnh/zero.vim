@@ -119,27 +119,17 @@ function! s:ParseCommitHash() abort
     endif
 endfunction
 
-function! zero#git#ViewCommit(command)
+function! s:ViewCommit(command)
     let l:hash = s:ParseCommitHash()
     if empty(l:hash)
         return
     endif
-    if exists(a:command) == 2
-        execute a:command l:hash
-    elseif a:command ==# 'gitk'
-        call zero#gitk#Gitk(l:hash)
-    endif
+    execute a:command l:hash
 endfunction
 
 function! zero#git#SetupViewCommit()
-    if executable('gitk')
-        command! -buffer ViewCommitWithGitk call zero#git#ViewCommit('gitk')
-        nnoremap <buffer> <silent> K :<C-U>ViewCommitWithGitk<CR>
-    endif
-
     if exists(':GBrowse') == 2
-        command! -buffer ViewCommitWithGBrowse call zero#git#ViewCommit(':GBrowse')
-        nnoremap <buffer> <silent> gb :<C-U>ViewCommitWithGBrowse<CR>
+        nnoremap <buffer> <silent> gb :<C-U>call <SID>ViewCommit(':GBrowse')<CR>
     endif
 endfunction
 
