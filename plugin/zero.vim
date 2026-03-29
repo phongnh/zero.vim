@@ -28,10 +28,4 @@ if get(g:, 'zero_vim_highlight_commands', 0)
 endif
 " }}}
 
-" Gitk
-if executable('gitk')
-    command! -nargs=? -complete=custom,zero#git#Branches Gitk     call zero#gitk#Gitk(expand(<q-args>))
-    command! -bang -nargs=? -complete=file               GitkFile call zero#gitk#GitkFile(expand(<q-args>), <bang>0)
-endif
-
 let g:loaded_zero_vim = 1

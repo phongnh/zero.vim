@@ -1,74 +1,3 @@
-" Git helpers
-function! zero#git#BuildPath(path) abort
-    let l:path = empty(a:path) ? expand('%') : a:path
-
-    if empty(l:path)
-        throw 'Path is required!'
-    endif
-
-    let l:path = fnamemodify(l:path, ':p')
-    let l:path = substitute(l:path, zero#git#WorkTree() .. '/', '', 'g')
-    return l:path
-endfunction
-
-function! zero#git#FindRepo() abort
-    if exists('b:git_dir') && !empty(b:git_dir)
-        return fnamemodify(b:git_dir, ':h')
-    endif
-
-    let l:path = expand('%:p:h')
-    if empty(l:path)
-        let l:path = getcwd()
-    endif
-
-    let l:git_dir = finddir('.git', l:path .. ';')
-    if empty(l:git_dir)
-        throw 'Not in git repo!'
-    endif
-
-    let b:git_dir = fnamemodify(l:git_dir, ':p:h')
-
-    return fnamemodify(b:git_dir, ':h')
-endfunction
-
-function! zero#git#WorkTree() abort
-    if exists('b:__gitmessenger_popup')
-        return gitmessenger#git#root_dir(b:__gitmessenger_popup.opener_bufnr)
-    else
-        return fnamemodify(b:git_dir, ':h:p')
-    endif
-endfunction
-
-function! s:SystemRun(cmd, ...) abort
-    let l:cwd = get(a:, 1, '')
-
-    if !empty(l:cwd)
-        let l:cmd = printf('cd %s && %s', fnameescape(l:cwd), a:cmd)
-    else
-        let l:cmd = a:cmd
-    endif
-
-    try
-        call zero#LogCommand(l:cmd)
-        return system(l:cmd)
-    catch /E684/
-    endtry
-
-    return ''
-endfunction
-
-function! zero#git#Branches(A, L, P) abort
-    try
-        let l:repo_dir = zero#git#FindRepo()
-        let l:output = s:SystemRun('git branch -a | cut -c 3-', l:repo_dir)
-        let l:output = substitute(l:output, '\s->\s[0-9a-zA-Z_\-]\+/[0-9a-zA-Z_\-]\+', '', 'g')
-        let l:output = substitute(l:output, 'remotes/', '', 'g')
-        return l:output
-    catch
-        return ''
-    endtry
-endfunction
-
 " Git Messenger Popup
 function! s:ParseGitMessengerContent() abort
     for l:line in get(b:__gitmessenger_popup, 'contents', [])
@@ -132,4 +61,3 @@ function! zero#git#SetupViewCommit()
         nnoremap <buffer> <silent> gb :<C-U>call <SID>ViewCommit(':GBrowse')<CR>
     endif
 endfunction
-
