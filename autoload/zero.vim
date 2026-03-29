@@ -2,9 +2,6 @@
 " Maintainer: Phong Nguyen
 " Version:    0.1.0
 
-let s:save_cpo = &cpoptions
-set cpoptions&vim
-
 function! s:Print(msg) abort
     echohl WarningMsg | echomsg a:msg | echohl None
 endfunction
@@ -190,6 +187,3 @@ function! zero#ReplaceTypographicCharacters() abort
                 \ }
     execute ':keeppatterns :%substitute/' .. join(keys(l:map), '\|') .. '/\=l:map[submatch(0)]/ge'
 endfunction
-
-let &cpoptions = s:save_cpo
-unlet s:save_cpo
