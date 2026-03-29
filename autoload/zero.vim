@@ -10,23 +10,13 @@ function! zero#Error(msg) abort
     echohl ErrorMsg | echomsg a:msg | echohl None
 endfunction
 
-function! zero#LogCommand(cmd, ...) abort
-    if g:zero_vim_debug
-        let l:tag = get(a:, 1, '')
-        if !empty(l:tag)
-            let l:tag = '[' .. l:tag .. '] '
-        endif
-        call s:Print('Running: ' .. l:tag .. string(a:cmd))
-    endif
-endfunction
-
-function! zero#Trim(str) abort
-    return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
-endfunction
-
 if exists('*trim')
     function! zero#Trim(str) abort
         return trim(a:str)
+    endfunction
+else
+    function! zero#Trim(str) abort
+        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
     endfunction
 endif
 
@@ -44,23 +34,19 @@ function! zero#Word() abort
 endfunction
 
 function! zero#Vword() range abort
-    let l:reg_save = @@
-    let l:regtype_save = getregtype('"')
-
-    normal! gvy
-    let l:selection = @@
-
-    call setreg('"', l:reg_save, l:regtype_save)
-
-    return l:selection ==# "\n" ? '' : l:selection
+    let l:saved = @"
+    silent execute 'normal! ""gvy'
+    let l:text = @"
+    let @" = l:saved
+    return l:text ==# "\n" ? '' : l:text
 endfunction
 
 function! zero#Pword() abort
-    let l:search = @/
-
-    return empty(l:search) || l:search ==# "\n"
-                \ ? ''
-                \ : substitute(l:search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    let l:text = @/
+    if empty(l:text) || l:text ==# "\n"
+        return ''
+    endif
+    return substitute(l:text, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
