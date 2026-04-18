@@ -44,7 +44,11 @@ endif
 
 augroup ZeroVimToggleSetup
     autocmd!
-    autocmd VimEnter * call zero#toggle#Setup()
+    if v:vim_did_init
+        call zero#toggle#Setup()
+    else
+        autocmd VimEnter * call zero#toggle#Setup()
+    endif
 augroup END
 
 " Replace typographic characters {{{

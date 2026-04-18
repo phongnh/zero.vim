@@ -33,5 +33,9 @@ import autoload 'zero/toggle.vim' as ZeroToggle
 
 augroup ZeroVimToggleSetup
     autocmd!
-    autocmd VimEnter * ZeroToggle.Setup()
+    if v:vim_did_init
+        ZeroToggle.Setup()
+    else
+        autocmd VimEnter * ZeroToggle.Setup()
+    endif
 augroup END
