@@ -8,12 +8,8 @@ H.default_config = {
   unimpaired_mappings = nil,
 }
 
-H.echo = function(...)
-  local args = {}
-  for idx = 1, select("#", ...) do
-    args[idx] = select(idx, ...)
-  end
-  vim.api.nvim_echo({ { table.concat(args, " ") } }, false, {})
+H.echo = function(message)
+  vim.api.nvim_echo({ { message } }, false, {})
 end
 
 -- Move line up/down
