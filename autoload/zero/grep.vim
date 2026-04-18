@@ -69,7 +69,13 @@ function! zero#grep#GrepperPword() abort
 endfunction
 
 function! s:LeaderfEscape(text) abort
-    return shellescape(escape(a:text, '"'))
+    let l:shell = &shell
+    try
+        let &shell = 'sh'
+        return shellescape(escape(a:text, '"'))
+    finally
+        let &shell = l:shell
+    endtry
 endfunction
 
 function! zero#grep#LeaderfEscape(text) abort
