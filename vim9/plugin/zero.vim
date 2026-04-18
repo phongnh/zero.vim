@@ -28,3 +28,10 @@ if get(g:, 'zero_path_mappings', 1)
     nnoremap <silent> yd <ScriptCmd>call ZeroPath.CopyFullDirPath()<CR>
     nnoremap <silent> yD <ScriptCmd>call ZeroPath.CopyAbsoluteDirPath()<CR>
 endif
+
+import autoload 'zero/toggle.vim' as ZeroToggle
+
+augroup ZeroVimToggleSetup
+    autocmd!
+    autocmd VimEnter * ZeroToggle.Setup()
+augroup END
