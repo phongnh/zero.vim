@@ -1,6 +1,4 @@
-let s:escape_characters = '\^$.*+?()[]{}|-'
-
-function! s:Shellescape(text) abort
+function! s:Escape(text) abort
     let l:shell = &shell
     try
         let &shell = 'sh'
@@ -10,29 +8,16 @@ function! s:Shellescape(text) abort
     endtry
 endfunction
 
-function! zero#grepper#Shellescape(text) abort
-    return s:Shellescape(a:text)
-endfunction
-
-function! s:Escape(text) abort
-    return s:Shellescape(escape(a:text, s:escape_characters))
-endfunction
-
 function! zero#grepper#Escape(text) abort
     return s:Escape(a:text)
 endfunction
 
-function! zero#grepper#Input(...) abort
-    let l:prompt = get(a:, 1, 'Shell: ')
-    return s:Escape(input(l:prompt)) .. ' '
-endfunction
-
 function! zero#grepper#CCword() abort
-    return shellescape(zero#CCword())
+    return s:Escape(zero#CCword())
 endfunction
 
 function! zero#grepper#Cword() abort
-    return shellescape(zero#Cword())
+    return s:Escape(zero#Cword())
 endfunction
 
 function! zero#grepper#Word() abort
@@ -40,11 +25,13 @@ function! zero#grepper#Word() abort
 endfunction
 
 function! zero#grepper#Vword() range abort
-    let l:text = zero#Trim(zero#Vword())
-    return s:Escape(l:text)
+    return s:Escape(zero#Vword())
+endfunction
+
+function! zero#grepper#Visual() range abort
+    return s:Escape(zero#Visual())
 endfunction
 
 function! zero#grepper#Pword() abort
-    let l:text = zero#Trim(zero#Pword())
-    return s:Escape(l:text)
+    return s:Escape(zero#Pword())
 endfunction
