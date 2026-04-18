@@ -10,6 +10,10 @@ function! s:Shellescape(text) abort
     endtry
 endfunction
 
+function! zero#grepper#Shellescape(text) abort
+    return s:Shellescape(a:text)
+endfunction
+
 function! s:Escape(text) abort
     return s:Shellescape(escape(a:text, s:escape_characters))
 endfunction
