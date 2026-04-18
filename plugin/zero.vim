@@ -42,6 +42,11 @@ if get(g:, 'zero_path_mappings', 1)
     nnoremap <silent> yD :<C-U>call zero#path#CopyAbsoluteDirPath()<CR>
 endif
 
+augroup ZeroVimToggleSetup
+    autocmd!
+    autocmd VimEnter * call zero#toggle#Setup()
+augroup END
+
 " Replace typographic characters {{{
 command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacters()
 " }}}
