@@ -1,3 +1,5 @@
+local M = {}
+
 function M.ccword()
   return "\\b" .. vim.fn.expand("<cword>") .. "\\b"
 end
