@@ -1,24 +1,9 @@
-" zero.vim
-" Maintainer: Phong Nguyen
-" Version:    0.1.0
-
-function! s:Print(msg) abort
-    echohl WarningMsg | echomsg a:msg | echohl None
-endfunction
-
-function! zero#Error(msg) abort
-    echohl ErrorMsg | echomsg a:msg | echohl None
-endfunction
-
-if exists('*trim')
-    function! zero#Trim(str) abort
+function! zero#Trim(str) abort
+    if exists('*trim')
         return trim(a:str)
-    endfunction
-else
-    function! zero#Trim(str) abort
-        return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
-    endfunction
-endif
+    endif
+    return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
 
 " Search Helpers
 function! zero#CCword() abort
@@ -54,12 +39,8 @@ function! s:IsSubstituteCommand(cmd) abort
                 \ a:cmd =~# '^\(silent!\?\s\+\)\?\(c\|l\)\(fdo\|do\)\s\+\(s\|substitute\|S\|Subvert\)/'
 endfunction
 
-function! s:IsGrepperGitCommand(cmd) abort
-    return a:cmd =~# '^\(GrepperGit\)\s'
-endfunction
-
 function! s:IsGrepperCommand(cmd) abort
-    return a:cmd =~# '^\(Grepper\|SGrepper\|LGrepper\|PGrepper\|TGrepper\|GrepperRg\)\s'
+    return a:cmd =~# '^\(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
@@ -76,8 +57,6 @@ function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#CCword()
-    elseif s:IsGrepperGitCommand(l:cmd)
-        return zero#dumb_jump#GitCword()
     elseif s:IsGrepperCommand(l:cmd)
         return zero#dumb_jump#RgCword()
     elseif s:IsGrepCommand(l:cmd)
@@ -91,8 +70,6 @@ function! zero#InsertCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Cword()
-    elseif s:IsGrepperGitCommand(l:cmd)
-        return zero#dumb_jump#Cword()
     elseif s:IsGrepperCommand(l:cmd)
         return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
@@ -108,8 +85,6 @@ function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Word()
-    elseif s:IsGrepperGitCommand(l:cmd)
-        return zero#dumb_jump#Cword()
     elseif s:IsGrepperCommand(l:cmd)
         return zero#dumb_jump#Cword()
     elseif s:IsGrepCommand(l:cmd)
