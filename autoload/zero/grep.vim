@@ -67,3 +67,35 @@ endfunction
 function! zero#grep#GrepperPword() abort
     return s:GrepperEscape(zero#Pword())
 endfunction
+
+function! s:LeaderfEscape(text) abort
+    return shellescape(escape(a:text, '"'))
+endfunction
+
+function! zero#grep#LeaderfEscape(text) abort
+    return s:LeaderfEscape(a:text)
+endfunction
+
+function! zero#grep#LeaderfCCword() abort
+    return s:LeaderfEscape(zero#CCword())
+endfunction
+
+function! zero#grep#LeaderfCword() abort
+    return s:LeaderfEscape(zero#Cword())
+endfunction
+
+function! zero#grep#LeaderfWord() abort
+    return s:LeaderfEscape(zero#Word())
+endfunction
+
+function! zero#grep#LeaderfVword() range abort
+    return s:LeaderfEscape(zero#Vword())
+endfunction
+
+function! zero#grep#LeaderfVisual() range abort
+    return s:LeaderfEscape(zero#Visual())
+endfunction
+
+function! zero#grep#LeaderfPword() abort
+    return s:LeaderfEscape(zero#Pword())
+endfunction
