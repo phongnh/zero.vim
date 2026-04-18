@@ -30,11 +30,13 @@ let s:ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
             \ expand('~'),
             \ ])
 
-function! zero#project#find(...) abort
+function! zero#project#Find(...) abort
+    " Handle optional starting directory argument
     let l:starting_dir = a:0 > 0 && type(a:1) == v:t_string && !empty(a:1)
                 \ ? a:1
                 \ : expand('%:p:h')
 
+    " Return empty if directory is invalid
     if empty(l:starting_dir) || !isdirectory(l:starting_dir)
         return ''
     endif
