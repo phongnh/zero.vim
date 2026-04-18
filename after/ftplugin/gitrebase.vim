@@ -1,1 +1,0 @@
-call zero#git#SetupViewCommit()
