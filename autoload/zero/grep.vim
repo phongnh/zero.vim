@@ -1,5 +1,5 @@
 function! s:Escape(text) abort
-    return shellescape(l:text)
+    return shellescape(a:text)
 endfunction
 
 function! zero#grep#Escape(text) abort
