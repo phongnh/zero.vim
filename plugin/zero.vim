@@ -51,10 +51,6 @@ augroup ZeroVimToggleSetup
     endif
 augroup END
 
-" Replace typographic characters {{{
-command! -bar ReplaceTypographicCharacters call zero#ReplaceTypographicCharacters()
-" }}}
-
 " Highlight commands {{{
 if get(g:, 'zero_vim_highlight_commands', 0)
     " Highlight current line

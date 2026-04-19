@@ -145,19 +145,3 @@ function! zero#InsertInput() abort
         return zero#shell#Input()
     endif
 endfunction
-
-" Replace typographic characters
-" Copied from https://github.com/srstevenson/dotfiles
-function! zero#ReplaceTypographicCharacters() abort
-    let l:map = {
-                \ '–': '--',
-                \ '—': '---',
-                \ "‘": "'",
-                \ "’": "'",
-                \ '“': '"',
-                \ '”': '"',
-                \ '•': '*',
-                \ '…': '...',
-                \ }
-    execute ':keeppatterns :%substitute/' .. join(keys(l:map), '\|') .. '/\=l:map[submatch(0)]/ge'
-endfunction
