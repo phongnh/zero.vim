@@ -70,78 +70,38 @@ function! zero#InsertCCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#CCword()
-    elseif s:IsGrepperCommand(l:cmd)
-        return zero#dumb_jump#RgCword()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#CCword()
-    else
-        return zero#shell#CCword()
     endif
+    return zero#CCword()
 endfunction
 
 function! zero#InsertCword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Cword()
-    elseif s:IsGrepperCommand(l:cmd)
-        return zero#dumb_jump#Cword()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#CCword()
-    elseif s:IsInputCommand()
-        return zero#shell#Cword()
-    else
-        return zero#Cword()
     endif
+    return zero#Cword()
 endfunction
 
 function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Word()
-    elseif s:IsGrepperCommand(l:cmd)
-        return zero#dumb_jump#Cword()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#Word()
-    else
-        return zero#shell#Word()
     endif
+    return zero#grep#Word()
 endfunction
 
 function! zero#InsertVword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Vword()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#Vword()
-    elseif s:IsInputCommand()
-        return zero#shell#Vword()
-    else
-        return zero#Vword()
     endif
+    return zero#grep#Vword()
 endfunction
 
 function! zero#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Pword()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#Pword()
-    else
-        return zero#shell#Pword()
     endif
-endfunction
-
-function! zero#InsertGrepPword() abort
     return zero#grep#Pword()
-endfunction
-
-function! zero#InsertInput() abort
-    let l:cmd = getcmdline()
-    if s:IsSubstituteCommand(l:cmd)
-        return zero#substitute#Input()
-    elseif s:IsGrepCommand(l:cmd)
-        return zero#grep#Input()
-    else
-        return zero#shell#Input()
-    endif
 endfunction
