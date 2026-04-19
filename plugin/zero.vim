@@ -51,22 +51,6 @@ augroup ZeroVimToggleSetup
     endif
 augroup END
 
-" Highlight commands {{{
-if get(g:, 'zero_vim_highlight_commands', 0)
-    " Highlight current line
-    command! HighlightLine call matchadd('Search', '\%' .. line('.') .. 'l')
-
-    " Highlight the word underneath the cursor
-    command! HighlightWord call matchadd('Search', '\<\w*\%' .. line('.') .. 'l\%' .. col('.') .. 'c\w*\>')
-
-    " Highlight the words contained in the virtual column
-    command! HighlightColumns call matchadd('Search', '\<\w*\%' .. virtcol('.') .. 'v\w*\>')
-
-    " Clear the permanent highlights
-    command! ClearHightlights call clearmatches()
-endif
-" }}}
-
 " Restore cpoptions
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
