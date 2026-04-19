@@ -1,7 +1,6 @@
 class ParseDefinition
   # rg, git-grep and git-grep
   RG_WORD_BOUNDARY = "($|[^a-zA-Z0-9\\?\\*-])"
-  PLACEHOLDER = "KEYWORD"
 
   DEFINITION_KEYS = [:language, :type, :regex, :regex_vim, :pcre_regex, :pcre_regex_vim, :supports]
   TEST_KEYS = [:"skip-ref-filter", :tests, :not]
@@ -37,9 +36,7 @@ class ParseDefinition
   end
 
   def build_pcre_regexp(regexp)
-    regexp
-      .gsub("JJJ", PLACEHOLDER)
-      .gsub('\\j', RG_WORD_BOUNDARY)
+    regexp.gsub('\\j', RG_WORD_BOUNDARY)
   end
 
   def format_quotes(string)

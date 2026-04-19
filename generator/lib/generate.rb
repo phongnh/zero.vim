@@ -78,8 +78,6 @@ class Generate
       definitions[key] = definitions[value]
     end
 
-    placeholder = ParseDefinition::PLACEHOLDER
-
     puts "Generating VimL from #{TEMPLATE}"
     template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)

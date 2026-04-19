@@ -1,7 +1,7 @@
 " NOTES:
 " - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
 
-let s:placeholder = '<%= placeholder %>'
+let s:placeholder = 'JJJ'
 
 let s:definitions = {
   <% definitions.each do |language, regexes| -%>
@@ -13,53 +13,18 @@ let s:definitions = {
   <% end -%>
           \ }
 
-function! s:Regexes(...) abort
-    let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
-    if has_key(s:definitions, l:ft)
-        return s:definitions[l:ft]
-    endif
-    return []
+function! s:Definitions(...) abort
+    let l:ft = get(a:, 1, '')
+    let l:ft = empty(l:ft) ? (&filetype !=# '' ? &filetype : &buftype) : l:ft
+    return get(s:definitions, l:ft, [])
 endfunction
 
-function! <%= namespace %>#Cword() abort
+function! s:Patterns(...) abort
+    let l:definitions = call('s:Definitions', a:000)
     let l:keyword = expand('<cword>')
-    let l:patterns = []
-    for l:regex in s:Regexes()
-        call add(l:patterns, '(' .. substitute(l:regex, s:placeholder, l:keyword, 'g') .. ')')
-    endfor
-    if len(l:patterns)
-        " call add(l:patterns, '(\b' .. l:keyword .. '\b)')
-        " return shellescape('(' .. join(l:patterns, '|') .. ')')
-        return "\"(" .. join(l:patterns, '|') .. ")\""
-    endif
-    return shellescape('\b' .. l:keyword .. '\b')
+    return map(l:definitions, 'substitute(v:val, s:placeholder, l:keyword, "g")')
 endfunction
 
-function! <%= namespace %>#CwordRegex() abort
-    let l:keyword = expand('<cword>')
-    let l:patterns = []
-    for l:regex in s:Regexes()
-        call add(patterns, '-e ' .. shellescape(substitute(l:regex, s:placeholder, l:keyword, 'g')))
-    endfor
-    if len(l:patterns)
-        " call add(l:patterns, '-e ' .. printf('''\b%s\b''', l:keyword))
-        return join(l:patterns, ' ')
-    endif
-    return printf('''\b%s\b''', l:keyword)
-endfunction
-
-function! <%= namespace %>#RgCword() abort
-    return '-s ' .. join(zero#filetype#RgFileTypeOpts(), ' ') .. ' ' .. <%= namespace %>#Cword()
-endfunction
-
-function! <%= namespace %>#RgCwordRegex() abort
-    return '-s ' .. join(zero#filetype#RgFileTypeOpts(), ' ') .. ' ' .. <%= namespace %>#CwordRegex()
-endfunction
-
-function! <%= namespace %>#GitCword() abort
-    return <%= namespace %>#Cword() .. ' ' .. join(zero#filetype#GitFileTypeOpts(), ' ')
-endfunction
-
-function! <%= namespace %>#GitCwordRegex() abort
-    return <%= namespace %>#CwordRegex() .. ' ' .. join(zero#filetype#GitFileTypeOpts(), ' ')
+function! <%= namespace %>#Patterns(...) abort
+    return call('s:Patterns', a:000)
 endfunction

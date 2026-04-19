@@ -80,6 +80,7 @@
   (:language "elisp" :type "variable"
              :supports ("ag" "grep" "rg" "git-grep")
              :regex "\\(JJJ\\s+"
+             :skip-ref-filter t
              :tests ("(let ((test 123)))"
                      "(let* ((test 123)))")
              :not ("(let ((test-2 123)))"
@@ -595,6 +596,29 @@
          :not ("class testnot:"
                "public class testnot implements Something"))
 
+  (:language "java" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "\\benum\\s+JJJ\\b"
+         :tests ("enum test {"
+                 "public enum test {")
+         :not ("enum testnot {"))
+
+  (:language "java" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "@interface\\s+JJJ\\b"
+         :tests ("@interface test {"
+                 "public @interface test {")
+         :not ("@interface testnot {"))
+
+  (:language "java" :type "function"
+         :supports ("grep" "git-grep")
+         :regex "(public|protected|private|static)[^(]+JJJ\\s*\\\("
+         :tests ("public int test()"
+                 "private static String test(param)"
+                 "protected List<String> test()")
+         :not ("test()"
+               "new test()"))
+
   (:language "vala" :type "function"
          :supports ("ag" "rg")
          :regex "^\\s*(?:[\\w\\[\\]]+\\s+){1,3}JJJ\\s*\\\("
@@ -625,49 +649,49 @@
                "public class testnot : IReadableChannel, I"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Variable\\s+JJJ\\b"
          :tests ("Variable test")
          :not ("Variable testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Inductive\\s+JJJ\\b"
          :tests ("Inductive test")
          :not ("Inductive testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Lemma\\s+JJJ\\b"
          :tests ("Lemma test")
          :not ("Lemma testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Definition\\s+JJJ\\b"
          :tests ("Definition test")
          :not ("Definition testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Hypothesis\\s+JJJ\\b"
          :tests ("Hypothesis test")
          :not ("Hypothesis testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
-         :regex "\\s*Theorm\\s+JJJ\\b"
-         :tests ("Theorm test")
-         :not ("Theorm testx"))
+         :supports ("ag" "rg" "grep" "git-grep")
+         :regex "\\s*Theorem\\s+JJJ\\b"
+         :tests ("Theorem test")
+         :not ("Theorem testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Fixpoint\\s+JJJ\\b"
          :tests ("Fixpoint test")
          :not ("Fixpoint testx"))
 
   (:language "coq" :type "function"
-         :supports ("ag" "rg" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*Module\\s+JJJ\\b"
          :tests ("Module test")
          :not ("Module testx"))
@@ -696,7 +720,7 @@
          :regex "\\s*\\bJJJ\\b(\\s*:[^=]+)?\\s*=[^=]+"
          :tests ("test = 1234"
                  "test: int = 1234"
-                 "test: int | None = 12i34"
+                 "test: int | None = 1234"
                  "test: List[Optional[int]] = [1234, None]")
          :not ("if test == 1234:"
                "_test = 1234"
@@ -719,6 +743,22 @@
                  "class test:")
          :not ("class testnot:"
                "class testnot(object):"))
+
+  (:language "python" :type "function"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "async\\s+def\\s*JJJ\\b\\s*\\\("
+         :tests ("async def test(param)"
+                 "async def test()")
+         :not ("async def testnot(param)"
+               "async def testnot()"))
+
+  (:language "python" :type "function"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "^\\s*JJJ\\s*=\\s*lambda\\b"
+         :tests ("test = lambda x: x"
+                 "test = lambda: None")
+         :not ("testnot = lambda x: x"
+               "foo(test=lambda x: x)"))
 
   (:language "matlab" :type "variable"
          :supports ("ag" "grep" "rg" "git-grep")
@@ -1040,9 +1080,9 @@
          :tests ("contract test{"
                  "contract test {"
                  "contract test is foo"))
-  
-  (:language "solidity" :type "type" 
-         :supports ("ag" "grep" "rg" "git-grep") 
+
+  (:language "solidity" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
          :regex  "struct\\s*JJJ\\s*\\\{"
          :tests ("struct test{"
                  "struct test {"))
@@ -1389,6 +1429,23 @@
          :regex "type\\s+JJJ\\s+struct\\s+\\\{"
          :tests ("type test struct {"))
 
+  (:language "go" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "type\\s+JJJ(\\\[[^]]+\\\])?\\s+interface\\s*\\\{"
+         :tests ("type test interface {"
+                 "type test[T comparable] interface {")
+         :not ("type testnot interface {"))
+
+  (:language "go" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "type\\s+JJJ(\\\[[^]]+\\\])?\\s+"
+         :tests ("type test int"
+                 "type test[T any] []byte"
+                 "type test = string"
+                 "type test []byte"
+                 "type test string")
+         :not ("type testnot int"))
+
   (:language "javascript" :tags ("angular") :type "function"
          :supports ("ag" "grep" "rg" "git-grep")
          :regex "(service|factory)\\\(['\"]JJJ['\"]"
@@ -1625,12 +1682,13 @@
                  "abstract test <:Testable" ))
 
   (:language "haskell" :type "module"
-         :supports ("ag")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "^module\\s+JJJ\\s+"
-         :tests ("module Test (exportA, exportB) where"))
+         :tests ("module test (exportA, exportB) where")
+         :not ("-- module test" "import test"))
 
   (:language "haskell" :type "top level function"
-         :supports ("ag")
+         :supports ("ag" "rg")
          :regex "^\\bJJJ(?!(\\s+::))\\s+((.|\\s)*?)=\\s+"
          :tests ("test n = n * 2"
                  "test X{..} (Y a b c) \n bcd \n =\n x * y"
@@ -1644,27 +1702,27 @@
                "test :: Sometype -> AnotherType aoeu kek = undefined"))
 
   (:language "haskell" :type "type-like"
-         :supports ("ag")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "^\\s*((data(\\s+family)?)|(newtype)|(type(\\s+family)?))\\s+JJJ\\s+"
-         :tests ("newtype Test a = Something { b :: Kek }"
-                 "data Test a b = Somecase a | Othercase b"
-                 "type family Test (x :: *) (xs :: [*]) :: Nat where"
-                 "data family Test "
-                 "type Test = TestAlias")
-         :not ("newtype NotTest a = NotTest (Not a)"
-               "data TestNot b = Aoeu"))
+         :tests ("newtype test a = Something { b :: Kek }"
+                 "data test a b = Somecase a | Othercase b"
+                 "type family test (x :: *) (xs :: [*]) :: Nat where"
+                 "data family test "
+                 "type test = TestAlias")
+         :not ("newtype nottest a = nottest (Not a)"
+               "data testnot b = Aoeu"))
 
   (:language "haskell" :type "(data)type constructor 1"
-         :supports ("ag")
+         :supports ("ag" "rg")
          :regex "(data|newtype)\\s{1,3}(?!JJJ\\s+)([^=]{1,40})=((\\s{0,3}JJJ\\s+)|([^=]{0,500}?((?<!(-- ))\\|\\s{0,3}JJJ\\s+)))"
-         :tests ("data Something a = Test { b :: Kek }"
-                 "data Mem a = TrueMem { b :: Kek } | Test (Mem Int) deriving Mda"
-                 "newtype SafeTest a = Test (Kek a) deriving (YonedaEmbedding)")
-         :not ("data Test = Test { b :: Kek }"))
+         :tests ("data Something a = test { b :: Kek }"
+                 "data Mem a = TrueMem { b :: Kek } | test (Mem Int) deriving Mda"
+                 "newtype SafeTest a = test (Kek a) deriving (YonedaEmbedding)")
+         :not ("data test = test { b :: Kek }"))
 
 
   (:language "haskell" :type "data/newtype record field"
-         :supports ("ag")
+         :supports ("ag" "rg")
          :regex "(data|newtype)([^=]*)=[^=]*?({([^=}]*?)(\\bJJJ)\\s+::[^=}]+})"
          :tests ("data Mem = Mem { \n mda :: A \n  , test :: Kek \n , \n aoeu :: E \n }"
                  "data Mem = Mem { \n test :: A \n  , mda :: Kek \n , \n aoeu :: E \n }"
@@ -1679,16 +1737,16 @@
          :not ("data Heh = Mda { sometest :: Kek, testsome :: Mem }"))
 
   (:language "haskell" :type "typeclass"
-         :supports ("ag")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "^class\\s+(.+=>\\s*)?JJJ\\s+"
          :tests (
-                 "class (Constr1 m, Constr 2) => Test (Kek a) where"
-                 "class  Test  (Veryovka a)  where ")
-         :not ("class Test2 (Kek a) where"
-               "class MakeTest (AoeuTest x y z) where"))
+                 "class (Constr1 m, Constr 2) => test (Kek a) where"
+                 "class  test  (Veryovka a)  where ")
+         :not ("class test2 (Kek a) where"
+               "class maketest (AoeuTest x y z) where"))
 
   (:language "ocaml" :type "type"
-         :supports ("ag" "rg")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "^\\s*(and|type)\\s+.*\\bJJJ\\b"
          :tests ("type test ="
                  "and test ="
@@ -1696,29 +1754,29 @@
                  "type ('a, _, 'c) test"))
 
   (:language "ocaml" :type "variable"
-         :supports ("ag" "rg")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "let\\s+JJJ\\b"
          :tests ("let test ="
                  "let test x y ="))
 
   (:language "ocaml" :type "variable"
-         :supports ("ag" "rg")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "let\\s+rec\\s+JJJ\\b"
          :tests ("let rec test ="
                  "let rec  test x y ="))
 
   (:language "ocaml" :type "variable"
-         :supports ("ag" "rg")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "\\s*val\\s*\\bJJJ\\b\\s*"
          :tests ("val test"))
 
   (:language "ocaml" :type "module"
-         :supports ("ag" "rg")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "^\\s*module\\s*\\bJJJ\\b"
          :tests ("module test ="))
 
    (:language "ocaml" :type "module"
-          :supports ("ag" "rg")
+          :supports ("ag" "rg" "grep" "git-grep")
           :regex "^\\s*module\\s*type\\s*\\bJJJ\\b"
           :tests ("module type test ="))
 
@@ -2090,7 +2148,7 @@
          :not ("assign testing ="
                "assign test2="))
 
-  (:language "systemverilog" :type "function"
+  (:language "systemverilog" :type "function" 
          :supports ("ag" "rg" "git-grep")
          :regex "function\\s[^\\s]+\\s*\\bJJJ\\b"
          :tests ("function Matrix test ;"
@@ -2150,7 +2208,7 @@
          :not("\\test"
               "test"))
 
-  (:language "tex" :type "length"
+  (:language "tex" :type "length" 
          :supports ("ag" "grep" "rg" "git-grep")
          :regex "\\\\(s)etlength\\s*\\\{\\s*(\\\\)JJJ\\s*}"
          :tests ("\\setlength { \\test}"
@@ -2187,7 +2245,7 @@
          :tests ("  procedure test ; "))
 
   (:language "fsharp" :type "variable"
-         :supports ("ag" "grep" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "let\\s+JJJ\\b.*\\\="
          :tests ("let test = 1234"
                  "let test() = 1234"
@@ -2197,7 +2255,7 @@
                "let testnot abc def = 1234"))
 
   (:language "fsharp" :type "interface"
-         :supports ("ag" "grep" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "member(\\b.+\\.|\\s+)JJJ\\b.*\\\="
          :tests ("member test = 1234"
                  "member this.test = 1234")
@@ -2205,7 +2263,7 @@
                "member this.testnot = 1234"))
 
   (:language "fsharp" :type "type"
-         :supports ("ag" "grep" "git-grep")
+         :supports ("ag" "rg" "grep" "git-grep")
          :regex "type\\s+JJJ\\b.*\\\="
          :tests ("type test = 1234")
          :not ("type testnot = 1234"))
@@ -2318,6 +2376,27 @@
                  "test:: proc(a: i32) -> i32 {"
                  "test::proc{}"
                  "test: :proc \"contextless\" {}"))
+
+  (:language "odin" :type "function"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "\\bJJJ\\s*:\\s*:\\s*proc\\s*[({]"
+         :tests ("test :: proc(a: int)"
+                 "test ::proc()"
+                 "test:: proc(a: i32) -> i32 {"
+                 "test::proc{}")
+         :not ("testnot :: proc()"
+               "test: proc()"))
+
+  (:language "odin" :type "type"
+         :supports ("ag" "grep" "rg" "git-grep")
+         :regex "\\bJJJ\\s*:\\s*:\\s*(struct|enum|union|bit_set|bit_field)\\b"
+         :tests ("test :: struct {"
+                 "test :: enum {"
+                 "test :: union {"
+                 "test :: bit_set {"
+                 "test :: bit_field {")
+         :not ("testnot :: struct {"
+               "test :: structure_builder"))
 
   (:language "cobol" :type "variable"
              :supports ("ag" "grep" "rg" "git-grep")
