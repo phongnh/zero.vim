@@ -4,16 +4,17 @@ class ParseDefinition
   PLACEHOLDER = "KEYWORD"
 
   DEFINITION_KEYS = [:language, :type, :regex, :regex_vim, :pcre_regex, :pcre_regex_vim, :supports]
-  TEST_KEYS = [:tests, :not]
+  TEST_KEYS = [:"skip-ref-filter", :tests, :not]
+
+  # ALL_LISP_KEYS = (DEFINITION_KEYS + TEST_KEYS).map { |key| :"#{key.inspect}" }
 
   def initialize(definition)
-    @definition = definition
+    @definition = normalize(definition)
   end
 
   def call
     definition
-      .each_slice(2)
-      .each_with_object({}) { |(key, value), hash| hash[key.to_s.sub(/^:/, "").to_sym] = value }
+      .except(*TEST_KEYS)
       .tap { |hash| hash[:pcre_regex] = build_pcre_regexp(hash[:regex]) }
       .tap { |hash| hash[:pcre_regex_vim] = format_quotes(hash[:pcre_regex]) }
       .tap { |hash| hash[:regex_vim] = format_quotes(hash[:regex]) }
@@ -28,6 +29,13 @@ class ParseDefinition
 
   attr_reader :definition
 
+  def normalize(definition)
+    index = definition.index(:":tests")
+    (index ? definition[0...index] : definition)
+      .each_slice(2)
+      .each_with_object({}) { |(key, value), hash| hash[key.to_s.sub(/^:/, "").to_sym] = value }
+  end
+
   def build_pcre_regexp(regexp)
     regexp
       .gsub("JJJ", PLACEHOLDER)
@@ -35,9 +43,16 @@ class ParseDefinition
   end
 
   def format_quotes(string)
-    string
+    result = string
       .gsub("'", "''")
       .gsub('"', "\\\\\"")
       .gsub("`", "\\\\`")
+
+    language = definition[:language]
+    if language == "rust"
+      result = result.sub("muts", "mut\\\\s")
+    end
+
+    result
   end
 end

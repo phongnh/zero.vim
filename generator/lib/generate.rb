@@ -2,6 +2,7 @@ require "fileutils"
 require "json"
 require "erb"
 require "sxp"
+require "pp"
 require_relative "parse_definition"
 
 class Generate
@@ -10,32 +11,39 @@ class Generate
   LANGUAGE_MAPPINGS = {
     "c" => "c++",
     "cpp" => "c++",
+    "cs" => "csharp",
     "javascriptreact" => "javascript",
     "typescriptreact" => "typescript",
+    "sh" => "shell",
+    "zsh" => "shell",
   }
 
-  ENABLED_LANGUAGES = [
-    "c++",
-    "python",
-    "ruby",
-    "crystal",
-    "shell",
-    "dart",
-    "fennel",
-    "go",
-    "javascript",
-    "hcl",
-    "typescript",
-    "lua",
-    "rust",
-    "elixir",
-    "erlang",
-    "sql",
-    "zig",
-    "protobuf",
+  IGNORED_LANGUAGES = [
+    "apex",
+    "cobol",
+    "commonlisp",
+    "coq",
+    "dlang",
+    "elisp",
+    "faust",
+    "fortran",
+    "jai",
+    "janet",
+    "julia",
+    "matlab",
+    "odin",
+    "pascal",
+    "purescript",
+    "racket",
+    "scad",
+    "scheme",
+    "sml",
+    "systemverilog",
+    "tcl",
+    "vhdl",
   ]
 
-  def initialize(input: "dumb-jump-find-rules.el", namespace: "zero#dumb_jump")
+  def initialize(input: "dumb-jump-find-rules.el", namespace: "zero_grep#dumb_jump")
     @filename = "#{namespace.gsub("#", "/")}.vim"
     @input = input
     @output = File.basename(filename)
@@ -50,6 +58,8 @@ class Generate
     s_expressions = SXP.read(source)
     # s_expressions = SXP::Reader::Basic.read(source)
 
+    # puts "=" * 80, JSON.pretty_generate(s_expressions), "=" * 80
+
     puts "Parsing #{s_expressions.count} found definition rules from #{input}"
     definitions = s_expressions.map do |s_expression|
       ParseDefinition.call(s_expression)
@@ -58,7 +68,7 @@ class Generate
     puts "Formatting #{definitions.count} definitions"
     definitions = definitions.each_with_object({}) do |definition, group|
       language = definition[:language]
-      next unless ENABLED_LANGUAGES.include?(language)
+      next if IGNORED_LANGUAGES.include?(language)
       group[language] ||= []
       group[language] << definition[:pcre_regex_vim]
     end

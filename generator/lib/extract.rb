@@ -25,20 +25,36 @@ class Extract
     # Remove ' at start of source
     source.sub!(/^'\(\(/, "((")
     # Remove indent
-    source = source.each_line.map { |line| line.start_with?("  ") ? line[2..-1] : line }
+    lines = source.each_line.map { |line| (line.start_with?("  ") ? line[2..-1] : line).rstrip }
 
     # Write raw source
     raw_output = "#{File.basename(output, File.extname(output))}-with-comments#{File.extname(output)}"
-    File.open(raw_output, "w") { |file| file.puts(source) }
+    File.open(raw_output, "w") { |file| file.puts(lines) }
     puts "Saved: #{raw_output}"
 
     # Remove comments
-    source = source.select { |line| !line.start_with?(/\s{2,};;?\s/) }
-    source = source.select { |line| !line.start_with?(';;', '  ;;--') }
-    File.open(output, "w") { |file| file.puts(source) }
+    lines = lines.select { |line| !line.start_with?(/\s{2,};;?\s/, ';;', '  ;;--', /^\s{4,};;\?;\?/) }
+    lines[0].sub!(/^'\(\(/, "((")
+    lines = lines.map do |line|
+      next line if line.end_with?("))")
+      index = line.index(' ;; ')
+      if index
+        line[0...index].rstrip
+      else
+        index = line.index(' ; ')
+        index ? line[0...index].rstrip : line
+      end
+    end
+    (0...(lines.size - 1)).each do |idx|
+      if lines[idx].end_with?(':') && lines[idx + 1].start_with?(/^\s+supports/)
+        lines[idx] = lines[idx][0..-2]
+        lines[idx + 1] = lines[idx + 1].sub(' supports', ' :supports')
+      end
+    end
+    File.open(output, "w") { |file| file.puts(lines) }
     puts "Saved: #{output}"
 
-    source
+    lines
   end
 
   def self.call(...)
