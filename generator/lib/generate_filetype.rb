@@ -4,70 +4,6 @@ require "erb"
 class GenerateFiletype
   TEMPLATE  = File.join(__dir__, "templates/filetype.vim.erb")
 
-  ENABLED_FILETYPES = [
-    "c",
-    "cmake",
-    "config",
-    "cpp",
-    "crystal",
-    "css",
-    "csv",
-    "dart",
-    "diff",
-    "docker",
-    "dockercompose",
-    "elixir",
-    "elm",
-    "erb",
-    "erlang",
-    "fennel",
-    "fish",
-    "go",
-    "graphql",
-    "groovy",
-    "h",
-    "haml",
-    "html",
-    "js",
-    "json",
-    "jsonl",
-    "jupyter",
-    "log",
-    "lua",
-    "make",
-    "man",
-    "markdown",
-    "md",
-    "pod",
-    "protobuf",
-    "py",
-    "python",
-    "rdoc",
-    "readme",
-    "ruby",
-    "rust",
-    "sass",
-    "sh",
-    "slim",
-    "sql",
-    "svelte",
-    "svg",
-    "tf",
-    "toml",
-    "ts",
-    "txt",
-    "typescript",
-    "v",
-    "vim",
-    "vimscript",
-    "vue",
-    "xml",
-    "yacc",
-    "yaml",
-    "zig",
-    "zsh",
-  ]
-
   def initialize(namespace: "zero#filetype")
     @filename = "#{namespace.gsub("#", "/")}.vim"
     @output = File.basename(filename)
@@ -77,7 +13,6 @@ class GenerateFiletype
   def call
     rg_filetypes = `rg --type-list`.each_line.reduce({}) do |hash, line|
       filetype, extensions = line.chomp.split(": ", 2)
-      next hash unless ENABLED_FILETYPES.include?(filetype)
       extensions = extensions.split(", ").map do |ext|
         md = ext.match(/^*\.\{(.*)\}$/)
         if md

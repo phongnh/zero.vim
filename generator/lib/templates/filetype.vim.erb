@@ -6,7 +6,7 @@ let s:rg_filetypes = {
             \ }
 
 " Map vim filetype to rg filetype
-" - key: vim filetype 
+" - key: vim filetype
 " - value: rg filetype
 let s:rg_filetype_mappings = {
             \ 'python':          'py',
@@ -16,80 +16,64 @@ let s:rg_filetype_mappings = {
             \ 'typescriptreact': 'ts',
             \ }
 
-function! <%= namespace %>#RgFileTypeOpts(...) abort
-    let l:opts = []
-    let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+function! s:RgArgs(...) abort
+    let l:ft = get(a:, 1, '')
+    let l:ft = empty(l:ft) ? (&filetype !=# '' ? &filetype : &buftype) : l:ft
     let l:ft = get(s:rg_filetype_mappings, l:ft, l:ft)
-    if strlen(l:ft) && has_key(s:rg_filetypes, l:ft)
-        call add(l:opts, '-t ' .. l:ft)
+    let l:args = []
+    if !empty(l:ft) && has_key(s:rg_filetypes, l:ft)
+        call add(l:args, '-t ' .. l:ft)
     else
         let l:ext = expand('%:e')
-        if strlen(l:ext)
-            call add(l:opts, '-g ' .. shellescape(printf('*.{%s}', l:ext)))
+        if !empty(l:ext)
+            call add(l:args, '-g ' .. shellescape(printf('*.{%s}', l:ext)))
         endif
     endif
-    return l:opts
+    return l:args
 endfunction
 
-function! s:RgOpts(keyword) abort
-    let l:opts = <%= namespace %>#RgFileTypeOpts()
-    call add(l:opts, shellescape(a:keyword))
-    return join(l:opts, ' ')
-endfunction
-
-function! <%= namespace %>#RgCCword() abort
-    return s:RgOpts(zero#CCword())
-endfunction
-
-function! <%= namespace %>#RgCword() abort
-    return s:RgOpts(zero#Cword())
-endfunction
-
-function! <%= namespace %>#RgWord() abort
-    return s:RgOpts(zero#Word())
-endfunction
-
-function! <%= namespace %>#RgVword() abort
-    return s:RgOpts(zero#Vword())
-endfunction
-
-function! <%= namespace %>#GitFileTypeOpts(...) abort
-    let l:opts = []
-    let l:ft = get(a:, 1, &filetype !=# '' ? &filetype : &buftype)
+function! s:GitArgs(...) abort
+    let l:ft = get(a:, 1, '')
+    let l:ft = empty(l:ft) ? (&filetype !=# '' ? &filetype : &buftype) : l:ft
     let l:ft = get(s:rg_filetype_mappings, l:ft, l:ft)
-    if strlen(l:ft) && has_key(s:rg_filetypes, l:ft)
-        call add(l:opts, '--')
+    let l:args = []
+    if !empty(l:ft) && has_key(s:rg_filetypes, l:ft)
+        call add(l:args, '--')
         for l:ext in s:rg_filetypes[l:ft]
-            call add(l:opts, shellescape(l:ext))
+            call add(l:args, shellescape(l:ext))
         endfor
     else
         let l:ext = expand('%:e')
-        if strlen(l:ext)
-            call add(l:opts, '--')
-            call add(l:opts, shellescape(printf('*.{%s}', l:ext)))
+        if !empty(l:ext)
+            call add(l:args, '--')
+            call add(l:args, shellescape(printf('*.{%s}', l:ext)))
         endif
     endif
-    return l:opts
+    return l:args
 endfunction
 
-function! s:GitOpts(keyword) abort
-    let l:opts = [shellescape(a:keyword)]
-    call extend(l:opts, <%= namespace %>#GitFileTypeOpts())
-    return join(l:opts, ' ')
+function! s:DetectGrepTool(...) abort
+    let l:tool = get(a:, 1, '')
+    if l:tool ==# 'git' || stridx(getcmdprompt(), 'git') == 0 || stridx(&grepprg, 'git') == 0
+        return 'git'
+    endif
+    return 'rg'
 endfunction
 
-function! <%= namespace %>#GitCCword() abort
-    return s:GitOpts(zero#CCword())
+function! <%= namespace %>#Args(...) abort
+    let l:tool = get(a:, 1, '')
+    let l:ft = get(a:, 2, '')
+    if s:DetectGrepTool(l:tool) ==# 'git'
+        return join(s:GitArgs(l:ft), ' ')
+    else
+        return join(s:RgArgs(l:ft), ' ')
+    endif
 endfunction
 
-function! <%= namespace %>#GitCword() abort
-    return s:GitOpts(zero#Cword())
+function! <%= namespace %>#RgArgs(...) abort
+    return call('s:RgArgs', a:000)
 endfunction
 
-function! <%= namespace %>#GitWord() abort
-    return s:GitOpts(zero#Word())
-endfunction
-
-function! <%= namespace %>#GitVword() abort
-    return s:GitOpts(zero#Vword())
+function! <%= namespace %>#GitArgs(...) abort
+    return call('s:GitArgs', a:000)
 endfunction
