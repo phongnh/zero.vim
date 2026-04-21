@@ -43,14 +43,14 @@ export def Pword(): string
 enddef
 
 def IsSubstituteCommand(cmd: string): bool
-    return cmd =~# '^%\?\%(s\|substitute\|S\|Subvert\)/'
-                \ cmd =~# '^\%(silent!\?\s\+\)\?\%(cfdo\|lfdo\|cdo\|ldo\)\s\+%\?\%(s\|substitute\|S\|Subvert\)/'
+    return cmd =~# '^%\?\%(s\|substitute\|S\|Subvert\)/' ||
+        cmd =~# '^\%(silent!\?\s\+\)\?\%(cfdo\|lfdo\|cdo\|ldo\)\s\+%\?\%(s\|substitute\|S\|Subvert\)/'
 enddef
 
 def IsGrepCommand(cmd: string): bool
     return cmd =~# '^\%(Grep\|LGrep\|BGrep\)\s' ||
-                \ cmd =~# '^\%(\%(silent!\?\s\+\)\?grep\|lgrep\)!\?\s' ||
-                \ cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
+        cmd =~# '^\%(\%(silent!\?\s\+\)\?grep\|lgrep\)!\?\s' ||
+        cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
 enddef
 
 def IsGrepperCommand(cmd: string): bool
