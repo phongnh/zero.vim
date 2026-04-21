@@ -40,11 +40,11 @@ function! zero#Visual() range abort
 endfunction
 
 function! zero#Pword() abort
-    let l:text = @/
-    if empty(l:text) || l:text ==# "\n"
+    let l:search = @/
+    if empty(l:search) || l:search ==# "\n"
         return ''
     endif
-    return substitute(l:text, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
+    return substitute(l:search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
