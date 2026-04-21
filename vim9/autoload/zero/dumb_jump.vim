@@ -344,18 +344,17 @@ const DEFINITIONS = {
     ],
 }
 
-def Definitions(...opts: list<any>): list<string>
-    var ft = get(opts, 1, '')
-    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+def Definitions(filetype: string = ''): list<string>
+    const ft = empty(filetype) ? (&filetype !=# '' ? &filetype : &buftype) : filetype
     return get(DEFINITIONS, ft, [])
 enddef
 
-def BuildPatterns(...opts: list<any>): list<string>
-    const definitions = Definitions(opts)
+def BuildPatterns(filetype: string = ''): list<string>
+    const definitions = Definitions(filetype)
     const keyword = expand('<cword>')
     return mapnew(definitions, (_k, v) => substitute(v, PLACEHOLDER, keyword, 'g'))
 enddef
 
-export def Patterns(...opts: list<any>): list<string>
-    return BuildPatterns(opts)
+export def Patterns(filetype: string = ''): list<string>
+    return BuildPatterns(filetype)
 enddef
