@@ -62,7 +62,7 @@ export def GrepperPword(): string
     return GrepperEscape(zero#Pword())
 enddef
 
-export def LeaderfEscape(text): string
+export def LeaderfEscape(text: string): string
     const shell = &shell
     try
         &shell = 'sh'
