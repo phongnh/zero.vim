@@ -30,10 +30,12 @@ enddef
 
 export def GrepperEscape(text: string): string
     const shell = &shell
-    &shell = 'sh'
-    const escaped = shellescape(text)
-    &shell = shell
-    return escaped
+    try
+        &shell = 'sh'
+        return shellescape(text)
+    finally
+        &shell = shell
+    endtry
 enddef
 
 export def GrepperCCword(): string
