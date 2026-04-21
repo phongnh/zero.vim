@@ -3,7 +3,7 @@ require "bundler/setup"
 
 require_relative "lib/download"
 require_relative "lib/extract"
-require_relative "lib/generate"
+require_relative "lib/generate_dumb_jump"
 require_relative "lib/generate_filetype"
 
 task default: [:update]
@@ -18,16 +18,20 @@ task :extract do
   Extract.call(input: input, output: "dumb-jump-find-rules.el")
 end
 
-task :generate do
-  input = "dumb-jump-find-rules.el"
-  Rake::Task["extract"].invoke unless File.exist?(input)
-  Generate.call(input: input, namespace: "zero#dumb_jump")
+task generate: ["generate:dumb_jump"]
+
+namespace :generate do
+  task :dumb_jump do
+    input = "dumb-jump-find-rules.el"
+    Rake::Task["extract"].invoke unless File.exist?(input)
+    GenerateDumbJump.call(input: input)
+  end
+
+  task :filetype do
+    GenerateFiletype.call
+  end
 end
 
-task :filetype do
-  GenerateFiletype.call(namespace: "zero#filetype")
-end
-
-task build: [:download, :extract, :generate]
+task build: [:download, :extract, :"generate:dumb_jump"]
 
 task update: [:build]

@@ -282,9 +282,8 @@ function! zero#filetype#Args(...) abort
     let l:ft = get(a:, 2, '')
     if s:DetectGrepTool(l:tool) ==# 'git'
         return join(s:GitArgs(l:ft), ' ')
-    else
-        return join(s:RgArgs(l:ft), ' ')
     endif
+    return join(s:RgArgs(l:ft), ' ')
 endfunction
 
 function! zero#filetype#RgArgs(...) abort

@@ -1,0 +1,80 @@
+vim9script
+
+# rg --type-list
+const RG_FILETYPES = {
+<% rg_filetypes.each do |filetype, extensions| -%>
+    '<%= filetype %>': [<%= extensions.map { |ext| "'#{ext}'" }.join(", ") %>],
+<% end -%>
+}
+
+# Map vim filetype to rg filetype
+# - key: vim filetype
+# - value: rg filetype
+const RG_FILETYPE_MAPPINGS = {
+    'python':          'py',
+    'javascript':      'js',
+    'javascriptreact': 'js',
+    'typescript':      'ts',
+    'typescriptreact': 'ts',
+}
+
+def BuildRgArgs(...opts: list<any>): list<string>
+    var ft = get(opts, 1, '')
+    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+    ft = get(RG_FILETYPE_MAPPINGS, ft, ft)
+    var args: list<string> = []
+    if !empty(ft) && has_key(RG_FILETYPES, ft)
+        add(args, '-t ' .. ft)
+    else
+        const ext = expand('%:e')
+        if !empty(ext)
+            add(args, '-g ' .. shellescape(printf('*.{%s}', ext)))
+        endif
+    endif
+    return args
+enddef
+
+def BuildGitArgs(...opts: list<any>): list<string>
+    var ft = get(opts, 1, '')
+    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+    ft = get(RG_FILETYPE_MAPPINGS, ft, ft)
+    var args: list<string> = []
+    if !empty(ft) && has_key(RG_FILETYPES, ft)
+        add(args, '--')
+        for ext in RG_FILETYPES[ft]
+            add(args, shellescape(ext))
+        endfor
+    else
+        const ext = expand('%:e')
+        if !empty(ext)
+            add(args, '--')
+            add(args, shellescape(printf('*.{%s}', ext)))
+        endif
+    endif
+    return args
+enddef
+
+def DetectGrepTool(...opts: list<any>): string
+    const tool = get(opts, 1, '')
+    if tool ==# 'git' || stridx(getcmdprompt(), 'git') == 0 || stridx(&grepprg, 'git') == 0
+        return 'git'
+    endif
+    return 'rg'
+enddef
+
+export def Args(...opts: list<any>): list<string>
+    const tool = get(opts, 1, '')
+    const ft = get(opts, 2, '')
+    if DetectGrepTool(tool) ==# 'git'
+        return join(BuildGitArgs(ft), ' ')
+    endif
+    return join(BuildRgArgs(ft), ' ')
+enddef
+
+export def RgArgs(...opts: list<any>): list<string>
+    return BuildRgArgs(opts)
+enddef
+
+export def GitArgs(...opts: list<any>): list<string>
+    return BuildGitArgs(opts)
+enddef

@@ -25,6 +25,6 @@ function! s:Patterns(...) abort
     return map(l:definitions, 'substitute(v:val, s:placeholder, l:keyword, "g")')
 endfunction
 
-function! <%= namespace %>#Patterns(...) abort
+function! zero#dumb_jump#Patterns(...) abort
     return call('s:Patterns', a:000)
 endfunction

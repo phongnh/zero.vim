@@ -5,8 +5,11 @@ require "sxp"
 require "pp"
 require_relative "parse_definition"
 
-class Generate
-  TEMPLATE  = File.join(__dir__, "templates/dumb_jump.vim.erb")
+class GenerateDumbJump
+  BASE_DIR = File.expand_path(File.join(__dir__, "..", ".."))
+
+  VIML_TEMPLATE = File.join(__dir__, "templates/dumb_jump.vim.erb")
+  VIM9SCRIPT_TEMPLATE = File.join(__dir__, "templates/dumb_jump.vim9script.erb")
 
   LANGUAGE_MAPPINGS = {
     "c" => "c++",
@@ -43,11 +46,8 @@ class Generate
     "vhdl",
   ]
 
-  def initialize(input: "dumb-jump-find-rules.el", namespace: "zero_grep#dumb_jump")
-    @filename = "#{namespace.gsub("#", "/")}.vim"
+  def initialize(input: "dumb-jump-find-rules.el")
     @input = input
-    @output = File.basename(filename)
-    @namespace = namespace
   end
 
   def call
@@ -78,19 +78,22 @@ class Generate
       definitions[key] = definitions[value]
     end
 
-    puts "Generating VimL from #{TEMPLATE}"
-    template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
+    FileUtils.mkdir_p(File.join(BASE_DIR, "autoload", "zero"))
+    FileUtils.mkdir_p(File.join(BASE_DIR, "vim9", "autoload", "zero"))
+
+    puts "Generating VimL from #{VIML_TEMPLATE}"
+    template = ERB.new(File.read(VIML_TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)
+    vimscript_file = File.join(BASE_DIR, "autoload", "zero", "dumb_jump.vim")
+    File.open(vimscript_file, "w") { |file| file.puts(vimscript) }
+    puts "Saved: #{vimscript_file}"
 
-    File.open(output, "w") { |file| file.puts(vimscript) }
-    puts "Saved: #{output}"
-
-    FileUtils.chdir(File.expand_path("../..", __dir__), verbose: true) do
-      FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
-      FileUtils.mv("generator/#{output}", "autoload/#{filename}", verbose: true)
-    end
-
-    vimscript
+    puts "Generating Vim9script from #{VIM9SCRIPT_TEMPLATE}"
+    template = ERB.new(File.read(VIM9SCRIPT_TEMPLATE), trim_mode: "<>-")
+    vimscript = template.result(binding)
+    vimscript_file = File.join(BASE_DIR, "vim9", "autoload", "zero", "dumb_jump.vim")
+    File.open(vimscript_file, "w") { |file| file.puts(vimscript) }
+    puts "Saved: #{vimscript_file}"
   end
 
   def self.call(...)
@@ -99,5 +102,5 @@ class Generate
 
   private
 
-  attr_reader :input, :filename, :output, :namespace
+  attr_reader :input
 end

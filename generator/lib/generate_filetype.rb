@@ -2,13 +2,10 @@ require "fileutils"
 require "erb"
 
 class GenerateFiletype
-  TEMPLATE  = File.join(__dir__, "templates/filetype.vim.erb")
+  BASE_DIR = File.expand_path(File.join(__dir__, "..", ".."))
 
-  def initialize(namespace: "zero#filetype")
-    @filename = "#{namespace.gsub("#", "/")}.vim"
-    @output = File.basename(filename)
-    @namespace = namespace
-  end
+  VIML_TEMPLATE  = File.join(__dir__, "templates/filetype.vim.erb")
+  VIM9SCRIPT_TEMPLATE  = File.join(__dir__, "templates/filetype.vim9script.erb")
 
   def call
     rg_filetypes = `rg --type-list`.each_line.reduce({}) do |hash, line|
@@ -25,19 +22,22 @@ class GenerateFiletype
       hash
     end
 
-    puts "Generating VimL from #{TEMPLATE}"
-    template = ERB.new(File.read(TEMPLATE), trim_mode: "<>-")
+    FileUtils.mkdir_p(File.join(BASE_DIR, "autoload", "zero"))
+    FileUtils.mkdir_p(File.join(BASE_DIR, "vim9", "autoload", "zero"))
+
+    puts "Generating VimL from #{VIML_TEMPLATE}"
+    template = ERB.new(File.read(VIML_TEMPLATE), trim_mode: "<>-")
     vimscript = template.result(binding)
+    vimscript_file = File.join(BASE_DIR, "autoload", "zero", "filetype.vim")
+    File.open(vimscript_file, "w") { |file| file.puts(vimscript) }
+    puts "Saved: #{vimscript_file}"
 
-    File.open(output, "w") { |file| file.puts(vimscript) }
-    puts "Saved: #{output}"
-
-    FileUtils.chdir(File.expand_path("../..", __dir__), verbose: true) do
-      FileUtils.mkdir_p("autoload/#{File.dirname(filename)}")
-      FileUtils.mv("generator/#{output}", "autoload/#{filename}", verbose: true)
-    end
-
-    vimscript
+    puts "Generating Vim9script from #{VIM9SCRIPT_TEMPLATE}"
+    template = ERB.new(File.read(VIM9SCRIPT_TEMPLATE), trim_mode: "<>-")
+    vimscript = template.result(binding)
+    vimscript_file = File.join(BASE_DIR, "vim9", "autoload", "zero", "filetype.vim")
+    File.open(vimscript_file, "w") { |file| file.puts(vimscript) }
+    puts "Saved: #{vimscript_file}"
   end
 
   def self.call(...)

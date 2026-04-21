@@ -1,0 +1,32 @@
+vim9script
+
+# NOTES:
+# - All language regular expressions are ported from https://github.com/jacktasia/dumb-jump/blob/master/dumb-jump.el
+
+const PLACEHOLDER = 'JJJ'
+
+const DEFINITIONS = {
+<% definitions.each do |language, regexes| -%>
+    '<%= language %>': [
+    <% regexes.each do |regex| -%>
+    <%= "'#{regex}'" %>,
+    <% end -%>
+],
+<% end -%>
+}
+
+def Definitions(...opts: list<any>): list<string>
+    var ft = get(opts, 1, '')
+    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+    return get(DEFINITIONS, ft, [])
+enddef
+
+def BuildPatterns(...opts: list<any>): list<string>
+    const definitions = Definitions(opts)
+    const keyword = expand('<cword>')
+    return mapnew(definitions, (_k, v) => substitute(v, PLACEHOLDER, keyword, 'g'))
+enddef
+
+export def Patterns(...opts: list<any>): list<string>
+    return BuildPatterns(opts)
+enddef
