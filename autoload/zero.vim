@@ -48,18 +48,18 @@ function! zero#Pword() abort
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
-    return a:cmd =~# '^%\?\%(s\|substitute\|S\|Subvert\)/'
+    return a:cmd =~# '^\%(''<,''>\|%\)\?\%(s\|substitute\|S\|Subvert\)/' ||
                 \ a:cmd =~# '^\%(silent!\?\s\+\)\?\%(cfdo\|lfdo\|cdo\|ldo\)\s\+%\?\%(s\|substitute\|S\|Subvert\)/'
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
-    return a:cmd =~# '^\%(Grep\|LGrep\|BGrep\)\s' ||
+    return a:cmd =~# '^\%(''<,''>\)\?\%(Grep\|LGrep\|BGrep\)\s' ||
                 \ a:cmd =~# '^\%(\%(silent!\?\s\+\)\?grep\|lgrep\)!\?\s' ||
                 \ a:cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
 endfunction
 
 function! s:IsGrepperCommand(cmd) abort
-    return a:cmd =~# '^\%(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
+    return a:cmd =~# '^\%(''<,''>\)\?\%(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
 endfunction
 
 function! s:IsGrepperInputCommand() abort
