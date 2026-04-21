@@ -62,12 +62,10 @@ enddef
 
 export def LeaderfEscape(text: string): string
     const shell = &shell
-    try
-        &shell = 'sh'
-        return shellescape(escape(text, '"'))
-    finally
-        &shell = shell
-    endtry
+    &shell = 'sh'
+    const escaped = shellescape(escape(text, '"'))
+    &shell = shell
+    return escaped
 enddef
 
 export def LeaderfCCword(): string
