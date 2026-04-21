@@ -62,7 +62,7 @@ def DetectGrepTool(...opts: list<any>): string
     return 'rg'
 enddef
 
-export def Args(...opts: list<any>): list<string>
+export def Args(...opts: list<any>): string
     const tool = get(opts, 1, '')
     const ft = get(opts, 2, '')
     if DetectGrepTool(tool) ==# 'git'
