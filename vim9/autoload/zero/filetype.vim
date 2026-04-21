@@ -235,9 +235,8 @@ const RG_FILETYPE_MAPPINGS = {
     'typescriptreact': 'ts',
 }
 
-def BuildRgArgs(...opts: list<any>): list<string>
-    var ft = get(opts, 1, '')
-    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+def BuildRgArgs(filetype: string = ''): list<string>
+    var ft = empty(filetype) ? (&filetype !=# '' ? &filetype : &buftype) : filetype
     ft = get(RG_FILETYPE_MAPPINGS, ft, ft)
     var args: list<string> = []
     if !empty(ft) && has_key(RG_FILETYPES, ft)
@@ -251,9 +250,8 @@ def BuildRgArgs(...opts: list<any>): list<string>
     return args
 enddef
 
-def BuildGitArgs(...opts: list<any>): list<string>
-    var ft = get(opts, 1, '')
-    ft = empty(ft) ? (&filetype !=# '' ? &filetype : &buftype) : ft
+def BuildGitArgs(filetype: string = ''): list<string>
+    var ft = empty(filetype) ? (&filetype !=# '' ? &filetype : &buftype) : filetype
     ft = get(RG_FILETYPE_MAPPINGS, ft, ft)
     var args: list<string> = []
     if !empty(ft) && has_key(RG_FILETYPES, ft)
@@ -271,27 +269,24 @@ def BuildGitArgs(...opts: list<any>): list<string>
     return args
 enddef
 
-def DetectGrepTool(...opts: list<any>): string
-    const tool = get(opts, 1, '')
+def DetectGrepTool(tool: string = ''): string
     if tool ==# 'git' || stridx(getcmdprompt(), 'git') == 0 || stridx(&grepprg, 'git') == 0
         return 'git'
     endif
     return 'rg'
 enddef
 
-export def Args(...opts: list<any>): string
-    const tool = get(opts, 1, '')
-    const ft = get(opts, 2, '')
+export def Args(tool: string = '', filetype: string = ''): string
     if DetectGrepTool(tool) ==# 'git'
-        return join(BuildGitArgs(ft), ' ')
+        return join(BuildGitArgs(filetype), ' ')
     endif
-    return join(BuildRgArgs(ft), ' ')
+    return join(BuildRgArgs(filetype), ' ')
 enddef
 
-export def RgArgs(...opts: list<any>): list<string>
-    return BuildRgArgs(opts)
+export def RgArgs(filetype: string = ''): list<string>
+    return BuildRgArgs(filetype)
 enddef
 
-export def GitArgs(...opts: list<any>): list<string>
-    return BuildGitArgs(opts)
+export def GitArgs(filetype: string = ''): list<string>
+    return BuildGitArgs(filetype)
 enddef
