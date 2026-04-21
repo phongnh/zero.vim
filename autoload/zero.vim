@@ -48,22 +48,22 @@ function! zero#Pword() abort
 endfunction
 
 function! s:IsSubstituteCommand(cmd) abort
-    return a:cmd =~# '^%\?\(s\|substitute\|S\|Subvert\)/' ||
-                \ a:cmd =~# '^\(silent!\?\s\+\)\?\(c\|l\)\(fdo\|do\)\s\+\(s\|substitute\|S\|Subvert\)/'
-endfunction
-
-function! s:IsGrepperCommand(cmd) abort
-    return a:cmd =~# '^\(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
+    return a:cmd =~# '^%\?\%(s\|substitute\|S\|Subvert\)/'
+                \ a:cmd =~# '^\%(silent!\?\s\+\)\?\%(cfdo\|lfdo\|cdo\|ldo\)\s\+%\?\%(s\|substitute\|S\|Subvert\)/'
 endfunction
 
 function! s:IsGrepCommand(cmd) abort
-    return a:cmd =~# '^\(Grep\|LGrep\|BGrep\|grep\|lgrep\)\s' ||
-                \ a:cmd =~# '^\(Ggrep!\?\|Gcgrep!\?\|Glgrep!\?\)\s' ||
-                \ a:cmd =~# '^\(Git!\?\s\+grep\)\s'
+    return a:cmd =~# '^\%(Grep\|LGrep\|BGrep\)\s' ||
+                \ a:cmd =~# '^\%(\%(silent!\?\s\+\)\?grep\|lgrep\)!\?\s' ||
+                \ a:cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
 endfunction
 
-function! s:IsInputCommand() abort
-    return getcmdtype() == '@'
+function! s:IsGrepperCommand(cmd) abort
+    return a:cmd =~# '^\%(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
+endfunction
+
+function! s:IsGrepperInputCommand() abort
+    return getcmdtype() ==# '@' && getcmdprompt() =~# '^\%(rg\|git\)\s\+.\+>'
 endfunction
 
 function! zero#InsertCCword() abort
@@ -86,6 +86,10 @@ function! zero#InsertWord() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Word()
+    elseif s:IsGrepCommand(l:cmd)
+        return escape(zero#Word(), ' ')
+    elseif s:IsGrepperCommand(l:cmd) || s:IsGrepperInputCommand()
+        return zero#grep#GrepperWord()
     endif
     return zero#grep#Word()
 endfunction
@@ -94,6 +98,10 @@ function! zero#InsertVword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Vword()
+    elseif s:IsGrepCommand(l:cmd)
+        return escape(zero#Vword(), ' ')
+    elseif s:IsGrepperCommand(l:cmd) || s:IsGrepperInputCommand()
+        return zero#grep#GrepperVword()
     endif
     return zero#grep#Vword()
 endfunction
@@ -102,6 +110,10 @@ function! zero#InsertPword() abort
     let l:cmd = getcmdline()
     if s:IsSubstituteCommand(l:cmd)
         return zero#substitute#Pword()
+    elseif s:IsGrepCommand(l:cmd)
+        return escape(zero#Pword(), ' ')
+    elseif s:IsGrepperCommand(l:cmd) || s:IsGrepperInputCommand()
+        return zero#grep#GrepperPword()
     endif
     return zero#grep#Pword()
 endfunction
