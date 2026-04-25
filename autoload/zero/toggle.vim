@@ -159,8 +159,8 @@ function! s:SetupToggleMappings() abort
             autocmd!
             autocmd OptionSet shiftwidth
                         \   if &listchars =~# '\V\<leadmultispace\>'
-                        \ |     execute printf('setlocal listchars-=leadmultispace:┊%s', escape(repeat(' ', v:option_old - 1), ' '))
-                        \ |     execute printf('setlocal listchars+=leadmultispace:┊%s', escape(repeat(' ', v:option_new - 1), ' '))
+                        \ |     execute printf('setlocal listchars-=leadmultispace:┊%s', escape(repeat(' ', str2nr(v:option_old) - 1), ' '))
+                        \ |     execute printf('setlocal listchars+=leadmultispace:┊%s', escape(repeat(' ', str2nr(v:option_new) - 1), ' '))
                         \ | endif
         augroup END
     endif
