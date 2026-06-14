@@ -34,16 +34,10 @@ function! s:SetupMoveMappings() abort
     if get(g:, 'zero_toggle_move_mappings', 1)
         " macOS Alt key aliases (Option+J / Option+K) (∆ / ˚)
         if has('mac')
-            " Kitty sends ∆ / ˚
             execute 'nmap ˚ <Plug>(MoveLineUp)'
             execute 'nmap ∆ <Plug>(MoveLineDown)'
             execute 'vmap ˚ <Plug>(MoveLineUp)'
             execute 'vmap ∆ <Plug>(MoveLineDown)'
-            " Alacritty / Wezterm send <1b>j / <1b>k
-            execute 'nmap k <Plug>(MoveLineUp)'
-            execute 'nmap j <Plug>(MoveLineDown)'
-            execute 'vmap k <Plug>(MoveLineUp)'
-            execute 'vmap j <Plug>(MoveLineDown)'
         endif
         nmap <M-j> <Plug>(MoveLineDown)
         nmap <M-k> <Plug>(MoveLineUp)
@@ -53,12 +47,8 @@ function! s:SetupMoveMappings() abort
 
     if get(g:, 'zero_toggle_insert_move_mappings', 1)
         if has('mac')
-            " Kitty sends ∆ / ˚
             execute 'imap ˚ <Plug>(MoveLineUp)'
             execute 'imap ∆ <Plug>(MoveLineDown)'
-            " Alacritty / Wezterm send <1b>j / <1b>k
-            execute 'imap k <Plug>(MoveLineUp)'
-            execute 'imap j <Plug>(MoveLineDown)'
         endif
         imap <M-j> <Plug>(MoveLineDown)
         imap <M-k> <Plug>(MoveLineUp)
