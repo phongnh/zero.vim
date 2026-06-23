@@ -2,21 +2,6 @@ if has('nvim') || exists('g:loaded_zero_vim')
     finish
 endif
 
-" Use Vim9script implementation if available, otherwise fall back to legacy
-if has('vim9script')
-    " Add vim9/ subdirectory to runtimepath so vim9/autoload/zero_path.vim
-    " is found when the Vim9script plugin sources it via 'import autoload'
-    let s:vimdir = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
-    let s:vim9dir = s:vimdir . '/vim9'
-    if &runtimepath !~# s:vim9dir
-        execute 'set runtimepath-=' . fnameescape(s:vimdir)
-        execute 'set runtimepath+=' . fnameescape(s:vim9dir)
-    endif
-    unlet! s:vimdir s:vim9dir
-    source <sfile>:p:h:h/vim9/plugin/zero.vim
-    finish
-endif
-
 let g:loaded_zero_vim = 1
 
 " Save cpoptions
