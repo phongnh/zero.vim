@@ -258,15 +258,6 @@ function H.setup_toggle_mappings()
       vim.opt_local.listchars = listchars
     end,
   })
-
-  -- Improved fold mappings — echo foldlevel after each change
-  vim.keymap.set("n", "zr", "zr<Cmd>setlocal foldlevel?<CR>", opts)
-  vim.keymap.set("n", "zm", "zm<Cmd>setlocal foldlevel?<CR>", opts)
-  vim.keymap.set("n", "zR", "zR<Cmd>setlocal foldlevel?<CR>", opts)
-  vim.keymap.set("n", "zM", "zM<Cmd>setlocal foldlevel?<CR>", opts)
-  vim.keymap.set("n", "zi", "zi<Cmd>setlocal foldlevel?<CR>", opts)
-  vim.keymap.set("n", "z]", "<Cmd>let &foldcolumn = &foldcolumn + 1<CR><Cmd>setlocal foldcolumn?<CR>", opts)
-  vim.keymap.set("n", "z[", "<Cmd>let &foldcolumn = &foldcolumn - 1<CR><Cmd>setlocal foldcolumn?<CR>", opts)
 end
 
 H.setup_config = function(config)

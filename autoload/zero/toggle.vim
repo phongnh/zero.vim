@@ -154,15 +154,6 @@ function! s:SetupToggleMappings() abort
                         \ | endif
         augroup END
     endif
-
-    " Improved fold mappings — show foldlevel after each change
-    nnoremap <silent> zr zr:<C-U>setlocal foldlevel?<CR>
-    nnoremap <silent> zm zm:<C-U>setlocal foldlevel?<CR>
-    nnoremap <silent> zR zR:<C-U>setlocal foldlevel?<CR>
-    nnoremap <silent> zM zM:<C-U>setlocal foldlevel?<CR>
-    nnoremap <silent> zi zi:<C-U>setlocal foldenable?<CR>
-    nnoremap <silent> z] :<C-U>let &foldcolumn = &foldcolumn + 1<Bar>setlocal foldcolumn?<CR>
-    nnoremap <silent> z[ :<C-U>let &foldcolumn = &foldcolumn - 1<Bar>setlocal foldcolumn?<CR>
 endfunction
 
 function! zero#toggle#Setup() abort
