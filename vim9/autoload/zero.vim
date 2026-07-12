@@ -1,8 +1,8 @@
 vim9script
 
-export def Trim(str): string
+export def Trim(str: string): string
     return trim(str)
-endfunction
+enddef
 
 # Search Helpers
 export def CCword(): string
