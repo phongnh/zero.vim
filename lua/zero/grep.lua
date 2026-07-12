@@ -170,10 +170,10 @@ end
 
 H.apply_config = function(config)
   -- Commands
-  if H.user_commands then
+  if config.user_commands then
     H.setup_user_commands()
 
-    if H.extra_user_commands then
+    if config.extra_user_commands then
       H.setup_extra_user_commands()
     end
   end
