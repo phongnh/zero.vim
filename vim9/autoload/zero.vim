@@ -1,5 +1,9 @@
 vim9script
 
+export def Trim(str): string
+    return trim(str)
+endfunction
+
 # Search Helpers
 export def CCword(): string
     return '\b' .. expand('<cword>') .. '\b'
@@ -40,61 +44,4 @@ export def Pword(): string
         return ''
     endif
     return substitute(search, '^\\<\(.\+\)\\>$', '\\b\1\\b', '')
-enddef
-
-def IsSubstituteCommand(cmd: string): bool
-    return cmd =~# '^\%(''<,''>\|%\)\?\%(s\|substitute\|S\|Subvert\)/' ||
-        cmd =~# '^\%(silent!\?\s\+\)\?\%(cfdo\|lfdo\|cdo\|ldo\)\s\+%\?\%(s\|substitute\|S\|Subvert\)/'
-enddef
-
-def IsGrepCommand(cmd: string): bool
-    return cmd =~# '^\%(''<,''>\)\?\%(Grep\|LGrep\|BGrep\)\s' ||
-        cmd =~# '^\%(\%(silent!\?\s\+\)\?grep\|lgrep\)!\?\s' ||
-        cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
-enddef
-
-export def InsertCCword(): string
-    const cmd = getcmdline()
-    if IsSubstituteCommand(cmd)
-        return zero#substitute#CCword()
-    endif
-    return zero#CCword()
-enddef
-
-export def InsertCword(): string
-    const cmd = getcmdline()
-    if IsSubstituteCommand(cmd)
-        return zero#substitute#Cword()
-    endif
-    return zero#Cword()
-enddef
-
-export def InsertWord(): string
-    const cmd = getcmdline()
-    if IsSubstituteCommand(cmd)
-        return zero#substitute#Word()
-    elseif IsGrepCommand(cmd)
-        return escape(zero#Word(), ' ')
-    endif
-    return zero#grep#Word()
-enddef
-
-export def InsertVword(): string
-    const cmd = getcmdline()
-    if IsSubstituteCommand(cmd)
-        return zero#substitute#Vword()
-    elseif IsGrepCommand(cmd)
-        return escape(zero#Vword(), ' ')
-    endif
-    return zero#grep#Vword()
-enddef
-
-export def InsertPword(): string
-    const cmd = getcmdline()
-    if IsSubstituteCommand(cmd)
-        return zero#substitute#Pword()
-    elseif IsGrepCommand(cmd)
-        return escape(zero#Pword(), ' ')
-    endif
-    return zero#grep#Pword()
 enddef
