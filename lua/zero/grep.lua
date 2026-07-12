@@ -90,7 +90,7 @@ local H = {}
 
 H.default_config = {
   user_commands = true,
-  extra_user_commands = true,
+  extra_user_commands = false,
 }
 
 M.escape = function(text)
