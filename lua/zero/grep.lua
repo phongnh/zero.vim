@@ -65,7 +65,10 @@ function Grep:execute()
     mods = { silent = true },
     magic = { file = false, bar = false },
   })
-  vim.schedule(self._on_quickfix_cmd_post)
+
+  vim.schedule(function()
+    self:_on_quickfix_cmd_post()
+  end)
 end
 
 function Grep.run(opts)
