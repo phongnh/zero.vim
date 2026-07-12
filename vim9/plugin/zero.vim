@@ -1,10 +1,10 @@
-if !has('vim9script') || has('nvim') || exists('g:loaded_zero_path')
+if !has('vim9script') || has('nvim') || exists('g:loaded_zero_vim')
     finish
 endif
 
 vim9script
 
-g:loaded_zero_path = 1
+g:loaded_zero_vim = 1
 
 import autoload 'zero/path.vim' as ZeroPath
 

@@ -2,7 +2,7 @@ local M = {}
 
 local H = {}
 
-H.config = {
+H.default_config = {
   vcs_root_markers = {
     ".git",
     ".hg",
@@ -32,6 +32,8 @@ H.config = {
     vim.fn.expand("~"),
   },
 }
+
+H.config = vim.deepcopy(H.default_config)
 
 M.find = function(starting_dir)
   vim.validate("starting_dir", starting_dir, "string", true)
@@ -77,6 +79,41 @@ M.find = function(starting_dir)
     -- Fall back to starting directory
     return vim.fn.fnamemodify(starting_dir, ":~")
   end
+end
+
+H.setup_config = function(config)
+  vim.validate("config", config, "table", true)
+  config = vim.tbl_deep_extend("force", vim.deepcopy(H.default_config), config or {})
+
+  vim.validate("vcs_root_markers", config.vcs_root_markers, "table", true)
+  vim.validate("file_root_markers", config.file_root_markers, "table", true)
+  vim.validate("ignored_root_dirs", config.ignored_root_dirs, "table", true)
+
+  if not config.vcs_root_markers or vim.tbl_isempty(config.vcs_root_markers) then
+    config.vcs_root_markers = vim.deepcopy(config.vcs_root_markers)
+  end
+
+  if not config.file_root_markers or vim.tbl_isempty(config.file_root_markers) then
+    config.file_root_markers = vim.deepcopy(config.file_root_markers)
+  end
+
+  if not config.ignored_root_dirs or vim.tbl_isempty(config.ignored_root_dirs) then
+    config.ignored_root_dirs = vim.deepcopy(config.ignored_root_dirs)
+  end
+
+  return config
+end
+
+H.apply_config = function(config)
+  H.config = config
+end
+
+function M.setup(config)
+  -- Setup config
+  config = H.setup_config(config)
+
+  -- Apply config
+  H.apply_config(config)
 end
 
 return M

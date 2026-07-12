@@ -1,5 +1,5 @@
 " Find project dir from buffer based on root markers
-let s:vcs_root_markers = get(g:, 'zero_vim_vcs_root_markers', [
+let s:vcs_root_markers = get(g:, 'zero_project_vcs_root_markers', [
             \ '.git',
             \ '.hg',
             \ '.svn',
@@ -7,7 +7,7 @@ let s:vcs_root_markers = get(g:, 'zero_vim_vcs_root_markers', [
             \ '_darcs',
             \ ])
 
-let s:file_root_markers = get(g:, 'zero_vim_file_root_markers', [
+let s:file_root_markers = get(g:, 'zero_project_file_root_markers', [
             \ 'Gemfile',
             \ 'rebar.config',
             \ 'mix.exs',
@@ -17,7 +17,7 @@ let s:file_root_markers = get(g:, 'zero_vim_file_root_markers', [
             \ '.root',
             \ ])
 
-let s:ignored_root_dirs = get(g:, 'zero_vim_ignored_root_dirs', [
+let s:ignored_root_dirs = get(g:, 'zero_project_ignored_root_dirs', [
             \ '/',
             \ '/root',
             \ '/Users',
