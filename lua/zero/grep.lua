@@ -17,19 +17,11 @@ function Grep:execute()
     return val ~= ""
   end, self.args)
 
-  if vim.fn.visualmode() == "" then
-    if vim.tbl_isempty(args) then
-      local cword = vim.fn.expand("<cword>")
-      if cword ~= "" then
-        vim.list_extend(args, { "-w", cword })
-      end
+  if vim.tbl_isempty(args) then
+    local cword = vim.fn.expand("<cword>")
+    if cword ~= "" then
+      vim.list_extend(args, { "-w", cword })
     end
-  else
-    local vword = require("zero").vword()
-    if vword ~= "" then
-      args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(vword) }, args)
-    end
-    vim.fn.visualmode(1)
   end
 
   if vim.tbl_isempty(args) then
@@ -77,31 +69,31 @@ H.default_config = {
 H.setup_user_commands = function()
   vim.api.nvim_create_user_command("Grep", function(opts)
     Grep.run({ args = opts.fargs })
-  end, { nargs = "*", range = true, complete = "file_in_path" })
+  end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("LGrep", function(opts)
     Grep.run({ cmd = "lgrep", args = opts.fargs })
-  end, { nargs = "*", range = true, complete = "file_in_path" })
+  end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("BGrep", function(opts)
     Grep.run({ cmd = "lgrep", args = opts.fargs, path = vim.fn.expand("%:p:.") })
-  end, { nargs = "*", range = true })
+  end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepProject", function(opts)
     Grep.run_in_project({ args = opts.fargs })
-  end, { nargs = "*", range = true })
+  end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepProject", function(opts)
     Grep.run_in_project({ cmd = "lgrep", args = opts.fargs })
-  end, { nargs = "*", range = true })
+  end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepBufferDir", function(opts)
     Grep.run_in_buffer_dir({ args = opts.fargs })
-  end, { nargs = "*", range = true })
+  end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepBufferDir", function(opts)
     Grep.run_in_buffer_dir({ cmd = "lgrep", args = opts.fargs })
-  end, { nargs = "*", range = true })
+  end, { nargs = "*" })
 end
 
 H.create_extra_user_commands = function(opts)

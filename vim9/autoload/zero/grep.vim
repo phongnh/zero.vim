@@ -29,19 +29,11 @@ enddef
 export def Exec(opts: dict<any> = {}): void
     var args = opts->get('args', [])->copy()->filter((_, val) => !empty(val))
 
-    if visualmode() == null_string
-        if args->empty()
-            const cword = expand('<cword>')
-            if !cword->empty()
-                args = ['-w', cword]
-            endif
+    if args->empty()
+        const cword = expand('<cword>')
+        if !cword->empty()
+            args = ['-w', cword]
         endif
-    else
-        const vword = zero#Vword()
-        if !vword->empty()
-            args = ['-F', '-e', shellescape(vword)] + args
-        endif
-        visualmode(1)
     endif
 
     if empty(args)

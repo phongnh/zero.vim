@@ -47,15 +47,15 @@ if get(g:, 'zero_grep_auto_open_quickfix', 0)
 endif
 
 if get(g:, 'zero_grep_user_commands', 1)
-    command! -nargs=* -complete=file_in_path -range Grep  call zero#grep#Grep(<f-args>)
-    command! -nargs=* -complete=file_in_path -range LGrep call zero#grep#LGrep(<f-args>)
-    command! -nargs=*                        -range BGrep call zero#grep#BGrep(<f-args>)
+    command! -nargs=* -complete=file_in_path Grep  call zero#grep#Grep(<f-args>)
+    command! -nargs=* -complete=file_in_path LGrep call zero#grep#LGrep(<f-args>)
+    command! -nargs=*                        BGrep call zero#grep#BGrep(<f-args>)
 
-    command! -nargs=* -range GrepProject  call zero#grep#GrepProject(<f-args>)
-    command! -nargs=* -range LGrepProject call zero#grep#LGrepProject(<f-args>)
+    command! -nargs=* GrepProject  call zero#grep#GrepProject(<f-args>)
+    command! -nargs=* LGrepProject call zero#grep#LGrepProject(<f-args>)
 
-    command! -nargs=* -range GrepBufferDir  call zero#grep#GrepBufferDir(<f-args>)
-    command! -nargs=* -range LGrepBufferDir call zero#grep#LGrepBufferDir(<f-args>)
+    command! -nargs=* GrepBufferDir  call zero#grep#GrepBufferDir(<f-args>)
+    command! -nargs=* LGrepBufferDir call zero#grep#LGrepBufferDir(<f-args>)
 
     if get(g:, 'zero_grep_extra_user_commands', 0)
         command! -nargs=* -complete=file_in_path        GrepCCword  call zero#grep#Grep('-w', expand('<cword>'), <f-args>)

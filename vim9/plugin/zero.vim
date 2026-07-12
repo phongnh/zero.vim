@@ -51,15 +51,15 @@ if get(g:, 'zero_grep_auto_open_quickfix', 0)
 endif
 
 if get(g:, 'zero_grep_user_commands', 1)
-    command! -nargs=* -complete=file_in_path -range Grep  ZeroGrep.Grep(<f-args>)
-    command! -nargs=* -complete=file_in_path -range LGrep ZeroGrep.LGrep(<f-args>)
-    command! -nargs=*                        -range BGrep ZeroGrep.BGrep(<f-args>)
+    command! -nargs=* -complete=file_in_path Grep  ZeroGrep.Grep(<f-args>)
+    command! -nargs=* -complete=file_in_path LGrep ZeroGrep.LGrep(<f-args>)
+    command! -nargs=*                        BGrep ZeroGrep.BGrep(<f-args>)
 
-    command! -nargs=* -range GrepProject  ZeroGrep.GrepProject(<f-args>)
-    command! -nargs=* -range LGrepProject ZeroGrep.LGrepProject(<f-args>)
+    command! -nargs=* GrepProject  ZeroGrep.GrepProject(<f-args>)
+    command! -nargs=* LGrepProject ZeroGrep.LGrepProject(<f-args>)
 
-    command! -nargs=* -range GrepBufferDir  ZeroGrep.GrepBufferDir(<f-args>)
-    command! -nargs=* -range LGrepBufferDir ZeroGrep.LGrepBufferDir(<f-args>)
+    command! -nargs=* GrepBufferDir  ZeroGrep.GrepBufferDir(<f-args>)
+    command! -nargs=* LGrepBufferDir ZeroGrep.LGrepBufferDir(<f-args>)
 
     if get(g:, 'zero_grep_extra_user_commands', 0)
         command! -nargs=* -complete=file_in_path        GrepCCword  ZeroGrep.Grep('-w', expand('<cword>'), <f-args>)

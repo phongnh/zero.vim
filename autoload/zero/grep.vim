@@ -35,19 +35,11 @@ function! zero#grep#Exec(opts = {}) abort
     let l:args = get(a:opts, 'args', [])
     let l:args = filter(copy(args), '!empty(v:val)')
 
-    if empty(visualmode())
-        if empty(l:args)
-            let l:cword = expand('<cword>')
-            if !empty(l:cword)
-                let l:args = ['-w', l:cword]
-            endif
+    if empty(l:args)
+        let l:cword = expand('<cword>')
+        if !empty(l:cword)
+            let l:args = ['-w', l:cword]
         endif
-    else
-        let l:vword = zero#Vword()
-        if !empty(l:vword)
-            let l:args = ['-F', '-e', shellescape(l:vword)] + l:args
-        endif
-        call visualmode(1)
     endif
 
     if empty(l:args)
