@@ -112,7 +112,7 @@ end
 
 H.apply_config = function(config)
   -- Commands
-  if H.user_commands or not config.mappings then
+  if config.user_commands or not config.mappings then
     H.setup_user_commands()
   end
 
