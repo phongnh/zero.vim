@@ -17,7 +17,7 @@ endfunction
 
 function! zero#grep#OpenQuickfix() abort
     if exists('*timer_start')
-        call timer_start(0, {-> call <SID>OnQuickFixCmdPost(0)})
+        call timer_start(0, function('s:OnQuickFixCmdPost', [0]))
     else
         call <SID>OnQuickFixCmdPost(0)
     endif
@@ -25,7 +25,7 @@ endfunction
 
 function! zero#grep#OpenLocationList() abort
     if exists('*timer_start')
-        call timer_start(0, {-> call <SID>OnQuickFixCmdPost(1)})
+        call timer_start(0, function('s:OnQuickFixCmdPost', [1]))
     else
         call <SID>OnQuickFixCmdPost(1)
     endif
