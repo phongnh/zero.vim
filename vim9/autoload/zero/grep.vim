@@ -59,35 +59,3 @@ enddef
 export def GrepperPword(): string
     return GrepperEscape(zero#Pword())
 enddef
-
-export def LeaderfEscape(text: string): string
-    const shell = &shell
-    &shell = 'sh'
-    const escaped = shellescape(escape(text, '"'))
-    &shell = shell
-    return escaped
-enddef
-
-export def LeaderfCCword(): string
-    return LeaderfEscape(zero#CCword())
-enddef
-
-export def LeaderfCword(): string
-    return LeaderfEscape(zero#Cword())
-enddef
-
-export def LeaderfWord(): string
-    return LeaderfEscape(zero#Word())
-enddef
-
-export def LeaderfVword(): string
-    return LeaderfEscape(zero#Vword())
-enddef
-
-export def LeaderfVisual(): string
-    return LeaderfEscape(zero#Visual())
-enddef
-
-export def LeaderfPword(): string
-    return LeaderfEscape(zero#Pword())
-enddef
