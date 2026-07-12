@@ -49,7 +49,7 @@ if get(g:, 'zero_grep_user_commands', 1)
     command! -nargs=* -range GrepBufferDir  call zero#grep#GrepBufferDir(<f-args>)
     command! -nargs=* -range LGrepBufferDir call zero#grep#LGrepBufferDir(<f-args>)
 
-    if get(g: 'zero_grep_extra_user_commands', 0)
+    if get(g:, 'zero_grep_extra_user_commands', 0)
         command! -nargs=* -complete=file_in_path        GrepCCword  call zero#grep#Grep('-w', expand('<cword>'), <f-args>)
         command! -nargs=* -complete=file_in_path        GrepCword   call zero#grep#Grep('-F', '-e', expand('<cword>'), <f-args>)
         command! -nargs=* -complete=file_in_path        GrepWord    call zero#grep#Grep('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
