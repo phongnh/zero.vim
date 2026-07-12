@@ -18,6 +18,14 @@ def OnQuickFixCmdPost(...args: list<any>)
     endif
 enddef
 
+export def OpenQuickfix()
+    timer_start(0, (_) => OnQuickFixCmdPost(false))
+enddef
+
+export def OpenLocationList()
+    timer_start(0, (_) => OnQuickFixCmdPost(true))
+enddef
+
 export def Exec(opts: dict<any> = {}): void
     var args = opts->get('args', [])->copy()->filter((_, val) => !empty(val))
 
@@ -49,11 +57,11 @@ export def Exec(opts: dict<any> = {}): void
     if get(opts, 'cmd', 'grep') ==# 'lgrep'
         lgetexpr system(cmd)
         setloclist(0, [], 'a', { 'title': cmd })
-        timer_start(0, (_) => OnQuickFixCmdPost(true))
+        OpenLocationList()
     else
         cgetexpr system(cmd)
         setqflist([], 'a', { 'title': cmd })
-        timer_start(0, (_) => OnQuickFixCmdPost(false))
+        OpenQuickfix()
     endif
 enddef
 

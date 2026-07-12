@@ -12,24 +12,6 @@ function Grep.new(opts)
   return self
 end
 
-function Grep:_on_quickfix_cmd_post()
-  local loclist = self.cmd == "lgrep"
-  local total = 0
-  if loclist then
-    vim.cmd("belowright lwindow")
-    total = vim.fn.getloclist(0, { id = 0, size = 0 }).size
-  else
-    vim.cmd("botright cwindow")
-    total = vim.fn.getqflist({ id = 0, size = 0 }).size
-  end
-  vim.cmd("redraw!")
-  if total > 0 then
-    vim.api.nvim_echo({ { string.format("Found %d %s.", total, total == 1 and "match" or "matches") } }, false, {})
-  else
-    vim.api.nvim_echo({ { "No matches found." } }, false, {})
-  end
-end
-
 function Grep:execute()
   local args = vim.tbl_filter(function(val)
     return val ~= ""
@@ -65,10 +47,6 @@ function Grep:execute()
     mods = { silent = true },
     magic = { file = false, bar = false },
   })
-
-  vim.schedule(function()
-    self:_on_quickfix_cmd_post()
-  end)
 end
 
 function Grep.run(opts)
@@ -161,6 +139,47 @@ H.setup_extra_user_commands = function()
   H.create_extra_user_commands({ prefix = "LGrepBufferDir", cmd = "lgrep", fn = Grep.run_in_buffer_dir })
 end
 
+H.setup_autocmds = function()
+  local on_quickfix_cmd_post = function(loclist)
+    local total = 0
+    if loclist then
+      vim.cmd("belowright lwindow")
+      total = vim.fn.getloclist(0, { id = 0, size = 0 }).size
+    else
+      vim.cmd("botright cwindow")
+      total = vim.fn.getqflist({ id = 0, size = 0 }).size
+    end
+    vim.cmd("redraw!")
+    if total > 0 then
+      vim.api.nvim_echo({ { string.format("Found %d %s.", total, total == 1 and "match" or "matches") } }, false, {})
+    else
+      vim.api.nvim_echo({ { "No matches found." } }, false, {})
+    end
+  end
+
+  local group = vim.api.nvim_create_augroup("ZeroVimGrepAutoOpenQuickfix", { clear = true })
+
+  vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+    group = group,
+    pattern = { "grep", "grepadd" },
+    callback = function()
+      vim.schedule(function()
+        on_quickfix_cmd_post(false)
+      end)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+    group = group,
+    pattern = { "lgrep", "lgrepadd" },
+    callback = function()
+      vim.schedule(function()
+        on_quickfix_cmd_post(false)
+      end)
+    end,
+  })
+end
+
 H.setup_config = function(config)
   vim.validate("config", config, "table", true)
   config = vim.tbl_deep_extend("force", vim.deepcopy(H.default_config), config or {})
@@ -180,6 +199,8 @@ H.apply_config = function(config)
       H.setup_extra_user_commands()
     end
   end
+
+  H.setup_autocmds()
 end
 
 function M.setup(config)

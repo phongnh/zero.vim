@@ -15,6 +15,22 @@ function! s:OnQuickFixCmdPost(...) abort
     endif
 endfunction
 
+function! zero#grep#OpenQuickfix() abort
+    if exists('*timer_start')
+        call timer_start(0, {-> call <SID>OnQuickFixCmdPost(0)})
+    else
+        call <SID>OnQuickFixCmdPost(0)
+    endif
+endfunction
+
+function! zero#grep#OpenLocationList() abort
+    if exists('*timer_start')
+        call timer_start(0, {-> call <SID>OnQuickFixCmdPost(1)})
+    else
+        call <SID>OnQuickFixCmdPost(1)
+    endif
+endfunction
+
 function! zero#grep#Exec(opts = {}) abort
     let l:args = get(a:opts, 'args', [])
     let l:args = filter(copy(args), '!empty(v:val)')
@@ -47,11 +63,11 @@ function! zero#grep#Exec(opts = {}) abort
     if get(a:opts, 'cmd', 'grep') ==# 'lgrep'
         lgetexpr system(l:cmd)
         call setloclist(0, [], 'a', { 'title': l:cmd })
-        call <SID>OnQuickFixCmdPost(1)
+        call zero#grep#OpenLocationList()
     else
         cgetexpr system(l:cmd)
         call setqflist([], 'a', { 'title': l:cmd })
-        call <SID>OnQuickFixCmdPost(0)
+        call zero#grep#OpenQuickfix()
     endif
 endfunction
 

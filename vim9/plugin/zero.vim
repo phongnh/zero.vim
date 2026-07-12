@@ -42,6 +42,14 @@ augroup END
 
 import autoload 'zero/grep.vim' as ZeroGrep
 
+if get(g:, 'zero_grep_auto_open_quickfix', 0)
+    augroup ZeroVimGrepAutoOpenQuickfix
+        autocmd!
+        autocmd QuickFixCmdPost grep,grepadd ZeroGrep.OpenQuickfix()
+        autocmd QuickFixCmdPost lgrep,lgrepadd ZeroGrep.OpenLocationList()
+    augroup END
+endif
+
 if get(g:, 'zero_grep_user_commands', 1)
     command! -nargs=* -complete=file_in_path -range Grep  ZeroGrep.Grep(<f-args>)
     command! -nargs=* -complete=file_in_path -range LGrep ZeroGrep.LGrep(<f-args>)

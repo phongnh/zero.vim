@@ -38,6 +38,14 @@ augroup ZeroVimToggleSetup
     endif
 augroup END
 
+if get(g:, 'zero_grep_auto_open_quickfix', 0)
+    augroup ZeroVimGrepAutoOpenQuickfix
+        autocmd!
+        autocmd QuickFixCmdPost grep,grepadd call zero#grep#OpenQuickfix()
+        autocmd QuickFixCmdPost lgrep,lgrepadd call zero#grep#OpenLocationList()
+    augroup END
+endif
+
 if get(g:, 'zero_grep_user_commands', 1)
     command! -nargs=* -complete=file_in_path -range Grep  call zero#grep#Grep(<f-args>)
     command! -nargs=* -complete=file_in_path -range LGrep call zero#grep#LGrep(<f-args>)
