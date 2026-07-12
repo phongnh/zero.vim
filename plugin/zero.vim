@@ -38,6 +38,46 @@ augroup ZeroVimToggleSetup
     endif
 augroup END
 
+if get(g:, 'zero_grep_user_commands', 1)
+    command! -nargs=* -complete=file_in_path -range Grep  call zero#grep#Grep(<f-args>)
+    command! -nargs=* -complete=file_in_path -range LGrep call zero#grep#LGrep(<f-args>)
+    command! -nargs=*                        -range BGrep call zero#grep#BGrep(<f-args>)
+
+    command! -nargs=* -complete=file_in_path        GrepCCword  call zero#grep#Grep('-w', expand('<cword>'), <f-args>)
+    command! -nargs=* -complete=file_in_path        GrepCword   call zero#grep#Grep('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=* -complete=file_in_path        GrepWord    call zero#grep#Grep('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -complete=file_in_path -range GrepVword   call zero#grep#Grep('-F', '-e', shellescape(zero#Vword()), <f-args>)
+
+    command! -nargs=* -complete=file_in_path        LGrepCCword call zero#grep#LGrep('-w', expand('<cword>'), <f-args>)
+    command! -nargs=* -complete=file_in_path        LGrepCword  call zero#grep#LGrep('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=* -complete=file_in_path        LGrepWord   call zero#grep#LGrep('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -complete=file_in_path -range LGrepVword  call zero#grep#LGrep('-F', '-e', shellescape(zero#Vword()), <f-args>)
+
+    command! -nargs=* -range GrepProject       call zero#grep#GrepProject(<f-args>)
+    command! -nargs=*        GrepProjectCCword call zero#grep#GrepProject('-w', expand('<cword>'), <f-args>)
+    command! -nargs=*        GrepProjectCword  call zero#grep#GrepProject('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=*        GrepProjectWord   call zero#grep#GrepProject('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -range GrepProjectVword  call zero#grep#GrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
+
+    command! -nargs=* -range LGrepProject       call zero#grep#LGrepProject(<f-args>)
+    command! -nargs=*        LGrepProjectCCword call zero#grep#LGrepProject('-w', expand('<cword>'), <f-args>)
+    command! -nargs=*        LGrepProjectCword  call zero#grep#LGrepProject('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=*        LGrepProjectWord   call zero#grep#LGrepProject('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -range LGrepProjectVword  call zero#grep#LGrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
+
+    command! -nargs=* -range GrepBufferDir       call zero#grep#GrepBufferDir(<f-args>)
+    command! -nargs=*        GrepBufferDirCCword call zero#grep#GrepBufferDir('-w', expand('<cword>'), <f-args>)
+    command! -nargs=*        GrepBufferDirCword  call zero#grep#GrepBufferDir('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=*        GrepBufferDirWord   call zero#grep#GrepBufferDir('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -range GrepBufferDirVword  call zero#grep#GrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
+
+    command! -nargs=* -range LGrepBufferDir       call zero#grep#LGrepBufferDir(<f-args>)
+    command! -nargs=*        LGrepBufferDirCCword call zero#grep#LGrepBufferDir('-w', expand('<cword>'), <f-args>)
+    command! -nargs=*        LGrepBufferDirCword  call zero#grep#LGrepBufferDir('-F', '-e', expand('<cword>'), <f-args>)
+    command! -nargs=*        LGrepBufferDirWord   call zero#grep#LGrepBufferDir('-F', '-e', expand('<cWORD>'), <f-args>)
+    command! -nargs=* -range LGrepBufferDirVword  call zero#grep#LGrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
+endif
+
 " Restore cpoptions
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
