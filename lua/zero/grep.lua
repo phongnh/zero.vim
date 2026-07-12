@@ -40,38 +40,4 @@ M.pword = function()
   return M.escape(require("zero").pword())
 end
 
-M.grepper_escape = function(text)
-  local shell = vim.o.shell
-  local ok, result = pcall(function()
-    vim.o.shell = "sh"
-    return vim.fn.shellescape(text)
-  end)
-  vim.o.shell = shell
-  return ok and result or text
-end
-
-M.grepper_ccword = function()
-  return M.grepper_escape(require("zero").ccword())
-end
-
-M.grepper_cword = function()
-  return M.grepper_escape(require("zero").cword())
-end
-
-M.grepper_word = function()
-  return M.grepper_escape(require("zero").word())
-end
-
-M.grepper_vword = function()
-  return M.grepper_escape(require("zero").vword())
-end
-
-M.grepper_visual = function()
-  return M.grepper_escape(require("zero").visual())
-end
-
-M.grepper_pword = function()
-  return M.grepper_escape(require("zero").pword())
-end
-
 return M

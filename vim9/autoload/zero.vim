@@ -53,14 +53,6 @@ def IsGrepCommand(cmd: string): bool
         cmd =~# '^\%(Ggrep!\?\|Glgrep!\?\|Git!\?\s\+grep\)\s'
 enddef
 
-def IsGrepperCommand(cmd: string): bool
-    return cmd =~# '^\%(''<,''>\)\?\%(Grepper\|LGrepper\|PGrepper\|BGrepper\)\s'
-enddef
-
-def IsGrepperInputCommand(): bool
-    return getcmdtype() ==# '@' && getcmdprompt() =~# '^\%(rg\|git\)\s\+.\+>'
-enddef
-
 export def InsertCCword(): string
     const cmd = getcmdline()
     if IsSubstituteCommand(cmd)
@@ -83,8 +75,6 @@ export def InsertWord(): string
         return zero#substitute#Word()
     elseif IsGrepCommand(cmd)
         return escape(zero#Word(), ' ')
-    elseif IsGrepperCommand(cmd) || IsGrepperInputCommand()
-        return zero#grep#GrepperWord()
     endif
     return zero#grep#Word()
 enddef
@@ -95,8 +85,6 @@ export def InsertVword(): string
         return zero#substitute#Vword()
     elseif IsGrepCommand(cmd)
         return escape(zero#Vword(), ' ')
-    elseif IsGrepperCommand(cmd) || IsGrepperInputCommand()
-        return zero#grep#GrepperVword()
     endif
     return zero#grep#Vword()
 enddef
@@ -107,8 +95,6 @@ export def InsertPword(): string
         return zero#substitute#Pword()
     elseif IsGrepCommand(cmd)
         return escape(zero#Pword(), ' ')
-    elseif IsGrepperCommand(cmd) || IsGrepperInputCommand()
-        return zero#grep#GrepperPword()
     endif
     return zero#grep#Pword()
 enddef

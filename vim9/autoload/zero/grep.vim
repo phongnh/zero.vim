@@ -27,35 +27,3 @@ enddef
 export def Pword(): string
     return Escape(zero#Pword())
 enddef
-
-export def GrepperEscape(text: string): string
-    const shell = &shell
-    &shell = 'sh'
-    const escaped = shellescape(text)
-    &shell = shell
-    return escaped
-enddef
-
-export def GrepperCCword(): string
-    return GrepperEscape(zero#CCword())
-enddef
-
-export def GrepperCword(): string
-    return GrepperEscape(zero#Cword())
-enddef
-
-export def GrepperWord(): string
-    return GrepperEscape(zero#Word())
-enddef
-
-export def GrepperVword(): string
-    return GrepperEscape(zero#Vword())
-enddef
-
-export def GrepperVisual(): string
-    return GrepperEscape(zero#Visual())
-enddef
-
-export def GrepperPword(): string
-    return GrepperEscape(zero#Pword())
-enddef
