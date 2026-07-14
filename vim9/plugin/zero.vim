@@ -58,44 +58,4 @@ if get(g:, 'zero_grep_user_commands', 1)
     command! -nargs=*                        LGrepProject   ZeroGrep.LGrepProject(<f-args>)
     command! -nargs=*                        GrepBufferDir  ZeroGrep.GrepBufferDir(<f-args>)
     command! -nargs=*                        LGrepBufferDir ZeroGrep.LGrepBufferDir(<f-args>)
-
-    command! -nargs=* -range -complete=file_in_path VisualGrep           ZeroGrep.Grep('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range -complete=file_in_path VisualLGrep          ZeroGrep.LGrep('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range                        VisualBGrep          ZeroGrep.BGrep('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range                        VisualGrepProject    ZeroGrep.GrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range                        VisualLGrepProject   ZeroGrep.LGrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range                        VisualGrepBufferDir  ZeroGrep.GrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    command! -nargs=* -range                        VisualLGrepBufferDir ZeroGrep.LGrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-    if get(g:, 'zero_grep_extra_user_commands', 0)
-        command! -nargs=* -complete=file_in_path        GrepCCword  ZeroGrep.Grep('-w', expand('<cword>'), <f-args>)
-        command! -nargs=* -complete=file_in_path        GrepCword   ZeroGrep.Grep('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=* -complete=file_in_path        GrepWord    ZeroGrep.Grep('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -complete=file_in_path -range GrepVword   ZeroGrep.Grep('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-        command! -nargs=* -complete=file_in_path        LGrepCCword ZeroGrep.LGrep('-w', expand('<cword>'), <f-args>)
-        command! -nargs=* -complete=file_in_path        LGrepCword  ZeroGrep.LGrep('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=* -complete=file_in_path        LGrepWord   ZeroGrep.LGrep('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -complete=file_in_path -range LGrepVword  ZeroGrep.LGrep('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-        command! -nargs=*        GrepProjectCCword ZeroGrep.GrepProject('-w', expand('<cword>'), <f-args>)
-        command! -nargs=*        GrepProjectCword  ZeroGrep.GrepProject('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=*        GrepProjectWord   ZeroGrep.GrepProject('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -range GrepProjectVword  ZeroGrep.GrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-        command! -nargs=*        LGrepProjectCCword ZeroGrep.LGrepProject('-w', expand('<cword>'), <f-args>)
-        command! -nargs=*        LGrepProjectCword  ZeroGrep.LGrepProject('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=*        LGrepProjectWord   ZeroGrep.LGrepProject('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -range LGrepProjectVword  ZeroGrep.LGrepProject('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-        command! -nargs=*        GrepBufferDirCCword ZeroGrep.GrepBufferDir('-w', expand('<cword>'), <f-args>)
-        command! -nargs=*        GrepBufferDirCword  ZeroGrep.GrepBufferDir('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=*        GrepBufferDirWord   ZeroGrep.GrepBufferDir('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -range GrepBufferDirVword  ZeroGrep.GrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
-
-        command! -nargs=*        LGrepBufferDirCCword ZeroGrep.LGrepBufferDir('-w', expand('<cword>'), <f-args>)
-        command! -nargs=*        LGrepBufferDirCword  ZeroGrep.LGrepBufferDir('-F', '-e', expand('<cword>'), <f-args>)
-        command! -nargs=*        LGrepBufferDirWord   ZeroGrep.LGrepBufferDir('-F', '-e', shellescape(expand('<cWORD>')), <f-args>)
-        command! -nargs=* -range LGrepBufferDirVword  ZeroGrep.LGrepBufferDir('-F', '-e', shellescape(zero#Vword()), <f-args>)
-    endif
 endif
