@@ -94,32 +94,73 @@ H.setup_user_commands = function()
   vim.api.nvim_create_user_command("LGrepBufferDir", function(opts)
     Grep.run_in_buffer_dir({ cmd = "lgrep", args = opts.fargs })
   end, { nargs = "*" })
+
+  vim.api.nvim_create_user_command("VisualGrep", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run({ cmd = "grep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualLGrep", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run({ cmd = "lgrep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualBGrep", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run({ cmd = "lgrep", args = args, path = vim.fn.expand("%:p:.") })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualGrepProject", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run_in_project({ cmd = "grep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualLGrepProject", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run_in_project({ cmd = "lgrep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualGrepBufferDir", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run_in_buffer_dir({ cmd = "grep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
+
+  vim.api.nvim_create_user_command("VisualLGrepBufferDir", function(opts)
+    local args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs)
+    Grep.run_in_buffer_dir({ cmd = "lgrep", args = args })
+  end, { nargs = "*", complete = "file_in_path" })
 end
 
 H.create_extra_user_commands = function(opts)
   local prefix, cmd, fn = opts.prefix, opts.cmd, opts.fn
+  local default_opts = vim.tbl_extend(
+    "force",
+    { nargs = "*" },
+    (prefix == "Grep" or prefix == "LGrep") and { complete = "file_in_path" } or {}
+  )
+  local visual_opts = vim.tbl_extend("force", default_opts, { range = true })
 
   vim.api.nvim_create_user_command(prefix .. "CCword", function(opts)
     fn({ cmd = cmd, args = vim.list_extend({ "-w", vim.fn.expand("<cword>") }, opts.fargs) })
-  end, { nargs = "*", complete = "file_in_path" })
+  end, default_opts)
 
   vim.api.nvim_create_user_command(prefix .. "Cword", function(opts)
-    opts.fn({ cmd = opts.cmd, args = vim.list_extend({ "-F", "-e", vim.fn.expand("<cword>") }, opts.fargs) })
-  end, { nargs = "*", complete = "file_in_path" })
+    fn({ cmd = cmd, args = vim.list_extend({ "-F", "-e", vim.fn.expand("<cword>") }, opts.fargs) })
+  end, default_opts)
 
   vim.api.nvim_create_user_command(prefix .. "Word", function(opts)
     fn({
       cmd = cmd,
       args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(vim.fn.expand("<cWORD>")) }, opts.fargs),
     })
-  end, { nargs = "*", complete = "file_in_path" })
+  end, default_opts)
 
   vim.api.nvim_create_user_command(prefix .. "Vword", function(opts)
     fn({
       cmd = cmd,
       args = vim.list_extend({ "-F", "-e", vim.fn.shellescape(require("zero").vword()) }, opts.fargs),
     })
-  end, { nargs = "*", range = true, complete = "file_in_path" })
+  end, visual_opts)
 end
 
 H.setup_extra_user_commands = function()
