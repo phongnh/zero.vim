@@ -20,7 +20,7 @@ function Grep:execute()
   if vim.tbl_isempty(args) then
     local cword = vim.fn.expand("<cword>")
     if cword ~= "" then
-      vim.list_extend(args, { "-w", cword })
+      vim.list_extend(args, { vim.fn.shellescape("\\b" .. cword .. "\\b") })
     end
   end
 

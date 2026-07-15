@@ -38,7 +38,7 @@ function! zero#grep#Exec(opts = {}) abort
     if empty(l:args)
         let l:cword = expand('<cword>')
         if !empty(l:cword)
-            let l:args = ['-w', l:cword]
+            let l:args = [shellescape('\b' .. l:cword .. '\b')]
         endif
     endif
 

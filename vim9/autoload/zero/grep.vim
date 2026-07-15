@@ -32,7 +32,7 @@ export def Exec(opts: dict<any> = {}): void
     if args->empty()
         const cword = expand('<cword>')
         if !cword->empty()
-            args = ['-w', cword]
+            args = [shellescape('\b' .. cword .. '\b')]
         endif
     endif
 
