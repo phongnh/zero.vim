@@ -52,41 +52,41 @@ function! zero#grep#Exec(opts = {}) abort
     endif
 
     let l:cmd = &grepprg .. ' ' .. join(l:args, ' ')
-    if get(a:opts, 'cmd', 'grep') ==# 'lgrep'
-        lgetexpr system(l:cmd)
-        call setloclist(0, [], 'a', { 'title': l:cmd })
-        call zero#grep#OpenLocationList()
-    else
+    if get(a:opts, 'qf', 1)
         cgetexpr system(l:cmd)
         call setqflist([], 'a', { 'title': l:cmd })
         call zero#grep#OpenQuickfix()
+    else
+        lgetexpr system(l:cmd)
+        call setloclist(0, [], 'a', { 'title': l:cmd })
+        call zero#grep#OpenLocationList()
     endif
 endfunction
 
 function! zero#grep#Grep(...) abort
-    call zero#grep#Exec({ 'args': a:000 })
+    call zero#grep#Exec({ 'args': a:000, 'qf': 1 })
 endfunction
 
 function! zero#grep#LGrep(...) abort
-    call zero#grep#Exec({ 'cmd': 'lgrep', 'args': a:000 })
+    call zero#grep#Exec({ 'args': a:000, 'qf': 0 })
 endfunction
 
 function! zero#grep#BGrep(...) abort
-    call zero#grep#Exec({ 'cmd': 'lgrep', 'args': a:000, 'path': expand('%:p:.') })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.'), 'qf': 0 })
 endfunction
 
 function! zero#grep#GrepProject(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.') })
+    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'qf': 1 })
 endfunction
 
 function! zero#grep#LGrepProject(...) abort
-    call zero#grep#Exec({ 'cmd': 'lgrep', 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.') })
+    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'qf': 0 })
 endfunction
 
 function! zero#grep#GrepBufferDir(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h') })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'qf': 1 })
 endfunction
 
 function! zero#grep#LGrepBufferDir(...) abort
-    call zero#grep#Exec({ 'cmd': 'lgrep', 'args': a:000, 'path': expand('%:p:.:h') })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'qf': 0 })
 endfunction
