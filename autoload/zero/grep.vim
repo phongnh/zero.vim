@@ -52,7 +52,7 @@ function! zero#grep#Exec(opts = {}) abort
     endif
 
     let l:cmd = &grepprg .. ' ' .. join(l:args, ' ')
-    if get(a:opts, 'qf', 1)
+    if get(a:opts, 'quickfix', 1)
         cgetexpr system(l:cmd)
         call setqflist([], 'a', { 'title': l:cmd })
         call zero#grep#OpenQuickfix()
@@ -64,29 +64,29 @@ function! zero#grep#Exec(opts = {}) abort
 endfunction
 
 function! zero#grep#Grep(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'qf': 1 })
+    call zero#grep#Exec({ 'args': a:000, 'quickfix': 1 })
 endfunction
 
 function! zero#grep#LGrep(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'qf': 0 })
+    call zero#grep#Exec({ 'args': a:000, 'quickfix': 0 })
 endfunction
 
 function! zero#grep#BGrep(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.'), 'qf': 0 })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.'), 'quickfix': 0 })
 endfunction
 
 function! zero#grep#GrepProject(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'qf': 1 })
+    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'quickfix': 1 })
 endfunction
 
 function! zero#grep#LGrepProject(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'qf': 0 })
+    call zero#grep#Exec({ 'args': a:000, 'path': fnamemodify(zero#project#Find(), ':p:.'), 'quickfix': 0 })
 endfunction
 
 function! zero#grep#GrepBufferDir(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'qf': 1 })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'quickfix': 1 })
 endfunction
 
 function! zero#grep#LGrepBufferDir(...) abort
-    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'qf': 0 })
+    call zero#grep#Exec({ 'args': a:000, 'path': expand('%:p:.:h'), 'quickfix': 0 })
 endfunction

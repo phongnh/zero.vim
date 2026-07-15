@@ -6,8 +6,8 @@ function Grep.new(opts)
   opts = opts or {}
   local self = setmetatable({}, Grep)
   self.opts = opts
-  self.qf = vim.nonnil(opts.qf, true)
-  self.cmd = self.qf and "grep" or "lgrep"
+  self.quickfix = vim.nonnil(opts.quickfix, true)
+  self.cmd = self.quickfix and "grep" or "lgrep"
   self.args = opts.args or {}
   self.path = opts.path or ""
   return self
@@ -68,31 +68,31 @@ H.default_config = {
 
 H.setup_user_commands = function()
   vim.api.nvim_create_user_command("Grep", function(opts)
-    Grep.run({ args = opts.fargs, qf = true })
+    Grep.run({ args = opts.fargs, quickfix = true })
   end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("LGrep", function(opts)
-    Grep.run({ args = opts.fargs, qf = false })
+    Grep.run({ args = opts.fargs, quickfix = false })
   end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("BGrep", function(opts)
-    Grep.run({ args = opts.fargs, path = vim.fn.expand("%:p:."), qf = false })
+    Grep.run({ args = opts.fargs, path = vim.fn.expand("%:p:."), quickfix = false })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepProject", function(opts)
-    Grep.run_in_project({ args = opts.fargs, qf = true })
+    Grep.run_in_project({ args = opts.fargs, quickfix = true })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepProject", function(opts)
-    Grep.run_in_project({ args = opts.fargs, qf = false })
+    Grep.run_in_project({ args = opts.fargs, quickfix = false })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepBufferDir", function(opts)
-    Grep.run_in_buffer_dir({ args = opts.fargs, qf = true })
+    Grep.run_in_buffer_dir({ args = opts.fargs, quickfix = true })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepBufferDir", function(opts)
-    Grep.run_in_buffer_dir({ args = opts.fargs, qf = false })
+    Grep.run_in_buffer_dir({ args = opts.fargs, quickfix = false })
   end, { nargs = "*" })
 end
 

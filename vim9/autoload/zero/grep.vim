@@ -46,7 +46,7 @@ export def Exec(opts: dict<any> = {}): void
     endif
 
     const cmd = &grepprg .. ' ' .. args->join(' ')
-    if get(opts, 'qf', 1)
+    if get(opts, 'quickfix', 1)
         cgetexpr system(cmd)
         setqflist([], 'a', { 'title': cmd })
         OpenQuickfix()
@@ -58,29 +58,29 @@ export def Exec(opts: dict<any> = {}): void
 enddef
 
 export def Grep(...args: list<any>): void
-    Exec({ 'args': args, 'qf': true })
+    Exec({ 'args': args, 'quickfix': true })
 enddef
 
 export def LGrep(...args: list<any>): void
-    Exec({ 'args': args, 'qf': false })
+    Exec({ 'args': args, 'quickfix': false })
 enddef
 
 export def BGrep(...args: list<any>): void
-    Exec({ 'args': args, 'path': expand('%:p:.'), 'qf': false })
+    Exec({ 'args': args, 'path': expand('%:p:.'), 'quickfix': false })
 enddef
 
 export def GrepProject(...args: list<any>): void
-    Exec({ 'args': args, 'path': zero#project#Find()->fnamemodify(':p:.'), 'qf': true })
+    Exec({ 'args': args, 'path': zero#project#Find()->fnamemodify(':p:.'), 'quickfix': true })
 enddef
 
 export def LGrepProject(...args: list<any>): void
-    Exec({ 'args': args, 'path': zero#project#Find()->fnamemodify(':p:.'), 'qf': false })
+    Exec({ 'args': args, 'path': zero#project#Find()->fnamemodify(':p:.'), 'quickfix': false })
 enddef
 
 export def GrepBufferDir(...args: list<any>): void
-    Exec({ 'args': args, 'path': expand('%p:.:h'), 'qf': true })
+    Exec({ 'args': args, 'path': expand('%p:.:h'), 'quickfix': true })
 enddef
 
 export def LGrepBufferDir(...args: list<any>): void
-    Exec({ 'args': args, 'path': expand('%p:.:h'), 'qf': false })
+    Exec({ 'args': args, 'path': expand('%p:.:h'), 'quickfix': false })
 enddef
