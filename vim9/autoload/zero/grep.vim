@@ -48,7 +48,6 @@ def ExtractOptions(opts: dict<any>): dict<any>
     var options = extend({
         'quickfix': true,
         'path': [],
-        'escape': '\',
         'grepprg': &grepprg,
         'grepformat': &grepformat,
         'append': false,
@@ -70,10 +69,6 @@ def ExtractOptions(opts: dict<any>): dict<any>
     options.grepprg = BuildGrepprg(options.grepprg)
 
     return options
-enddef
-
-def BuildEscapedArgs(args: list<string>, chars: string): list<string>
-    return mapnew(args, (_, arg) => escape(arg, chars))
 enddef
 
 def BuildEscapedPath(paths: list<string>): list<string>

@@ -54,7 +54,6 @@ function! s:ExtractOptions(opts) abort
     let l:options = extend({
                 \ 'quickfix': 1,
                 \ 'path': [],
-                \ 'escape': '\',
                 \ 'grepprg': &grepprg,
                 \ 'grepformat': &grepformat,
                 \ 'append': 0,
@@ -76,10 +75,6 @@ function! s:ExtractOptions(opts) abort
     let l:options.grepprg = s:BuildGrepprg(l:options.grepprg)
 
     return l:options
-endfunction
-
-function! s:BuildEscapedArgs(args, chars) abort
-    return mapnew(a:args, 'escape(v:val, a:chars)')
 endfunction
 
 function! s:BuildEscapedPath(paths) abort
