@@ -32,7 +32,6 @@ function Grep.new(opts)
   self.quickfix = opts.quickfix
   self.args = opts.args
   self.path = opts.path
-  self.escape = opts.escape
   self.grepprg = opts.grepprg
   self.grepformat = opts.grepformat
   self.append = self.append
@@ -60,7 +59,6 @@ end
 function Grep:extract_options(opts)
   local options = vim.tbl_extend("keep", vim.deepcopy(opts or {}), {
     quickfix = true,
-    escape = "\\",
     grepprg = vim.o.grepprg,
     grepformat = vim.o.grepformat,
     append = false,
@@ -68,9 +66,14 @@ function Grep:extract_options(opts)
     async = true,
   })
 
+  options.args = options.args or {}
+  if type(options.args) == "string" then
+    options.args = { options.args }
+  end
+
   options.args = vim.tbl_filter(function(val)
     return val ~= nil and val ~= ""
-  end, options.args or {})
+  end, options.args)
 
   if not options.path then
     options.path = {}
@@ -87,15 +90,6 @@ function Grep:extract_options(opts)
   options.grepprg = self:build_grepprg(options.grepprg)
 
   return options
-end
-
-function Grep:build_escaped_args()
-  return vim
-    .iter(self.args)
-    :map(function(arg)
-      return vim.fn.escape(arg, self.escape)
-    end)
-    :totable()
 end
 
 function Grep:build_escaped_path()
@@ -150,10 +144,7 @@ function Grep:execute_async()
     end
   end
 
-  local cmd = table.concat(
-    vim.iter({ self.grepprg, self:build_escaped_args(), self:build_escaped_path() }):flatten():totable(),
-    " "
-  )
+  local cmd = table.concat(vim.iter({ self.grepprg, self.args, self:build_escaped_path() }):flatten():totable(), " ")
 
   if current_obj then
     current_obj:kill(15) -- Sends SIGTERM
@@ -171,7 +162,7 @@ function Grep:execute_async()
 end
 
 function Grep:execute_sync()
-  local args = vim.list_extend(self:build_escaped_args(), self:build_escaped_path())
+  local args = vim.iter({ self.args, self:build_escaped_path() }):flatten():totable()
   local cmd = self.quickfix and "grep" or "lgrep"
   cmd = cmd .. (self.append and "add" or "")
   vim.cmd({
@@ -221,31 +212,31 @@ H.default_config = {
 
 H.setup_user_commands = function()
   vim.api.nvim_create_user_command("Grep", function(opts)
-    Grep.run({ args = opts.fargs, quickfix = true })
+    Grep.run({ args = opts.args, quickfix = true })
   end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("LGrep", function(opts)
-    Grep.run({ args = opts.fargs, quickfix = false })
+    Grep.run({ args = opts.args, quickfix = false })
   end, { nargs = "*", complete = "file_in_path" })
 
   vim.api.nvim_create_user_command("BGrep", function(opts)
-    Grep.run({ args = opts.fargs, path = vim.fn.expand("%:p:."), quickfix = false })
+    Grep.run({ args = opts.args, path = vim.fn.expand("%:p:."), quickfix = false })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepProject", function(opts)
-    Grep.run_in_project({ args = opts.fargs, quickfix = true })
+    Grep.run_in_project({ args = opts.args, quickfix = true })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepProject", function(opts)
-    Grep.run_in_project({ args = opts.fargs, quickfix = false })
+    Grep.run_in_project({ args = opts.args, quickfix = false })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("GrepBufferDir", function(opts)
-    Grep.run_in_buffer_dir({ args = opts.fargs, quickfix = true })
+    Grep.run_in_buffer_dir({ args = opts.args, quickfix = true })
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("LGrepBufferDir", function(opts)
-    Grep.run_in_buffer_dir({ args = opts.fargs, quickfix = false })
+    Grep.run_in_buffer_dir({ args = opts.args, quickfix = false })
   end, { nargs = "*" })
 end
 
