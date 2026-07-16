@@ -72,14 +72,6 @@ function Grep:extract_options(opts)
     return val ~= nil and val ~= ""
   end, options.args or {})
 
-  if #options.args == 0 then
-    options.cword = true
-    local cword = vim.fn.expand("<cword>")
-    if cword and cword ~= "" then
-      options.args = { vim.fn.shellescape("\\b" .. cword .. "\\b") }
-    end
-  end
-
   if not options.path then
     options.path = {}
   elseif type(options.path) == "string" then
