@@ -1,45 +1,206 @@
+local function on_quickfix_cmd_post(quickfix)
+  quickfix = vim.nonnil(quickfix, true)
+  local total = 0
+  if quickfix then
+    vim.cmd("botright cwindow")
+    total = vim.fn.getqflist({ id = 0, size = 0 }).size
+  else
+    vim.cmd("belowright lwindow")
+    total = vim.fn.getloclist(0, { id = 0, size = 0 }).size
+  end
+  vim.cmd("redraw!")
+  if total > 0 then
+    -- vim.api.nvim_echo({ { string.format("Found %d %s.", total, total == 1 and "match" or "matches") } }, false, {})
+    vim.notify(string.format("Found %d %s.", total, total == 1 and "match" or "matches"), vim.log.levels.INFO)
+  else
+    -- vim.api.nvim_echo({ { "No matches found." } }, false, {})
+    vim.notify("No matches found.", vim.log.levels.INFO)
+  end
+end
+
 -- Grep Class
 local Grep = {}
 Grep.__index = Grep
 
+-- Track current running background progress
+local current_obj = nil
+
 function Grep.new(opts)
-  opts = opts or {}
   local self = setmetatable({}, Grep)
+  opts = self:extract_options(opts or {})
   self.opts = opts
-  self.quickfix = vim.nonnil(opts.quickfix, true)
-  self.cmd = self.quickfix and "grep" or "lgrep"
-  self.args = opts.args or {}
-  self.path = opts.path or ""
+  self.quickfix = opts.quickfix
+  self.args = opts.args
+  self.path = opts.path
+  self.escape = opts.escape
+  self.grepprg = opts.grepprg
+  self.grepformat = opts.grepformat
+  self.append = self.append
+  self.cword = opts.cword
+  self.async = opts.async
   return self
 end
 
-function Grep:execute()
-  local args = vim.tbl_filter(function(val)
-    return val ~= ""
-  end, self.args)
+function Grep:build_grepprg(grepprg)
+  if type(grepprg) == "table" and vim.islist(grepprg) and #grepprg > 0 then
+    return grepprg
+  elseif type(grepprg) ~= "string" or #grepprg == 0 then
+    grepprg = vim.o.grepprg
+  end
+  local cmd = {}
+  local tokens = vim.split(grepprg, "%s+", { trimempty = true })
+  for _, token in ipairs(tokens) do
+    if not token:match("^[$%%]") then
+      table.insert(cmd, token)
+    end
+  end
+  return cmd
+end
 
-  if vim.tbl_isempty(args) then
+function Grep:extract_options(opts)
+  local options = vim.tbl_extend("keep", vim.deepcopy(opts or {}), {
+    quickfix = true,
+    escape = "\\",
+    grepprg = vim.o.grepprg,
+    grepformat = vim.o.grepformat,
+    append = false,
+    cword = false,
+    async = true,
+  })
+
+  options.args = vim.tbl_filter(function(val)
+    return val ~= nil and val ~= ""
+  end, options.args or {})
+
+  if #options.args == 0 then
+    options.cword = true
     local cword = vim.fn.expand("<cword>")
-    if cword ~= "" then
-      vim.list_extend(args, { vim.fn.shellescape("\\b" .. cword .. "\\b") })
+    if cword and cword ~= "" then
+      options.args = { vim.fn.shellescape("\\b" .. cword .. "\\b") }
     end
   end
 
-  if vim.tbl_isempty(args) then
-    return
+  if not options.path then
+    options.path = {}
+  elseif type(options.path) == "string" then
+    options.path = { options.path }
+  elseif not type(options.path) == "table" or not vim.islist(options.path) then
+    options.path = {}
   end
 
-  if self.path ~= nil and self.path ~= "" then
-    table.insert(args, vim.fn.fnameescape(self.path))
+  options.path = vim.tbl_filter(function(val)
+    return val ~= nil and val ~= ""
+  end, options.path)
+
+  options.grepprg = self:build_grepprg(options.grepprg)
+
+  return options
+end
+
+function Grep:build_escaped_args()
+  return vim
+    .iter(self.args)
+    :map(function(arg)
+      return vim.fn.escape(arg, self.escape)
+    end)
+    :totable()
+end
+
+function Grep:build_escaped_path()
+  return vim
+    .iter(self.path)
+    :map(function(path)
+      return vim.fn.fnameescape(path)
+    end)
+    :totable()
+end
+
+function Grep:execute_async()
+  local title = table.concat(vim.iter({ self.grepprg, self.args, self.path }):flatten():totable(), " ")
+  local efm = self.grepformat
+  local on_stdout
+  if self.quickfix then
+    if self.append then
+      vim.fn.setqflist({}, "a", { title = title })
+    else
+      vim.fn.setqflist({}, "r", { items = {}, title = title })
+    end
+    on_stdout = function(_, data)
+      if data and data ~= "" then
+        vim.schedule(function()
+          local lines = vim.split(data, "\n", { trimempty = true })
+          vim.fn.setqflist({}, "a", { lines = lines, efm = efm })
+        end)
+      end
+    end
+  else
+    if self.append then
+      vim.fn.setloclist(0, {}, "a", { title = title })
+    else
+      vim.fn.setloclist(0, {}, "r", { items = {}, title = title })
+    end
+    on_stdout = function(_, data)
+      if data and data ~= "" then
+        vim.schedule(function()
+          local lines = vim.split(data, "\n", { trimempty = true })
+          vim.fn.setloclist(0, {}, "a", { lines = lines, efm = efm })
+        end)
+      end
+    end
   end
 
+  local on_exit = function(obj)
+    if obj.code == 0 or obj.code == 1 then
+      on_quickfix_cmd_post(self.quickfix)
+    else
+      -- vim.api.nvim_echo({ { string.format("Grep failed with error code: %d", obj.code), "ErrorMsg" } }, false, {})
+      vim.notify(string.format("Grep failed with error code: %d", obj.code), vim.log.levels.INFO)
+    end
+  end
+
+  local cmd = table.concat(
+    vim.iter({ self.grepprg, self:build_escaped_args(), self:build_escaped_path() }):flatten():totable(),
+    " "
+  )
+
+  if current_obj then
+    current_obj:kill(15) -- Sends SIGTERM
+  end
+
+  current_obj = vim.system({ vim.o.shell, vim.o.shellcmdflag, cmd }, {
+    stdout = on_stdout,
+  }, function(obj)
+    current_obj = nil
+
+    vim.schedule(function()
+      on_exit(obj)
+    end)
+  end)
+end
+
+function Grep:execute_sync()
+  local args = vim.list_extend(self:build_escaped_args(), self:build_escaped_path())
+  local cmd = self.quickfix and "grep" or "lgrep"
+  cmd = cmd .. (self.append and "add" or "")
   vim.cmd({
-    cmd = self.cmd,
+    cmd = cmd,
     args = args,
     bang = true,
     mods = { silent = true },
     magic = { file = false, bar = false },
   })
+end
+
+function Grep:execute()
+  if #self.args == 0 then
+    return
+  end
+
+  if self.async then
+    self:execute_async()
+  else
+    self:execute_sync()
+  end
 end
 
 function Grep.run(opts)
@@ -97,23 +258,6 @@ H.setup_user_commands = function()
 end
 
 H.setup_autocmds = function()
-  local on_quickfix_cmd_post = function(loclist)
-    local total = 0
-    if loclist then
-      vim.cmd("belowright lwindow")
-      total = vim.fn.getloclist(0, { id = 0, size = 0 }).size
-    else
-      vim.cmd("botright cwindow")
-      total = vim.fn.getqflist({ id = 0, size = 0 }).size
-    end
-    vim.cmd("redraw!")
-    if total > 0 then
-      vim.api.nvim_echo({ { string.format("Found %d %s.", total, total == 1 and "match" or "matches") } }, false, {})
-    else
-      vim.api.nvim_echo({ { "No matches found." } }, false, {})
-    end
-  end
-
   local group = vim.api.nvim_create_augroup("ZeroVimGrepAutoOpenQuickfix", { clear = true })
 
   vim.api.nvim_create_autocmd("QuickFixCmdPost", {
@@ -121,7 +265,7 @@ H.setup_autocmds = function()
     pattern = { "grep", "grepadd" },
     callback = function()
       vim.schedule(function()
-        on_quickfix_cmd_post(false)
+        on_quickfix_cmd_post(true)
       end)
     end,
   })
