@@ -51,11 +51,11 @@ if get(g:, 'zero_grep_auto_open_quickfix', 0)
 endif
 
 if get(g:, 'zero_grep_user_commands', 1)
-    command! -nargs=* -complete=file_in_path Grep           ZeroGrep.Grep(<f-args>)
-    command! -nargs=* -complete=file_in_path LGrep          ZeroGrep.LGrep(<f-args>)
-    command! -nargs=*                        BGrep          ZeroGrep.BGrep(<f-args>)
-    command! -nargs=*                        GrepProject    ZeroGrep.GrepProject(<f-args>)
-    command! -nargs=*                        LGrepProject   ZeroGrep.LGrepProject(<f-args>)
-    command! -nargs=*                        GrepBufferDir  ZeroGrep.GrepBufferDir(<f-args>)
-    command! -nargs=*                        LGrepBufferDir ZeroGrep.LGrepBufferDir(<f-args>)
+    command! -nargs=* -complete=file_in_path Grep           ZeroGrep.Grep(<q-args>)
+    command! -nargs=* -complete=file_in_path LGrep          ZeroGrep.LGrep(<q-args>)
+    command! -nargs=*                        BGrep          ZeroGrep.BGrep(<q-args>)
+    command! -nargs=*                        GrepProject    ZeroGrep.GrepProject(<q-args>)
+    command! -nargs=*                        LGrepProject   ZeroGrep.LGrepProject(<q-args>)
+    command! -nargs=*                        GrepBufferDir  ZeroGrep.GrepBufferDir(<q-args>)
+    command! -nargs=*                        LGrepBufferDir ZeroGrep.LGrepBufferDir(<q-args>)
 endif

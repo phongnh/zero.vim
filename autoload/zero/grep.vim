@@ -1,3 +1,5 @@
+let s:current_job = v:null
+
 function! s:OnQuickFixCmdPost(...) abort
     let l:quickfix = get(a:, 1, 1)
     if l:quickfix
@@ -31,14 +33,16 @@ function! zero#grep#OpenLocationList() abort
     endif
 endfunction
 
-function! s:BuildGrepCmd(grepprg) abort
+function! s:BuildGrepprg(grepprg) abort
     if type(a:grepprg) == v:t_list
         return a:grepprg
-    elseif type(a:grepprg) == v:t_dict
-        return [a:grepprg.cmd]->extend(get(a:grepprg, 'args', []))
+    endif
+    let l:new_grepprg = a:grepprg
+    if type(a:grepprg) != v:t_string || empty(a:grepprg)
+        let l:new_grepprg = &grepprg
     endif
     let l:cmd = []
-    for l:token in split(a:grepprg, '\s\+')
+    for l:token in split(l:new_grepprg, '\s\+')
         if l:token !~# '^[$%]'
             call add(l:cmd, l:token)
         endif
@@ -50,20 +54,16 @@ function! s:ExtractOptions(opts) abort
     let l:options = extend({
                 \ 'quickfix': 1,
                 \ 'path': [],
+                \ 'escape': '\',
                 \ 'grepprg': &grepprg,
                 \ 'grepformat': &grepformat,
-                \ 'cword': 0,
+                \ 'append': 0,
                 \ 'async': 1,
                 \ }, deepcopy(a:opts))
+
     let l:options.args = get(l:options, 'args', [])
     call filter(l:options.args, '!empty(v:val)')
-    if empty(l:options.args)
-        let l:options.cword = 1
-        let l:cword = expand('<cword>')
-        if !empty(l:cword)
-            let l:options.args = [shellescape('\b' .. l:cword .. '\b')]
-        endif
-    endif
+
     if empty(l:options.path)
         let l:options.path = []
     elseif type(l:options.path) == v:t_string
@@ -72,35 +72,63 @@ function! s:ExtractOptions(opts) abort
         let l:options.path = []
     endif
     call filter(l:options.path, '!empty(v:val)')
-    let l:options.grep_cmd = s:BuildGrepCmd(l:options.grepprg)
+
+    let l:options.grepprg = s:BuildGrepprg(l:options.grepprg)
+
     return l:options
 endfunction
 
+function! s:BuildEscapedArgs(args, chars) abort
+    return mapnew(a:args, 'escape(v:val, a:chars)')
+endfunction
+
+function! s:BuildEscapedPath(paths) abort
+    return mapnew(a:paths, 'fnameescape(v:val)')
+endfunction
+
 function! s:OnJobExit(opts, job, status) abort
-    if a:status == 0 || a:status == 1
-        if a:opts.quickfix
-            call zero#grep#OpenQuickfix()
-        else
-            call zero#grep#OpenLocationList()
+    try
+        if a:status < 0
+            return
         endif
-    else
-        echoerr 'Grep failed with error code:' status
-    endif
+        if a:status == 0 || a:status == 1
+            if a:opts.quickfix
+                call zero#grep#OpenQuickfix()
+            else
+                call zero#grep#OpenLocationList()
+            endif
+        else
+            echoerr 'Grep failed with error code:' status
+        endif
+    finally
+        let s:current_job = v:null
+    endtry
 endfunction
 
 function! s:ExecAsync(opts = {}) abort
-    let l:cmd = join(a:opts.grep_cmd + a:opts.args + mapnew(a:opts.path, 'fnameescape(v:val)'), ' ')
-
+    let l:title = join(a:opts.grepprg + a:opts.args + a:opts.path, ' ')
     let l:efm = a:opts.grepformat
-
     if a:opts.quickfix
-        call setqflist([], 'r', { 'items': [], 'title': l:cmd })
+        if a:opts.append
+            call setqflist([], 'a', { 'title': l:title })
+        else
+            call setqflist([], 'r', { 'items': [], 'title': l:title })
+        endif
         let l:OnJobOut = {_channel, msg -> setqflist([], 'a', { 'lines': [msg], 'efm': l:efm })}
     else
-        call setloclist(0, [], 'r', { 'items': [], 'title': l:cmd })
+        if a:opts.append
+            call setloclist(0, [], 'a', { 'title': l:title })
+        else
+            call setloclist(0, [], 'r', { 'items': [], 'title': l:title })
+        endif
         let l:OnJobOut = {_channel, msg -> setloclist(0, [], 'a', { 'lines': [msg], 'efm': l:efm })}
     endif
 
+    if exists('s:current_job') && type(s:current_job) == v:t_job && job_status(s:current_job) ==# 'run'
+        call job_stop(s:current_job)
+    endif
+
+    let l:cmd = join(a:opts.grepprg + a:opts.args + s:BuildEscapedPath(a:opts.path), ' ')
     let s:current_job = job_start([&shell, &shellcmdflag, l:cmd], {
                 \ 'in_io': 'null',
                 \ 'err_io': 'out',
@@ -110,18 +138,27 @@ function! s:ExecAsync(opts = {}) abort
 endfunction
 
 function! s:ExecSync(opts = {}) abort
-    let l:cmd = join(a:opts.grep_cmd + a:opts.args + mapnew(a:opts.path, 'fnameescape(v:val)'), ' ')
+    let l:title = join(a:opts.grepprg + a:opts.args + a:opts.path, ' ')
+    let l:cmd = join(a:opts.grepprg + a:opts.args + s:BuildEscapedPath(a:opts.path), ' ')
 
     let l:errorformat = &errorformat
     try
         let &errorformat = a:opts.grepformat
         if a:opts.quickfix
-            cgetexpr system(l:cmd)
-            call setqflist([], 'a', { 'title': l:cmd })
+            if a:opts.append
+                caddexpr system(l:cmd)
+            else
+                cgetexpr system(l:cmd)
+            endif
+            call setqflist([], 'a', { 'title': l:title })
             call zero#grep#OpenQuickfix()
         else
-            lgetexpr system(l:cmd)
-            call setloclist(0, [], 'a', { 'title': l:cmd })
+            if a:opts.append
+                laddexpr system(l:cmd)
+            else
+                lgetexpr system(l:cmd)
+            endif
+            call setloclist(0, [], 'a', { 'title': l:title })
             call zero#grep#OpenLocationList()
         endif
     finally
@@ -132,7 +169,7 @@ endfunction
 function! zero#grep#Exec(opts = {}) abort
     let l:options = s:ExtractOptions(a:opts)
 
-    if empty(l:options.args)
+    if empty(l:options.grepprg) || empty(l:options.args)
         return
     endif
 

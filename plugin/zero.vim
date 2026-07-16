@@ -47,13 +47,13 @@ if get(g:, 'zero_grep_auto_open_quickfix', 0)
 endif
 
 if get(g:, 'zero_grep_user_commands', 1)
-    command! -nargs=* -complete=file_in_path Grep           call zero#grep#Grep(<f-args>)
-    command! -nargs=* -complete=file_in_path LGrep          call zero#grep#LGrep(<f-args>)
-    command! -nargs=*                        BGrep          call zero#grep#BGrep(<f-args>)
-    command! -nargs=*                        GrepProject    call zero#grep#GrepProject(<f-args>)
-    command! -nargs=*                        LGrepProject   call zero#grep#LGrepProject(<f-args>)
-    command! -nargs=*                        GrepBufferDir  call zero#grep#GrepBufferDir(<f-args>)
-    command! -nargs=*                        LGrepBufferDir call zero#grep#LGrepBufferDir(<f-args>)
+    command! -nargs=* -complete=file_in_path Grep           call zero#grep#Grep(<q-args>)
+    command! -nargs=* -complete=file_in_path LGrep          call zero#grep#LGrep(<q-args>)
+    command! -nargs=*                        BGrep          call zero#grep#BGrep(<q-args>)
+    command! -nargs=*                        GrepProject    call zero#grep#GrepProject(<q-args>)
+    command! -nargs=*                        LGrepProject   call zero#grep#LGrepProject(<q-args>)
+    command! -nargs=*                        GrepBufferDir  call zero#grep#GrepBufferDir(<q-args>)
+    command! -nargs=*                        LGrepBufferDir call zero#grep#LGrepBufferDir(<q-args>)
 endif
 
 " Restore cpoptions
