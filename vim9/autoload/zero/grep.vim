@@ -100,18 +100,16 @@ def ExecAsync(opts: dict<any> = {}): void
     const efm = opts.grepformat
     var OnJobOut: any
     if opts.quickfix
-        if opts.append
-            setqflist([], 'a', { 'title': title })
-        else
-            setqflist([], 'r', { 'items': [], 'title': title })
+        if !opts.append
+            setqflist([])
         endif
+        setqflist([], 'a', { 'title': title })
         OnJobOut = (_channel, msg) => setqflist([], 'a', { 'lines': [msg], 'efm': efm })
     else
-        if opts.append
-            setloclist(0, [], 'a', { 'title': title })
-        else
-            setloclist(0, [], 'r', { 'items': [], 'title': title })
+        if !opts.append
+            setloclist(0, [])
         endif
+        setloclist(0, [], 'a', { 'title': title })
         OnJobOut = (_channel, msg) => setloclist(0, [], 'a', { 'lines': [msg], 'efm': efm })
     endif
 

@@ -106,11 +106,10 @@ function Grep:execute_async()
   local efm = self.grepformat
   local on_stdout
   if self.quickfix then
-    if self.append then
-      vim.fn.setqflist({}, "a", { title = title })
-    else
-      vim.fn.setqflist({}, "r", { items = {}, title = title })
+    if not self.append then
+      vim.fn.setqflist({})
     end
+    vim.fn.setqflist({}, "a", { title = title })
     on_stdout = function(_, data)
       if data and data ~= "" then
         vim.schedule(function()
@@ -120,11 +119,10 @@ function Grep:execute_async()
       end
     end
   else
-    if self.append then
-      vim.fn.setloclist(0, {}, "a", { title = title })
-    else
-      vim.fn.setloclist(0, {}, "r", { items = {}, title = title })
+    if not self.append then
+      vim.fn.setloclist(0, {})
     end
+    vim.fn.setloclist(0, {}, "a", { title = title })
     on_stdout = function(_, data)
       if data and data ~= "" then
         vim.schedule(function()

@@ -104,18 +104,16 @@ function! s:ExecAsync(opts = {}) abort
     let l:title = join(a:opts.grepprg + a:opts.args + a:opts.path, ' ')
     let l:efm = a:opts.grepformat
     if a:opts.quickfix
-        if a:opts.append
-            call setqflist([], 'a', { 'title': l:title })
-        else
-            call setqflist([], 'r', { 'items': [], 'title': l:title })
+        if !a:opts.append
+            call setqflist([])
         endif
+        call setqflist([], 'a', { 'title': l:title })
         let l:OnJobOut = {_channel, msg -> setqflist([], 'a', { 'lines': [msg], 'efm': l:efm })}
     else
-        if a:opts.append
-            call setloclist(0, [], 'a', { 'title': l:title })
-        else
-            call setloclist(0, [], 'r', { 'items': [], 'title': l:title })
+        if !a:opts.append
+            call setloclist(0, [])
         endif
+        call setloclist(0, [], 'a', { 'title': l:title })
         let l:OnJobOut = {_channel, msg -> setloclist(0, [], 'a', { 'lines': [msg], 'efm': l:efm })}
     endif
 
