@@ -302,7 +302,7 @@ M.gen_ai_spec.comment = function()
           table.insert(regions, { from = { line = c.line, col = from_col }, to = { line = c.line, col = to_col }, vis_mode = 'v' })
         end
       else
-        table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end } })
+        table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end }, vis_mode = 'v' })
       end
     end
 
@@ -321,7 +321,7 @@ M.gen_ai_spec.comment = function()
             table.insert(regions, { from = { line = c.line, col = from_col }, to = { line = c.line, col = to_col }, vis_mode = 'v' })
           end
         else
-          table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end } })
+          table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end }, vis_mode = 'v' })
         end
       end
     end
