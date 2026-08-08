@@ -137,6 +137,7 @@ local function simple_comment_inner(lines, start_line, end_line, leader)
   return {
     from = { line = start_line, col = first_content_col or 1 },
     to = { line = end_line, col = math.max(last_col, 1) },
+    vis_mode = 'v',
   }
 end
 
@@ -160,6 +161,11 @@ local function paired_comment_inner(lines, start_line, end_line, open, close)
     if to_col < from_col then
       return nil
     end
+    return {
+      from = { line = from_line, col = from_col },
+      to = { line = to_line, col = to_col },
+      vis_mode = 'v',
+    }
   else
     -- Multi-line: first non-blank char after open, last non-blank char before close
     from_line = start_line
@@ -186,6 +192,7 @@ local function paired_comment_inner(lines, start_line, end_line, open, close)
   return {
     from = { line = from_line, col = from_col },
     to = { line = to_line, col = math.max(to_col, 1) },
+    vis_mode = 'v',
   }
 end
 
