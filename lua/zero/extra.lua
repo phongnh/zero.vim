@@ -62,20 +62,35 @@ local function get_comment_leaders()
   return simple, paired
 end
 
+-- Returns the simple leader that matches at the start of the given line, or nil.
+local function match_simple_leader(line, simple_leaders)
+  for _, leader in ipairs(simple_leaders) do
+    if line:match('^%s*' .. vim.pesc(leader)) then
+      return leader
+    end
+  end
+  return nil
+end
+
 -- Find a contiguous block of simple comment lines that includes lnum.
-local function find_simple_comment_block(lnum, simple_re)
-  if not vim.fn.getline(lnum):match(simple_re) then
+-- Returns start_line, end_line, matched_leader or nil.
+local function find_simple_comment_block(lnum, simple_leaders)
+  local line = vim.fn.getline(lnum)
+  local leader = match_simple_leader(line, simple_leaders)
+  if not leader then
     return nil
   end
+
+  local leader_re = '^%s*' .. vim.pesc(leader)
   local start_line = lnum
-  while start_line > 1 and vim.fn.getline(start_line - 1):match(simple_re) do
+  while start_line > 1 and vim.fn.getline(start_line - 1):match(leader_re) do
     start_line = start_line - 1
   end
   local end_line = lnum
-  while end_line < vim.fn.line('$') and vim.fn.getline(end_line + 1):match(simple_re) do
+  while end_line < vim.fn.line('$') and vim.fn.getline(end_line + 1):match(leader_re) do
     end_line = end_line + 1
   end
-  return start_line, end_line
+  return start_line, end_line, leader
 end
 
 -- Find a paired comment block (/* ... */) that contains lnum, or the nearest one above
@@ -116,20 +131,18 @@ local function find_paired_comment_block(lnum, open, close, upwards)
   end
 end
 
--- Build the inner region for a simple comment block: strip leaders and trailing whitespace.
-local function simple_comment_inner(start_line, end_line, simple_leaders)
+-- Build the inner region for a simple comment block: strip leader and trailing whitespace.
+local function simple_comment_inner(start_line, end_line, leader)
+  local leader_re = '^%s*' .. vim.pesc(leader)
   local first_content_col = nil
   for ln = start_line, end_line do
     local line = vim.fn.getline(ln)
-    for _, leader in ipairs(simple_leaders) do
-      local _, e = line:find('^%s*' .. vim.pesc(leader))
-      if e then
-        local rest = line:sub(e + 1)
-        local trimmed_start = rest:find('%S')
-        if trimmed_start and not first_content_col then
-          first_content_col = e + trimmed_start
-        end
-        break
+    local _, e = line:find(leader_re)
+    if e then
+      local rest = line:sub(e + 1)
+      local trimmed_start = rest:find('%S')
+      if trimmed_start and not first_content_col then
+        first_content_col = e + trimmed_start
       end
     end
   end
@@ -151,7 +164,7 @@ local function paired_comment_inner(start_line, end_line, open, close)
   local from_line, from_col, to_line, to_col
 
   if nonws and start_line == end_line then
-    -- Single-line paired comment: /* content */
+    -- Single-line: /* content */
     local close_line = vim.fn.getline(end_line)
     local cs = close_line:find('%s*' .. vim.pesc(close) .. '%s*$')
     from_line = start_line
@@ -202,29 +215,20 @@ M.gen_ai_spec.comment = function()
 
     local lnum = vim.fn.line('.')
 
-    -- Build a combined Lua pattern that matches any simple leader at line start
-    local simple_re = nil
-    if #simple_leaders > 0 then
-      local parts = vim.tbl_map(vim.pesc, simple_leaders)
-      simple_re = '^%s*(' .. table.concat(parts, '|') .. ')'
-    end
-
     -- 1. Try simple line comment at cursor
-    if simple_re then
-      local start_line, end_line = find_simple_comment_block(lnum, simple_re)
-      if start_line then
-        if ai_type == 'i' then
-          return simple_comment_inner(start_line, end_line, simple_leaders)
-        else
-          local end_col = #vim.fn.getline(end_line)
-          return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
-        end
+    local start_line, end_line, leader = find_simple_comment_block(lnum, simple_leaders)
+    if start_line then
+      if ai_type == 'i' then
+        return simple_comment_inner(start_line, end_line, leader)
+      else
+        local end_col = #vim.fn.getline(end_line)
+        return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
       end
     end
 
-    -- 2. Try paired comment containing or surrounding cursor
+    -- 2. Try paired comment containing cursor
     for _, pair in ipairs(paired_leaders) do
-      local start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, false)
+      start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, false)
       if start_line then
         if ai_type == 'i' then
           return paired_comment_inner(start_line, end_line, pair.open, pair.close)
@@ -235,21 +239,17 @@ M.gen_ai_spec.comment = function()
       end
     end
 
-    -- 3. Search upward for nearest comment
-    if simple_re then
-      for ln = lnum - 1, 1, -1 do
-        if vim.fn.getline(ln):match(simple_re) then
-          local start_line, end_line = find_simple_comment_block(ln, simple_re)
-          if start_line then
-            local end_col = #vim.fn.getline(end_line)
-            return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
-          end
-        end
+    -- 3. Search upward for nearest comment (simple first, then paired)
+    for ln = lnum - 1, 1, -1 do
+      start_line, end_line, leader = find_simple_comment_block(ln, simple_leaders)
+      if start_line then
+        local end_col = #vim.fn.getline(end_line)
+        return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
       end
     end
 
     for _, pair in ipairs(paired_leaders) do
-      local start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, true)
+      start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, true)
       if start_line then
         local end_col = #vim.fn.getline(end_line)
         return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
