@@ -215,6 +215,7 @@ M.gen_ai_spec.comment = function()
         table.insert(regions, {
           from = { line = block.start_line, col = 1 },
           to = { line = block.end_line, col = math.max(end_col, 1) },
+          vis_mode = 'V',
         })
       end
     end
@@ -231,6 +232,7 @@ M.gen_ai_spec.comment = function()
           table.insert(regions, {
             from = { line = block.start_line, col = 1 },
             to = { line = block.end_line, col = math.max(end_col, 1) },
+            vis_mode = block.start_line ~= block.end_line and 'V' or nil,
           })
         end
       end
