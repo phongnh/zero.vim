@@ -95,3 +95,41 @@ Because the spec function returns **all** comment regions in the buffer as an ar
 - `vim.pesc` is used for all pattern escaping.
 - Simple leader flag check uses `^[bnOf]*$` (strict — excludes middle-of-block `m`, start `s`, end `e` markers).
 - Regions are sorted by `(from.line, from.col)` before being returned so `mini.ai` search works correctly.
+
+## Known differences from vim-textobj-comment
+
+### Consecutive single-line `/* */` blocks are not merged
+
+The original `vim-textobj-comment` merges adjacent single-line paired comments into one block:
+
+```c
+/* line one */
+/* line two */   ← treated as one big comment by vim-textobj-comment
+/* line three */
+```
+
+With `vim-textobj-comment`, `ac` on any of these lines selects all three. In this implementation each `/* ... */` is returned as a **separate region**. This was a deliberate choice — separate regions are more flexible with `mini.ai`'s next/last navigation (`anc`/`alc` can target each block individually).
+
+If you want to implement merging later, the algorithm from `vim-textobj-comment`'s `s:FindNearestPair()` is:
+
+```vim
+" After finding a single-line paired block at [start, end] where start == end:
+" Walk upward from start, merging consecutive single-line blocks
+let ln = start[0] - 1
+while ln > 0
+  let col = match(getline(ln), startre)   " startre matches /^...*end..$/
+  if col < 0 | break | endif
+  let [start[0], start[1]] = [ln, col+1]
+  let ln -= 1
+endwhile
+" Walk downward from end, merging consecutive single-line blocks
+let ln = end[0] + 1
+while ln <= line("$")
+  let col = match(getline(ln), endre)
+  if col < 0 | break | endif
+  let [end[0], end[1]] = [ln, col+1]
+  let ln += 1
+endwhile
+```
+
+In Lua, this would be applied inside `find_all_paired_comment_blocks` after a single-line block (`start_line == end_line`) is found: walk up/down merging adjacent single-line `/* */` lines before appending to `blocks`.
