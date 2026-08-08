@@ -9,9 +9,9 @@ A port of [vim-textobj-comment](https://github.com/glts/vim-textobj-comment) to 
 ### Usage
 
 ```lua
-require('mini.ai').setup({
+require("mini.ai").setup({
   custom_textobjects = {
-    c = require('zero.extra').gen_ai_spec.comment(),
+    c = require("zero.extra").gen_ai_spec.comment(),
   },
 })
 ```
@@ -138,9 +138,9 @@ In Lua, replace `find_all_paired_comment_blocks` with this version that merges a
 local function find_all_paired_comment_blocks(lines, open, close)
   local blocks = {}
   local total = #lines
-  local open_re = '^%s*' .. vim.pesc(open)
-  local close_re = vim.pesc(close) .. '%s*$'
-  local single_re = '^%s*' .. vim.pesc(open) .. '.-' .. vim.pesc(close) .. '%s*$'
+  local open_re = "^%s*" .. vim.pesc(open)
+  local close_re = vim.pesc(close) .. "%s*$"
+  local single_re = "^%s*" .. vim.pesc(open) .. ".-" .. vim.pesc(close) .. "%s*$"
   local ln = 1
   while ln <= total do
     if lines[ln]:match(open_re) then
