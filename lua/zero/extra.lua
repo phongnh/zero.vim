@@ -69,16 +69,16 @@ end
 
 -- Scan the whole buffer and return all contiguous simple comment blocks as
 -- a list of {start_line, end_line, leader}.
-local function find_all_simple_comment_blocks(simple_leaders)
+local function find_all_simple_comment_blocks(lines, simple_leaders)
   local blocks = {}
-  local total = vim.fn.line('$')
+  local total = #lines
   local ln = 1
   while ln <= total do
-    local leader = match_simple_leader(vim.fn.getline(ln), simple_leaders)
+    local leader = match_simple_leader(lines[ln], simple_leaders)
     if leader then
       local leader_re = '^%s*' .. vim.pesc(leader)
       local start_line = ln
-      while ln < total and vim.fn.getline(ln + 1):match(leader_re) do
+      while ln < total and lines[ln + 1]:match(leader_re) do
         ln = ln + 1
       end
       table.insert(blocks, { start_line = start_line, end_line = ln, leader = leader })
@@ -90,18 +90,18 @@ end
 
 -- Scan the whole buffer and return all paired comment blocks (/* ... */) as
 -- a list of {start_line, end_line}.
-local function find_all_paired_comment_blocks(open, close)
+local function find_all_paired_comment_blocks(lines, open, close)
   local blocks = {}
-  local total = vim.fn.line('$')
+  local total = #lines
   local open_re = '^%s*' .. vim.pesc(open)
   local close_re = vim.pesc(close) .. '%s*$'
   local ln = 1
   while ln <= total do
-    if vim.fn.getline(ln):match(open_re) then
+    if lines[ln]:match(open_re) then
       local start_line = ln
       local found = false
       for el = ln, total do
-        if vim.fn.getline(el):match(close_re) then
+        if lines[el]:match(close_re) then
           table.insert(blocks, { start_line = start_line, end_line = el })
           ln = el
           found = true
@@ -118,11 +118,11 @@ local function find_all_paired_comment_blocks(open, close)
 end
 
 -- Build the inner region for a simple comment block: strip leader and trailing whitespace.
-local function simple_comment_inner(start_line, end_line, leader)
+local function simple_comment_inner(lines, start_line, end_line, leader)
   local leader_re = '^%s*' .. vim.pesc(leader)
   local first_content_col = nil
   for ln = start_line, end_line do
-    local line = vim.fn.getline(ln)
+    local line = lines[ln]
     local _, e = line:find(leader_re)
     if e then
       local rest = line:sub(e + 1)
@@ -132,7 +132,7 @@ local function simple_comment_inner(start_line, end_line, leader)
       end
     end
   end
-  local last_line = vim.fn.getline(end_line)
+  local last_line = lines[end_line]
   local last_col = #last_line:match('(.-)%s*$')
   return {
     from = { line = start_line, col = first_content_col or 1 },
@@ -141,8 +141,8 @@ local function simple_comment_inner(start_line, end_line, leader)
 end
 
 -- Build the inner region for a paired comment block: skip open/close delimiters.
-local function paired_comment_inner(start_line, end_line, open, close)
-  local open_line = vim.fn.getline(start_line)
+local function paired_comment_inner(lines, start_line, end_line, open, close)
+  local open_line = lines[start_line]
   local _, oe = open_line:find(vim.pesc(open))
   local rest_after_open = open_line:sub((oe or 0) + 1)
   local nonws = rest_after_open:find('%S')
@@ -151,7 +151,7 @@ local function paired_comment_inner(start_line, end_line, open, close)
 
   if nonws and start_line == end_line then
     -- Single-line: /* content */
-    local close_line = vim.fn.getline(end_line)
+    local close_line = lines[end_line]
     local cs = close_line:find('%s*' .. vim.pesc(close) .. '%s*$')
     from_line = start_line
     from_col = (oe or 0) + nonws
@@ -167,10 +167,10 @@ local function paired_comment_inner(start_line, end_line, open, close)
     if not nonws then
       -- open delimiter is alone on its line; content starts on the next line
       from_line = start_line + 1
-      local next_line = vim.fn.getline(from_line)
+      local next_line = lines[from_line]
       from_col = next_line:find('%S') or 1
     end
-    local close_line_str = vim.fn.getline(end_line)
+    local close_line_str = lines[end_line]
     local cs = close_line_str:find('%s*' .. vim.pesc(close) .. '%s*$')
     local content_before_close = close_line_str:sub(1, (cs or #close_line_str + 1) - 1)
     local last_nonws = #content_before_close:match('(.-)%s*$')
@@ -178,7 +178,7 @@ local function paired_comment_inner(start_line, end_line, open, close)
     to_col = last_nonws
     if last_nonws == 0 then
       to_line = end_line - 1
-      local prev = vim.fn.getline(to_line)
+      local prev = lines[to_line]
       to_col = #prev:match('(.-)%s*$')
     end
   end
@@ -201,16 +201,17 @@ M.gen_ai_spec.comment = function()
       return nil
     end
 
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     local regions = {}
 
-    for _, block in ipairs(find_all_simple_comment_blocks(simple_leaders)) do
+    for _, block in ipairs(find_all_simple_comment_blocks(lines, simple_leaders)) do
       if ai_type == 'i' then
-        local region = simple_comment_inner(block.start_line, block.end_line, block.leader)
+        local region = simple_comment_inner(lines, block.start_line, block.end_line, block.leader)
         if region then
           table.insert(regions, region)
         end
       else
-        local end_col = #vim.fn.getline(block.end_line)
+        local end_col = #lines[block.end_line]
         table.insert(regions, {
           from = { line = block.start_line, col = 1 },
           to = { line = block.end_line, col = math.max(end_col, 1) },
@@ -219,14 +220,14 @@ M.gen_ai_spec.comment = function()
     end
 
     for _, pair in ipairs(paired_leaders) do
-      for _, block in ipairs(find_all_paired_comment_blocks(pair.open, pair.close)) do
+      for _, block in ipairs(find_all_paired_comment_blocks(lines, pair.open, pair.close)) do
         if ai_type == 'i' then
-          local region = paired_comment_inner(block.start_line, block.end_line, pair.open, pair.close)
+          local region = paired_comment_inner(lines, block.start_line, block.end_line, pair.open, pair.close)
           if region then
             table.insert(regions, region)
           end
         else
-          local end_col = #vim.fn.getline(block.end_line)
+          local end_col = #lines[block.end_line]
           table.insert(regions, {
             from = { line = block.start_line, col = 1 },
             to = { line = block.end_line, col = math.max(end_col, 1) },
