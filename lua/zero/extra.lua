@@ -72,63 +72,54 @@ local function match_simple_leader(line, simple_leaders)
   return nil
 end
 
--- Find a contiguous block of simple comment lines that includes lnum.
--- Returns start_line, end_line, matched_leader or nil.
-local function find_simple_comment_block(lnum, simple_leaders)
-  local line = vim.fn.getline(lnum)
-  local leader = match_simple_leader(line, simple_leaders)
-  if not leader then
-    return nil
+-- Scan the whole buffer and return all contiguous simple comment blocks as
+-- a list of {start_line, end_line, leader}.
+local function find_all_simple_comment_blocks(simple_leaders)
+  local blocks = {}
+  local total = vim.fn.line('$')
+  local ln = 1
+  while ln <= total do
+    local leader = match_simple_leader(vim.fn.getline(ln), simple_leaders)
+    if leader then
+      local leader_re = '^%s*' .. vim.pesc(leader)
+      local start_line = ln
+      while ln < total and vim.fn.getline(ln + 1):match(leader_re) do
+        ln = ln + 1
+      end
+      table.insert(blocks, { start_line = start_line, end_line = ln, leader = leader })
+    end
+    ln = ln + 1
   end
-
-  local leader_re = '^%s*' .. vim.pesc(leader)
-  local start_line = lnum
-  while start_line > 1 and vim.fn.getline(start_line - 1):match(leader_re) do
-    start_line = start_line - 1
-  end
-  local end_line = lnum
-  while end_line < vim.fn.line('$') and vim.fn.getline(end_line + 1):match(leader_re) do
-    end_line = end_line + 1
-  end
-  return start_line, end_line, leader
+  return blocks
 end
 
--- Find a paired comment block (/* ... */) that contains lnum, or the nearest one above
--- when upwards=true.
-local function find_paired_comment_block(lnum, open, close, upwards)
+-- Scan the whole buffer and return all paired comment blocks (/* ... */) as
+-- a list of {start_line, end_line}.
+local function find_all_paired_comment_blocks(open, close)
+  local blocks = {}
+  local total = vim.fn.line('$')
   local open_re = '^%s*' .. vim.pesc(open)
   local close_re = vim.pesc(close) .. '%s*$'
-  local total = vim.fn.line('$')
-
-  if upwards then
-    for ln = lnum - 1, 1, -1 do
-      if vim.fn.getline(ln):match(close_re) then
-        local end_line = ln
-        for sl = ln, 1, -1 do
-          if vim.fn.getline(sl):match(open_re) then
-            return sl, end_line
-          end
+  local ln = 1
+  while ln <= total do
+    if vim.fn.getline(ln):match(open_re) then
+      local start_line = ln
+      local found = false
+      for el = ln, total do
+        if vim.fn.getline(el):match(close_re) then
+          table.insert(blocks, { start_line = start_line, end_line = el })
+          ln = el
+          found = true
+          break
         end
       end
-    end
-    return nil
-  else
-    for ln = lnum, total do
-      if vim.fn.getline(ln):match(close_re) then
-        local end_line = ln
-        for sl = end_line, 1, -1 do
-          if vim.fn.getline(sl):match(open_re) then
-            if sl <= lnum then
-              return sl, end_line
-            end
-            break
-          end
-        end
+      if not found then
         break
       end
     end
-    return nil
+    ln = ln + 1
   end
+  return blocks
 end
 
 -- Build the inner region for a simple comment block: strip leader and trailing whitespace.
@@ -206,6 +197,8 @@ end
 -- Port of vim-textobj-comment to mini.ai textobject specification.
 -- Supports both simple (// ...) and paired (/* ... */) comment delimiters.
 -- Uses the 'comments' and 'commentstring' options to determine comment leaders.
+-- Returns all comment regions in the buffer so mini.ai can apply its
+-- cover/next/prev/nearest search methods (enabling next/last variants).
 M.gen_ai_spec.comment = function()
   return function(ai_type)
     local simple_leaders, paired_leaders = get_comment_leaders()
@@ -213,50 +206,49 @@ M.gen_ai_spec.comment = function()
       return nil
     end
 
-    local lnum = vim.fn.line('.')
+    local regions = {}
 
-    -- 1. Try simple line comment at cursor
-    local start_line, end_line, leader = find_simple_comment_block(lnum, simple_leaders)
-    if start_line then
+    for _, block in ipairs(find_all_simple_comment_blocks(simple_leaders)) do
       if ai_type == 'i' then
-        return simple_comment_inner(start_line, end_line, leader)
+        local region = simple_comment_inner(block.start_line, block.end_line, block.leader)
+        if region then
+          table.insert(regions, region)
+        end
       else
-        local end_col = #vim.fn.getline(end_line)
-        return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
+        local end_col = #vim.fn.getline(block.end_line)
+        table.insert(regions, {
+          from = { line = block.start_line, col = 1 },
+          to = { line = block.end_line, col = math.max(end_col, 1) },
+        })
       end
     end
 
-    -- 2. Try paired comment containing cursor
     for _, pair in ipairs(paired_leaders) do
-      start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, false)
-      if start_line then
+      for _, block in ipairs(find_all_paired_comment_blocks(pair.open, pair.close)) do
         if ai_type == 'i' then
-          return paired_comment_inner(start_line, end_line, pair.open, pair.close)
+          local region = paired_comment_inner(block.start_line, block.end_line, pair.open, pair.close)
+          if region then
+            table.insert(regions, region)
+          end
         else
-          local end_col = #vim.fn.getline(end_line)
-          return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
+          local end_col = #vim.fn.getline(block.end_line)
+          table.insert(regions, {
+            from = { line = block.start_line, col = 1 },
+            to = { line = block.end_line, col = math.max(end_col, 1) },
+          })
         end
       end
     end
 
-    -- 3. Search upward for nearest comment (simple first, then paired)
-    for ln = lnum - 1, 1, -1 do
-      start_line, end_line, leader = find_simple_comment_block(ln, simple_leaders)
-      if start_line then
-        local end_col = #vim.fn.getline(end_line)
-        return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
+    -- Sort regions by start position so mini.ai search works correctly
+    table.sort(regions, function(a, b)
+      if a.from.line ~= b.from.line then
+        return a.from.line < b.from.line
       end
-    end
+      return a.from.col < b.from.col
+    end)
 
-    for _, pair in ipairs(paired_leaders) do
-      start_line, end_line = find_paired_comment_block(lnum, pair.open, pair.close, true)
-      if start_line then
-        local end_col = #vim.fn.getline(end_line)
-        return { from = { line = start_line, col = 1 }, to = { line = end_line, col = math.max(end_col, 1) } }
-      end
-    end
-
-    return nil
+    return regions
   end
 end
 
