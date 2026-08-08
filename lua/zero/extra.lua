@@ -48,8 +48,8 @@ local function get_comment_leaders()
   end
 
   for _, l in ipairs(leaders) do
-    -- Simple leaders have flags that contain only b, n, O or are empty (no s/e/m)
-    if not l.flags:match('[sem]') then
+    -- Simple leaders have flags that are empty or contain only b, n, O, f characters
+    if l.flags:match('^[bnOf]*$') then
       table.insert(simple, l.leader)
     end
   end
