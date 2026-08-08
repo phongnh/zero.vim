@@ -132,4 +132,48 @@ while ln <= line("$")
 endwhile
 ```
 
-In Lua, this would be applied inside `find_all_paired_comment_blocks` after a single-line block (`start_line == end_line`) is found: walk up/down merging adjacent single-line `/* */` lines before appending to `blocks`.
+In Lua, replace `find_all_paired_comment_blocks` with this version that merges adjacent single-line blocks:
+
+```lua
+local function find_all_paired_comment_blocks(lines, open, close)
+  local blocks = {}
+  local total = #lines
+  local open_re = '^%s*' .. vim.pesc(open)
+  local close_re = vim.pesc(close) .. '%s*$'
+  local single_re = '^%s*' .. vim.pesc(open) .. '.-' .. vim.pesc(close) .. '%s*$'
+  local ln = 1
+  while ln <= total do
+    if lines[ln]:match(open_re) then
+      local start_line = ln
+      local found = false
+      for el = ln, total do
+        if lines[el]:match(close_re) then
+          local sl, end_line = start_line, el
+          -- Merge consecutive single-line /* */ blocks
+          if sl == end_line then
+            local up = sl - 1
+            while up >= 1 and lines[up]:match(single_re) do
+              sl = up
+              up = up - 1
+            end
+            local down = end_line + 1
+            while down <= total and lines[down]:match(single_re) do
+              end_line = down
+              down = down + 1
+            end
+          end
+          table.insert(blocks, { start_line = sl, end_line = end_line })
+          ln = end_line
+          found = true
+          break
+        end
+      end
+      if not found then break end
+    end
+    ln = ln + 1
+  end
+  return blocks
+end
+```
+
+Note: with merging enabled, `anc`/`alc` will treat the merged group as one unit, losing the ability to target individual `/* */` lines.
