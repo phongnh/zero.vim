@@ -117,6 +117,51 @@ local function find_all_paired_comment_blocks(lines, open, close)
   return blocks
 end
 
+-- Scan each line for inline/end-of-line simple comments (leader not at line start).
+-- e.g. "code  // trailing comment" or "code  # remark"
+-- Returns a list of {line, col_start, col_end, leader}.
+local function find_all_inline_simple_comments(lines, simple_leaders)
+  local results = {}
+  for ln, line in ipairs(lines) do
+    -- Skip pure comment lines (already handled by find_all_simple_comment_blocks)
+    if not match_simple_leader(line, simple_leaders) then
+      for _, leader in ipairs(simple_leaders) do
+        local col = line:find(vim.pesc(leader))
+        if col and col > 1 then
+          table.insert(results, { line = ln, col_start = col, col_end = #line, leader = leader })
+          break -- take the first matching leader per line
+        end
+      end
+    end
+  end
+  return results
+end
+
+-- Scan each line for inline paired comments (/* ... */ not at line start).
+-- Returns a list of {line, col_start, col_end, open, close}.
+local function find_all_inline_paired_comments(lines, open, close)
+  local results = {}
+  local esc_open = vim.pesc(open)
+  local esc_close = vim.pesc(close)
+  local open_re = '^%s*' .. esc_open
+  for ln, line in ipairs(lines) do
+    -- Skip lines where the open is at line start (handled by paired block scanner)
+    if not line:match(open_re) then
+      local pos = 1
+      while true do
+        local s = line:find(esc_open, pos)
+        if not s then break end
+        local e = line:find(esc_close, s + #open)
+        if not e then break end
+        local col_end = e + #close - 1
+        table.insert(results, { line = ln, col_start = s, col_end = col_end, open = open, close = close })
+        pos = col_end + 1
+      end
+    end
+  end
+  return results
+end
+
 -- Build the inner region for a simple comment block: strip leader and trailing whitespace.
 local function simple_comment_inner(lines, start_line, end_line, leader)
   local leader_re = '^%s*' .. vim.pesc(leader)
@@ -241,6 +286,42 @@ M.gen_ai_spec.comment = function()
             to = { line = block.end_line, col = math.max(end_col, 1) },
             vis_mode = block.start_line ~= block.end_line and 'V' or nil,
           })
+        end
+      end
+    end
+
+    -- Inline/end-of-line simple comments: "code  // remark"
+    for _, c in ipairs(find_all_inline_simple_comments(lines, simple_leaders)) do
+      if ai_type == 'i' then
+        local _, e = lines[c.line]:find('^%s*' .. vim.pesc(c.leader), c.col_start)
+        local rest = lines[c.line]:sub((e or c.col_start) + 1)
+        local trimmed = rest:find('%S')
+        local from_col = trimmed and (e or c.col_start) + trimmed or c.col_start
+        local to_col = #lines[c.line]:match('(.-)%s*$')
+        if from_col <= to_col then
+          table.insert(regions, { from = { line = c.line, col = from_col }, to = { line = c.line, col = to_col }, vis_mode = 'v' })
+        end
+      else
+        table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end } })
+      end
+    end
+
+    -- Inline paired comments: "code /* remark */ more"
+    for _, pair in ipairs(paired_leaders) do
+      for _, c in ipairs(find_all_inline_paired_comments(lines, pair.open, pair.close)) do
+        if ai_type == 'i' then
+          local from_col = c.col_start + #pair.open
+          local to_col = c.col_end - #pair.close
+          local inner = lines[c.line]:sub(from_col, to_col)
+          local lt = inner:match('^%s*')
+          local rt = inner:match('%s*$')
+          from_col = from_col + #lt
+          to_col = to_col - #rt
+          if from_col <= to_col then
+            table.insert(regions, { from = { line = c.line, col = from_col }, to = { line = c.line, col = to_col }, vis_mode = 'v' })
+          end
+        else
+          table.insert(regions, { from = { line = c.line, col = c.col_start }, to = { line = c.line, col = c.col_end } })
         end
       end
     end
