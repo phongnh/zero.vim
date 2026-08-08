@@ -40,15 +40,10 @@ local function get_comment_leaders()
     return l.flags:match('[se]')
   end, leaders)
 
-  local i = 1
-  while i <= #se_leaders do
-    local s = se_leaders[i]
-    local e = se_leaders[i + 1]
-    if s and e and s.flags:match('s') and e.flags:match('e') then
+  for i = 1, #se_leaders - 1 do
+    local s, e = se_leaders[i], se_leaders[i + 1]
+    if s.flags:match('s') and e.flags:match('e') then
       table.insert(paired, { open = s.leader, close = e.leader })
-      i = i + 2
-    else
-      i = i + 1
     end
   end
 
